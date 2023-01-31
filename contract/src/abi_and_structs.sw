@@ -25,8 +25,6 @@ abi GameContract {
     #[storage(read, write)]
     fn sell_item(food_type: FoodType, amount: u64);
 
-    // send to another account
-
     #[storage(read)]
     fn get_player(id: Identity) -> Player;
 
@@ -34,19 +32,23 @@ abi GameContract {
     fn get_seed_amount(id: Identity, item: FoodType) -> u64;
 
     #[storage(read)]
-    fn get_item_amount(id: Identity, item: FoodType) -> u64;
+    fn get_planted_seeds_length(id: Identity) -> u64;
 
-    fn get_timestamp() -> u64;
+    #[storage(read)]
+    fn get_item_amount(id: Identity, item: FoodType) -> u64;
 }
 
 pub struct Player {
     farming_skill: u64,
-    total_value_farmed: u64
+    total_value_sold: u64,
 }
 
 impl Player {
-    pub fn level_up_skill(ref mut self){
+    pub fn level_up_skill(ref mut self) {
         self.farming_skill += 1
+    }
+    pub fn increase_tvs(ref mut self, amount: u64) {
+        self.total_value_sold += amount;
     }
 }
 
@@ -58,4 +60,3 @@ pub struct Food {
     name: FoodType,
     time_planted: Option<u64>,
 }
-
