@@ -9,13 +9,14 @@ interface BuySeedsProps {
 
 const CONTRACT_ID = "0xd0e74f541f351bd435907631634dd320b7a8937b54f854e86e19372e22b3ad03"
 
-const price = 1;
 
 export default function BuySeeds({ contract }: BuySeedsProps) {
     const [amount, setAmount] = useState<string>("0");
     // TODO: update to global?
     const [loading, setLoading] = useState<boolean>(false);
     const [status, setStatus] = useState<'success' | 'error' | 'none'>('none');
+
+    let price = bn.parseUnits('0.00000075');
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -67,6 +68,7 @@ export default function BuySeeds({ contract }: BuySeedsProps) {
                                     onChange={(e) => setAmount(e.target.value)}
                                 />
                             </div>
+                            {/* {parseInt(amount) > 0 && <div>Price: {parseInt(amount) * 0.00000075}</div>} */}
                             <button type="submit">Buy Seeds</button>
                         </form>
                     </>

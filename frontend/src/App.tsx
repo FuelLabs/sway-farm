@@ -45,7 +45,7 @@ function App() {
       {Fuel ? (
         <div>
           {isConnected ? (
-            <Game contract={contract}/>
+            <Game contract={contract} />
           ) : (
             <div>
               <button onClick={() => Fuel.connect()}>Connect Wallet</button>

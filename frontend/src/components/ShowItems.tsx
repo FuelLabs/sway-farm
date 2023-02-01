@@ -30,7 +30,7 @@ export default function ShowItems({ contract }: ShowItemsProps) {
 
     return (
         <div>
-            {seeds && <div>Inventory: {parseFloat(seeds.format()) * 1_000_000_000}</div>}
+            {seeds && <div>Harvested Items: {parseFloat(seeds.format()) * 1_000_000_000}</div>}
         </div>
     )
 }

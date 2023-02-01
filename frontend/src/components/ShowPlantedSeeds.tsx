@@ -16,7 +16,7 @@ export default function ShowPlantedSeeds({ contract }: ShowPlantedSeedsProps) {
                     let address: AddressInput = { value: contract.wallet.address.toB256() }
                     let id: IdentityInput = { Address: address };
                     let { value } = await contract.functions.get_planted_seeds_length(id).get();
-                    let len = parseFloat(value.format()) * 1_000_000_000 + 20
+                    let len = parseFloat(value.format()) * 1_000_000_000;
                     console.log("LENGTH:", len)
                     setLength(len);
                 } catch (err) {
