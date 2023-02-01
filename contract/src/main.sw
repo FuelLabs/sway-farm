@@ -47,7 +47,7 @@ impl GameContract for Contract {
 
         // create a new player struct
         let new_player = Player {
-            farming_skill: 0,
+            farming_skill: 1,
             total_value_sold: 0,
         };
 
@@ -68,8 +68,8 @@ impl GameContract for Contract {
 
         let new_level = player.farming_skill + 1;
 
-       // require that the total_value_sold > their new level squared * 1000
-        let exp = new_level * new_level * 1000;
+       // require that the total_value_sold > their new level squared * 3000
+        let exp = new_level * new_level * 3000;
         require(player.total_value_sold > exp, InvalidError::NotEnoughExp);
 
         // increase the player's skill level

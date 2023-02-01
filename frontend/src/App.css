@@ -2,37 +2,39 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.game-container{
+  display: flex;
+  justify-content: space-around;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.player-container{
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.farm-container{
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 400px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.bunny{
+  max-width: 500px;
+  /* border: 1px solid blue; */
+}
+
+.planted-seed{
+  max-width: 30px;
+}
+
+.player-info-container{
+  display: flex;
+  justify-content: space-around;
+  /* border: 1px solid blue; */
+  
+}
+
+button{
+  cursor: pointer;
 }

@@ -116,7 +116,9 @@ async fn can_harvest_and_sell_food() {
     let (instance, id, wallets) = get_contract_instance().await;
 
     let wallet_1 = wallets.get(0).unwrap();
+    let wallet_2 = wallets.get(1).unwrap();
     let wallet_1_id = Identity::Address(wallet_1.address().into());
+    let wallet_2_id = Identity::Address(wallet_2.address().into());
 
     // create a new player with wallet 1
     let response = instance
@@ -228,8 +230,17 @@ async fn can_harvest_and_sell_food() {
         .await
         .unwrap();
     assert!(player.value.total_value_sold == 15000);
-    assert!(player.value.farming_skill == 1);
+    assert!(player.value.farming_skill == 2);
     println!("UPDATED PLAYER: {:?}", player.value);
+
+    let fake_player = instance
+        .methods()
+        .get_player(wallet_2_id.clone())
+        .call()
+        .await
+        .unwrap();
+    
+        println!("FAKE PLAYER: {:?}", fake_player.value);
 
     // check that tokens were minted to wallet_1
     let final_balance = wallet_1.get_asset_balance(&contract_asset).await.unwrap();
