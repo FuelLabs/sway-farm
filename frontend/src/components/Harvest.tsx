@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { ContractAbi } from "../contracts";
-import { bn } from "fuels";
-import { FoodTypeInput } from "../contracts/ContractAbi";
 import { Spinner, Button } from "@fuel-ui/react";
 
 interface HarvestProps {

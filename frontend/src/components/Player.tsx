@@ -1,4 +1,3 @@
-// import { useState } from "react";
 import { ContractAbi } from "../contracts";
 import { PlayerOutput } from "../contracts/ContractAbi";
 import ShowCoins from "./ShowCoins";
@@ -6,9 +5,8 @@ import ShowSeeds from "./ShowSeeds";
 import ShowPlantedSeeds from "./ShowPlantedSeeds";
 import ShowItems from "./ShowItems";
 import BuySeeds from "./BuySeeds";
-import Harvest from "./Harvest";
-import SellItem from "./SellItem";
 import LevelUp from "./LevelUp";
+import { Flex, Box } from "@fuel-ui/react";
 
 interface PlayerProps {
     contract: ContractAbi | null;
@@ -20,11 +18,11 @@ export default function Player({ contract, player }: PlayerProps) {
         <div className="game-container">
             <div className="player-container">
                 <img src="pixel-bunny.png" className="bunny" alt="bunny" />
-                <div className="player-info-container">
-                    <p>Farming Skill Level: {parseFloat(player.farming_skill.format()) * 1_000_000_000}</p>
-                    <p>Total Value Sold: {parseInt(player.total_value_sold.format())}</p>
+                <Flex justify="space-around">
+                    <Box>Total Value Sold: {(parseFloat(player.total_value_sold.format()) * 1_000_000_000).toLocaleString()}</Box>
                     <ShowCoins/>
-                </div>
+                </Flex>
+                <Box style={{marginTop: "20px"}}>Farming Skill Level: {parseFloat(player.farming_skill.format()) * 1_000_000_000}</Box>
                 <LevelUp contract={contract}/>
             </div>
             <div className="farm-container">

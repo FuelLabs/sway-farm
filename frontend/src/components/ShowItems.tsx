@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import SellItem from "./SellItem";
-import { BN } from "fuels";
 import { ContractAbi } from "../contracts";
 import { FoodTypeInput, IdentityInput, AddressInput } from "../contracts/ContractAbi";
 
