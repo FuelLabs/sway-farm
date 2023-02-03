@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ContractAbi } from "../contracts";
+import { Button, Spinner } from "@fuel-ui/react";
 
 interface NewPlayerProps {
     contract: ContractAbi | null;
@@ -28,11 +29,11 @@ export default function NewPlayer({ contract }: NewPlayerProps){
 
     return (
         <>
-        {status === 'loading' && <div>Loading...</div>}
+        {status === 'loading' && <Spinner/>}
         {status === 'error' && <div>Something went wrong, try again</div>}
         {status === 'success' && <div>Success! Refresh the page</div>}
         {status === 'none' &&
-            <button onClick={handleNewPlayer}>Make A New Player</button>
+            <Button onPress={handleNewPlayer}>Make A New Player</Button>
         }
         </>
     )

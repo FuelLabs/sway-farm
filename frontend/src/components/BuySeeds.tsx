@@ -2,19 +2,17 @@ import { useState } from "react";
 import { ContractAbi } from "../contracts";
 import { bn } from "fuels";
 import { FoodTypeInput } from "../contracts/ContractAbi";
+import { Button, Spinner, Input } from "@fuel-ui/react";
 
 interface BuySeedsProps {
     contract: ContractAbi | null;
 }
 
-const CONTRACT_ID = "0xd0e74f541f351bd435907631634dd320b7a8937b54f854e86e19372e22b3ad03"
-
+const CONTRACT_ID = "0xcae2ec3ca9f6fc2a6c604f1c5cec7a8052e9379dc066acc651ea56515ddeca6e"
 
 export default function BuySeeds({ contract }: BuySeedsProps) {
     const [amount, setAmount] = useState<string>("0");
-    // TODO: update to global?
-    const [loading, setLoading] = useState<boolean>(false);
-    const [status, setStatus] = useState<'success' | 'error' | 'none'>('none');
+    const [status, setStatus] = useState<'success' | 'error' | 'none' | `loading`>('none');
 
     let price = bn.parseUnits('0.00000075');
 
@@ -22,20 +20,19 @@ export default function BuySeeds({ contract }: BuySeedsProps) {
         e.preventDefault();
         if (contract !== null) {
             try {
-                setLoading(true)
-                let inputAmount = bn.parseUnits(amount);
+                setStatus('loading')
+                let realAmount = parseInt(amount) / 1_000_000_000;
+                let inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
                 let seedType: FoodTypeInput = { tomatoes: [] };
                 await contract.functions
-                .buy_seeds(seedType, inputAmount)
-                .callParams({
-                    forward: [price, CONTRACT_ID],
-                  })
-                .call();
-                setLoading(false)
+                    .buy_seeds_free(seedType, inputAmount)
+                    // .callParams({
+                    //     forward: [price, CONTRACT_ID],
+                    // })
+                    .call();
                 setStatus('success')
             } catch (err) {
                 console.log("Error:", err)
-                setLoading(false)
                 setStatus('error')
             }
         } else {
@@ -46,34 +43,37 @@ export default function BuySeeds({ contract }: BuySeedsProps) {
 
     return (
         <>
-            {loading ?
-                <div>Loading...</div>
-                :
-                <div>
-                    {status == 'error' && <div>Something went wrong, try again</div>}
-                    {status == 'success' && <div>Success! You bought {amount} seeds</div>}
-                    {status == 'none' &&
-                    <>
+            {status == 'loading' && <Spinner />}
+            {status == 'error' && <div>Something went wrong, try again</div>}
+            {status == 'success' && <div>Success! You bought {amount} seeds</div>}
+            {status == 'none' &&
+                <>
                     <h3>Buy Seeds</h3>
-                        <form onSubmit={handleSubmit}>
-                            <div>
-                                <label htmlFor="amount">Amount</label>
-                                <input
-                                    id="amount"
-                                    type="number"
-                                    step="1"
-                                    min="0"
-                                    placeholder="0"
-                                    required
-                                    onChange={(e) => setAmount(e.target.value)}
-                                />
-                            </div>
-                            {/* {parseInt(amount) > 0 && <div>Price: {parseInt(amount) * 0.00000075}</div>} */}
-                            <button type="submit">Buy Seeds</button>
-                        </form>
-                    </>
-                    }
-                </div>
+                    <form onSubmit={handleSubmit}>
+                        <Input>
+                            <Input.Field
+                                type="number"
+                                id="amount"
+                                step="1"
+                                min="0"
+                                placeholder="0"
+                                required
+                                onChange={(e) => setAmount(e.target.value)}
+                            />
+                            <Input.ElementRight>
+                                <Button
+                                    css={{
+                                        mr: '-8px'
+                                    }}
+                                    type="submit"
+                                    variant="outlined"
+                                >
+                                    Buy
+                                </Button>
+                            </Input.ElementRight>
+                        </Input>
+                    </form>
+                </>
             }
         </>
     )

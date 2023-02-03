@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
+import Harvest from "./Harvest";
 import { ContractAbi } from "../contracts";
 import { IdentityInput, AddressInput } from "../contracts/ContractAbi";
+import { BoxCentered, Flex } from "@fuel-ui/react";
 
 interface ShowPlantedSeedsProps {
     contract: ContractAbi | null;
 }
 
 export default function ShowPlantedSeeds({ contract }: ShowPlantedSeedsProps) {
-    const [length, setLength] = useState<number>();
+    const [length, setLength] = useState<number>(0);
 
     useEffect(() => {
         async function getPlayer() {
@@ -36,20 +38,28 @@ export default function ShowPlantedSeeds({ contract }: ShowPlantedSeedsProps) {
             }
         }
         return (
-        <>
-        {arr.map((i) => <img key={i} src="plant.png" className="planted-seed" alt="planted seed" />)}
-        </>
+            <>
+                {arr.map((i) => (
+                    <BoxCentered key={i} direction={"column"}>
+                        <img src="plant.png" className="planted-seed" alt="planted seed" />
+                        <Harvest index={i} contract={contract} />
+                    </BoxCentered>
+                )
+                )}
+            </>
         )
     }
 
     return (
         <div>
-            {length ? <div>
-                <h3>Planted Seeds: {length}</h3>
-                <PlantedSeeds />
-            </div>
-                :
-                <div>No seeds planted!</div>}
+            {length > 0 &&
+                <div>
+                    <h3>Planted seeds: {length}</h3>
+                    <Flex wrap={'wrap'} gap={'$2'}>
+                        <PlantedSeeds />
+                    </Flex>
+                </div>
+            }
         </div>
     )
 }

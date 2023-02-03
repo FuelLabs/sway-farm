@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import SellItem from "./SellItem";
 import { BN } from "fuels";
 import { ContractAbi } from "../contracts";
 import { FoodTypeInput, IdentityInput, AddressInput } from "../contracts/ContractAbi";
@@ -8,7 +9,7 @@ interface ShowItemsProps {
 }
 
 export default function ShowItems({ contract }: ShowItemsProps) {
-    const [seeds, setSeeds] = useState<BN>();
+    const [seeds, setSeeds] = useState<number>(0);
 
     useEffect(() => {
         async function getPlayer() {
@@ -18,7 +19,8 @@ export default function ShowItems({ contract }: ShowItemsProps) {
                     let id: IdentityInput = { Address: address };
                     let seedType: FoodTypeInput = { tomatoes: [] };
                     let { value } = await contract.functions.get_item_amount(id, seedType).get();
-                    setSeeds(value)
+                    let num = parseFloat(value.format()) * 1_000_000_000
+                    setSeeds(num)
                 } catch (err) {
                     console.log("Error:", err)
                 }
@@ -30,7 +32,8 @@ export default function ShowItems({ contract }: ShowItemsProps) {
 
     return (
         <div>
-            {seeds && <div>Harvested Items: {parseFloat(seeds.format()) * 1_000_000_000}</div>}
+            <div>Inventory: {seeds > 0 ? seeds : "nothing here"}</div>
+            {seeds > 0 && <SellItem contract={contract} />}
         </div>
     )
 }

@@ -1,19 +1,40 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ContractAbi } from "../contracts";
+import { AddressInput, IdentityInput } from "../contracts/ContractAbi";
+import { Button, Spinner } from "@fuel-ui/react";
 
 interface LevelUpProps {
     contract: ContractAbi | null;
 }
 
-export default function LevelUp({ contract }: LevelUpProps){
+export default function LevelUp({ contract }: LevelUpProps) {
     const [status, setStatus] = useState<'success' | 'error' | 'loading' | 'none'>('none');
-    async function handleLevelUp(){
+    const [canLevelUp, setCanLevelUp] = useState<boolean>();
+
+    useEffect(() => {
+        async function getCanLevelUp() {
+            if (contract && contract.wallet) {
+                try {
+                    let address: AddressInput = { value: contract.wallet.address.toB256() }
+                    let id: IdentityInput = { Address: address };
+                    let { value } = await contract.functions.can_level_up(id).get();
+                    setCanLevelUp(value)
+                } catch (err) {
+                    console.log("Error:", err)
+                }
+            }
+        }
+
+        getCanLevelUp();
+    }, [contract])
+
+    async function handleLevelUp() {
         if (contract !== null) {
             try {
                 setStatus('loading')
                 await contract.functions.level_up().call();
                 setStatus('success')
-            } catch(err){
+            } catch (err) {
                 console.log("Error:", err)
                 setStatus('error')
             }
@@ -25,13 +46,14 @@ export default function LevelUp({ contract }: LevelUpProps){
 
     return (
         <>
-        <h3>Level Up</h3>
-        {status === 'loading' && <div>Loading...</div>}
-        {status === 'error' && <div>Something went wrong, try again</div>}
-        {status === 'success' && <div>Success! Refresh the page</div>}
-        {status === 'none' &&
-            <button onClick={handleLevelUp}>Level Up</button>
-        }
+            {canLevelUp &&
+                <>
+                    {status === 'loading' && <Spinner />}
+                    {status === 'error' && <div>Something went wrong, try again</div>}
+                    {status === 'success' && <div>Success! Refresh the page</div>}
+                    {status === 'none' && <Button onPress={handleLevelUp}>Level Up</Button>}
+                </>
+            }
         </>
     )
 }

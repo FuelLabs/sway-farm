@@ -98,8 +98,6 @@ impl GameContract for Contract {
             // the compiler knows that other options would be unreachable
         }
 
-        log(price);
-
         // the cost will be the amount of seeds * the price
         let cost = amount * price;
 
@@ -216,5 +214,64 @@ impl GameContract for Contract {
     #[storage(read)]
     fn get_item_amount(id: Identity, item: FoodType) -> u64 {
         storage.player_items.get((id, item))
+    }
+
+    #[storage(read)]
+    fn can_level_up(id: Identity) -> bool {
+        // get the player 
+        let player = storage.players.get(id);
+
+        // the max skill level is 10
+        if player.farming_skill < 10 {
+            let new_level = player.farming_skill + 1;
+            let exp = new_level * new_level * 3000;
+            if player.total_value_sold > exp {
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    #[storage(read)]
+    fn can_harvest(id: Identity, index: u64) -> bool {
+        let sender = msg_sender().unwrap();
+        let food = storage.planted_seeds.get(sender, index);
+
+        // make sure the index is valid
+        if food.is_some() {
+            return false;
+        }
+
+        let current_time = timestamp();
+        let planted_time = food.unwrap().time_planted.unwrap();
+
+        // three days
+        // let days = 86400 * 3;
+        // use for testing
+        let days = 0;
+
+        let finish_time = planted_time + days;
+
+        if current_time >= finish_time {
+            true
+        } else {
+            false
+        }
+    }
+
+    #[storage(read, write)]
+    fn buy_seeds_free(food_type: FoodType, amount: u64) {
+        let sender = msg_sender().unwrap();
+
+        // check how many seeds the player currenly has
+        let mut current_amount = storage.player_seeds.get((sender, food_type));
+        // add the current amount to the amount they are buying
+        current_amount = current_amount + amount;
+
+        // add seeds to inventory
+        storage.player_seeds.insert((sender, food_type), current_amount);
     }
 }

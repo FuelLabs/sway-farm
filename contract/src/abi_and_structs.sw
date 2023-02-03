@@ -36,6 +36,16 @@ abi GameContract {
 
     #[storage(read)]
     fn get_item_amount(id: Identity, item: FoodType) -> u64;
+
+    #[storage(read)]
+    fn can_level_up(id: Identity) -> bool;
+
+    #[storage(read)]
+    fn can_harvest(id: Identity, index: u64) -> bool;
+
+    //////// TEMP
+    #[storage(read, write)]
+    fn buy_seeds_free(food_type: FoodType, amount: u64);
 }
 
 pub struct Player {

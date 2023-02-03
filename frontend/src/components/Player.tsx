@@ -6,7 +6,6 @@ import ShowSeeds from "./ShowSeeds";
 import ShowPlantedSeeds from "./ShowPlantedSeeds";
 import ShowItems from "./ShowItems";
 import BuySeeds from "./BuySeeds";
-import PlantSeeds from "./PlantSeeds";
 import Harvest from "./Harvest";
 import SellItem from "./SellItem";
 import LevelUp from "./LevelUp";
@@ -24,18 +23,15 @@ export default function Player({ contract, player }: PlayerProps) {
                 <div className="player-info-container">
                     <p>Farming Skill Level: {parseFloat(player.farming_skill.format()) * 1_000_000_000}</p>
                     <p>Total Value Sold: {parseInt(player.total_value_sold.format())}</p>
+                    <ShowCoins/>
                 </div>
+                <LevelUp contract={contract}/>
             </div>
             <div className="farm-container">
-                <ShowCoins/>
                 <ShowSeeds contract={contract}/>
-                <BuySeeds contract={contract} />
-                <PlantSeeds contract={contract} />
                 <ShowPlantedSeeds contract={contract}/>
-                <Harvest contract={contract} />
                 <ShowItems contract={contract}/>
-                <SellItem contract={contract} />
-                <LevelUp contract={contract}/>
+                <BuySeeds contract={contract} />
             </div>
 
         </div>

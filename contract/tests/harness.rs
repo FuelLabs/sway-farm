@@ -214,6 +214,14 @@ async fn can_harvest_and_sell_food() {
         .await;
     assert!(sell_resp.is_ok());
 
+    let can_level_up = instance
+    .methods()
+    .can_level_up(wallet_1_id.clone())
+    .call()
+    .await
+    .unwrap();
+    assert!(can_level_up.value == true);
+
     let level_up_rep = instance
         .with_wallet(wallet_1.clone())
         .unwrap()

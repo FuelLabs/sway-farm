@@ -3,6 +3,7 @@ import NewPlayer from "./NewPlayer";
 import Player from "./Player";
 import { ContractAbi } from "../contracts";
 import { AddressInput, IdentityInput, PlayerOutput } from "../contracts/ContractAbi";
+import { Spinner } from "@fuel-ui/react";
 
 interface GameProps {
     contract: ContractAbi | null;
@@ -10,8 +11,7 @@ interface GameProps {
 
 export default function Game({ contract }: GameProps) {
     const [player, setPlayer] = useState<PlayerOutput | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [status, setStatus] = useState<'error' | 'none'>('none');
+    const [status, setStatus] = useState<'error' | 'none' | 'loading'>('loading');
 
     useEffect(() => {
         async function getPlayer() {
@@ -27,7 +27,7 @@ export default function Game({ contract }: GameProps) {
                     console.log("Error:", err)
                     setStatus('error')
                 }
-                setLoading(false)
+                setStatus('none')
             }
         }
 
@@ -36,20 +36,15 @@ export default function Game({ contract }: GameProps) {
 
     return (
         <div>
-            {loading ?
-                <div> Loading... </div>
-                :
+            {status === 'loading' && <Spinner />}
+            {status === 'error' && <div>Something went wrong, try again</div>}
+            {status === 'none' &&
                 <div>
-                    {status === 'error' && <div>Something went wrong, try again</div>}
-                    {status === 'none' &&
-                    <div>
                     {player === null ? <NewPlayer contract={contract} />
                         :
                         <Player contract={contract} player={player} />
                     }
-                    </div>}
-                </div>
-            }
+                </div>}
         </div>
     )
 }

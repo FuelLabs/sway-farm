@@ -29,6 +29,12 @@ const _abi = {
     },
     {
       "typeId": 2,
+      "type": "bool",
+      "components": null,
+      "typeParameters": null
+    },
+    {
+      "typeId": 3,
       "type": "enum FoodType",
       "components": [
         {
@@ -40,24 +46,24 @@ const _abi = {
       "typeParameters": null
     },
     {
-      "typeId": 3,
+      "typeId": 4,
       "type": "enum Identity",
       "components": [
         {
           "name": "Address",
-          "type": 5,
+          "type": 6,
           "typeArguments": null
         },
         {
           "name": "ContractId",
-          "type": 6,
+          "type": 7,
           "typeArguments": null
         }
       ],
       "typeParameters": null
     },
     {
-      "typeId": 4,
+      "typeId": 5,
       "type": "enum InvalidError",
       "components": [
         {
@@ -67,7 +73,7 @@ const _abi = {
         },
         {
           "name": "NotEnoughTokens",
-          "type": 8,
+          "type": 9,
           "typeArguments": null
         },
         {
@@ -82,7 +88,7 @@ const _abi = {
         },
         {
           "name": "NotEnoughSeeds",
-          "type": 8,
+          "type": 9,
           "typeArguments": null
         },
         {
@@ -99,7 +105,7 @@ const _abi = {
       "typeParameters": null
     },
     {
-      "typeId": 5,
+      "typeId": 6,
       "type": "struct Address",
       "components": [
         {
@@ -111,7 +117,7 @@ const _abi = {
       "typeParameters": null
     },
     {
-      "typeId": 6,
+      "typeId": 7,
       "type": "struct ContractId",
       "components": [
         {
@@ -123,24 +129,24 @@ const _abi = {
       "typeParameters": null
     },
     {
-      "typeId": 7,
+      "typeId": 8,
       "type": "struct Player",
       "components": [
         {
           "name": "farming_skill",
-          "type": 8,
+          "type": 9,
           "typeArguments": null
         },
         {
           "name": "total_value_sold",
-          "type": 8,
+          "type": 9,
           "typeArguments": null
         }
       ],
       "typeParameters": null
     },
     {
-      "typeId": 8,
+      "typeId": 9,
       "type": "u64",
       "components": null,
       "typeParameters": null
@@ -151,16 +157,49 @@ const _abi = {
       "inputs": [
         {
           "name": "food_type",
-          "type": 2,
+          "type": 3,
           "typeArguments": null
         },
         {
           "name": "amount",
-          "type": 8,
+          "type": 9,
           "typeArguments": null
         }
       ],
       "name": "buy_seeds",
+      "output": {
+        "name": "",
+        "type": 0,
+        "typeArguments": null
+      },
+      "attributes": [
+        {
+          "name": "payable",
+          "arguments": []
+        },
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "food_type",
+          "type": 3,
+          "typeArguments": null
+        },
+        {
+          "name": "amount",
+          "type": 9,
+          "typeArguments": null
+        }
+      ],
+      "name": "buy_seeds_free",
       "output": {
         "name": "",
         "type": 0,
@@ -173,10 +212,6 @@ const _abi = {
             "read",
             "write"
           ]
-        },
-        {
-          "name": "payable",
-          "arguments": []
         }
       ]
     },
@@ -184,19 +219,70 @@ const _abi = {
       "inputs": [
         {
           "name": "id",
-          "type": 3,
+          "type": 4,
+          "typeArguments": null
+        },
+        {
+          "name": "index",
+          "type": 9,
+          "typeArguments": null
+        }
+      ],
+      "name": "can_harvest",
+      "output": {
+        "name": "",
+        "type": 2,
+        "typeArguments": null
+      },
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "id",
+          "type": 4,
+          "typeArguments": null
+        }
+      ],
+      "name": "can_level_up",
+      "output": {
+        "name": "",
+        "type": 2,
+        "typeArguments": null
+      },
+      "attributes": [
+        {
+          "name": "storage",
+          "arguments": [
+            "read"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
+          "name": "id",
+          "type": 4,
           "typeArguments": null
         },
         {
           "name": "item",
-          "type": 2,
+          "type": 3,
           "typeArguments": null
         }
       ],
       "name": "get_item_amount",
       "output": {
         "name": "",
-        "type": 8,
+        "type": 9,
         "typeArguments": null
       },
       "attributes": [
@@ -212,14 +298,14 @@ const _abi = {
       "inputs": [
         {
           "name": "id",
-          "type": 3,
+          "type": 4,
           "typeArguments": null
         }
       ],
       "name": "get_planted_seeds_length",
       "output": {
         "name": "",
-        "type": 8,
+        "type": 9,
         "typeArguments": null
       },
       "attributes": [
@@ -235,14 +321,14 @@ const _abi = {
       "inputs": [
         {
           "name": "id",
-          "type": 3,
+          "type": 4,
           "typeArguments": null
         }
       ],
       "name": "get_player",
       "output": {
         "name": "",
-        "type": 7,
+        "type": 8,
         "typeArguments": null
       },
       "attributes": [
@@ -258,19 +344,19 @@ const _abi = {
       "inputs": [
         {
           "name": "id",
-          "type": 3,
+          "type": 4,
           "typeArguments": null
         },
         {
           "name": "item",
-          "type": 2,
+          "type": 3,
           "typeArguments": null
         }
       ],
       "name": "get_seed_amount",
       "output": {
         "name": "",
-        "type": 8,
+        "type": 9,
         "typeArguments": null
       },
       "attributes": [
@@ -286,7 +372,7 @@ const _abi = {
       "inputs": [
         {
           "name": "index",
-          "type": 8,
+          "type": 9,
           "typeArguments": null
         }
       ],
@@ -345,12 +431,12 @@ const _abi = {
       "inputs": [
         {
           "name": "food_type",
-          "type": 2,
+          "type": 3,
           "typeArguments": null
         },
         {
           "name": "amount",
-          "type": 8,
+          "type": 9,
           "typeArguments": null
         }
       ],
@@ -374,12 +460,12 @@ const _abi = {
       "inputs": [
         {
           "name": "food_type",
-          "type": 2,
+          "type": 3,
           "typeArguments": null
         },
         {
           "name": "amount",
-          "type": 8,
+          "type": 9,
           "typeArguments": null
         }
       ],
@@ -405,7 +491,7 @@ const _abi = {
       "logId": 0,
       "loggedType": {
         "name": "",
-        "type": 4,
+        "type": 5,
         "typeArguments": []
       }
     },
@@ -413,15 +499,15 @@ const _abi = {
       "logId": 1,
       "loggedType": {
         "name": "",
-        "type": 8,
-        "typeArguments": null
+        "type": 5,
+        "typeArguments": []
       }
     },
     {
       "logId": 2,
       "loggedType": {
         "name": "",
-        "type": 4,
+        "type": 5,
         "typeArguments": []
       }
     },
@@ -429,7 +515,7 @@ const _abi = {
       "logId": 3,
       "loggedType": {
         "name": "",
-        "type": 4,
+        "type": 5,
         "typeArguments": []
       }
     },
@@ -437,7 +523,7 @@ const _abi = {
       "logId": 4,
       "loggedType": {
         "name": "",
-        "type": 4,
+        "type": 5,
         "typeArguments": []
       }
     },
@@ -445,7 +531,7 @@ const _abi = {
       "logId": 5,
       "loggedType": {
         "name": "",
-        "type": 4,
+        "type": 5,
         "typeArguments": []
       }
     },
@@ -453,7 +539,7 @@ const _abi = {
       "logId": 6,
       "loggedType": {
         "name": "",
-        "type": 4,
+        "type": 5,
         "typeArguments": []
       }
     },
@@ -461,15 +547,7 @@ const _abi = {
       "logId": 7,
       "loggedType": {
         "name": "",
-        "type": 4,
-        "typeArguments": []
-      }
-    },
-    {
-      "logId": 8,
-      "loggedType": {
-        "name": "",
-        "type": 4,
+        "type": 5,
         "typeArguments": []
       }
     }

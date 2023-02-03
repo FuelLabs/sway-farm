@@ -4,10 +4,11 @@ import { useFuel } from "./hooks/useFuel";
 import { WalletLocked } from "fuels";
 import { ContractAbi__factory } from "./contracts"
 import Game from "./components/Game";
+import { Heading, Button, Link } from "@fuel-ui/react";
 
 import "./App.css";
 
-const CONTRACT_ID = "0xd0e74f541f351bd435907631634dd320b7a8937b54f854e86e19372e22b3ad03"
+const CONTRACT_ID = "0xcae2ec3ca9f6fc2a6c604f1c5cec7a8052e9379dc066acc651ea56515ddeca6e"
 
 function App() {
   const [account, setAccount] = useState<string>();
@@ -39,7 +40,7 @@ function App() {
   return (
     <div className="App">
       <header>
-        <h1>Sway Farm</h1>
+        <Heading as= "h1" fontColor="gray5">Sway Farm</Heading>
       </header>
 
       {Fuel ? (
@@ -48,20 +49,20 @@ function App() {
             <Game contract={contract} />
           ) : (
             <div>
-              <button onClick={() => Fuel.connect()}>Connect Wallet</button>
+              <Button onPress={() => Fuel.connect()}>Connect Wallet</Button>
             </div>
           )}
         </div>
       ) : (
         <div>
           Download the{" "}
-          <a
+          <Link
             target="_blank"
             rel="noopener noreferrer"
             href="https://wallet.fuel.network/"
           >
             Fuel Wallet
-          </a>{" "}
+          </Link>{" "}
           to play the game.
         </div>
       )}
