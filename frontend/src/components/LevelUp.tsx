@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
 import { ContractAbi } from "../contracts";
 import { AddressInput, IdentityInput } from "../contracts/ContractAbi";
-import { Button, Spinner } from "@fuel-ui/react";
+import { Button, Spinner, BoxCentered } from "@fuel-ui/react";
+import { Dispatch, SetStateAction } from "react";
 
 interface LevelUpProps {
     contract: ContractAbi | null;
+    setUpdateNum: Dispatch<SetStateAction<number>>;
+    updateNum: number;
 }
 
-export default function LevelUp({ contract }: LevelUpProps) {
-    const [status, setStatus] = useState<'success' | 'error' | 'loading' | 'none'>('none');
+export default function LevelUp({ contract, setUpdateNum, updateNum }: LevelUpProps) {
+    const [status, setStatus] = useState<'error' | 'loading' | 'none'>('none');
     const [canLevelUp, setCanLevelUp] = useState<boolean>();
 
     useEffect(() => {
@@ -26,14 +29,15 @@ export default function LevelUp({ contract }: LevelUpProps) {
         }
 
         getCanLevelUp();
-    }, [contract])
+    }, [contract, updateNum])
 
     async function handleLevelUp() {
         if (contract !== null) {
             try {
                 setStatus('loading')
                 await contract.functions.level_up().call();
-                setStatus('success')
+                setUpdateNum(updateNum + 1);
+                setStatus('none')
             } catch (err) {
                 console.log("Error:", err)
                 setStatus('error')
@@ -48,9 +52,8 @@ export default function LevelUp({ contract }: LevelUpProps) {
         <>
             {canLevelUp &&
                 <>
-                    {status === 'loading' && <Spinner />}
+                    {status === 'loading' && <BoxCentered><Spinner /></BoxCentered>}
                     {status === 'error' && <div>Something went wrong, try again</div>}
-                    {status === 'success' && <div>Success! Refresh the page</div>}
                     {status === 'none' && <Button onPress={handleLevelUp}>Level Up</Button>}
                 </>
             }

@@ -3,7 +3,7 @@ import NewPlayer from "./NewPlayer";
 import Player from "./Player";
 import { ContractAbi } from "../contracts";
 import { AddressInput, IdentityInput, PlayerOutput } from "../contracts/ContractAbi";
-import { Spinner } from "@fuel-ui/react";
+import { Spinner, BoxCentered } from "@fuel-ui/react";
 
 interface GameProps {
     contract: ContractAbi | null;
@@ -12,6 +12,7 @@ interface GameProps {
 export default function Game({ contract }: GameProps) {
     const [player, setPlayer] = useState<PlayerOutput | null>(null);
     const [status, setStatus] = useState<'error' | 'none' | 'loading'>('loading');
+    const [updateNum, setUpdateNum] = useState<number>(0);
 
     useEffect(() => {
         async function getPlayer() {
@@ -32,17 +33,17 @@ export default function Game({ contract }: GameProps) {
         }
 
         getPlayer();
-    }, [contract])
+    }, [contract, updateNum])
 
     return (
         <div>
-            {status === 'loading' && <Spinner />}
+            {status === 'loading' && <BoxCentered><Spinner /></BoxCentered>}
             {status === 'error' && <div>Something went wrong, try again</div>}
             {status === 'none' &&
                 <div>
-                    {player === null ? <NewPlayer contract={contract} />
+                    {player === null ? <NewPlayer updateNum={updateNum} setUpdateNum={setUpdateNum} contract={contract} />
                         :
-                        <Player contract={contract} player={player} />
+                        <Player updateNum={updateNum} setUpdateNum={setUpdateNum} contract={contract} player={player} />
                     }
                 </div>}
         </div>

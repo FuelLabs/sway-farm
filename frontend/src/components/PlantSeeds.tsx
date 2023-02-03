@@ -2,14 +2,17 @@ import { useState } from "react";
 import { ContractAbi } from "../contracts";
 import { bn } from "fuels";
 import { FoodTypeInput } from "../contracts/ContractAbi";
-import { Spinner, Input, Button } from "@fuel-ui/react";
+import { Spinner, Input, Button, BoxCentered} from "@fuel-ui/react";
+import { Dispatch, SetStateAction } from "react";
 
 interface PlantSeedsProps {
     contract: ContractAbi | null;
+    setUpdateNum: Dispatch<SetStateAction<number>>;
+    updateNum: number;
 }
-export default function PlantSeeds({ contract }: PlantSeedsProps) {
+export default function PlantSeeds({ contract, setUpdateNum, updateNum }: PlantSeedsProps) {
     const [amount, setAmount] = useState<string>("0");
-    const [status, setStatus] = useState<'success' | 'error' | 'none' | 'loading'>('none');
+    const [status, setStatus] = useState<'error' | 'none' | 'loading'>('none');
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -21,7 +24,8 @@ export default function PlantSeeds({ contract }: PlantSeedsProps) {
                 console.log("inputAmount:", inputAmount);
                 let seedType: FoodTypeInput = { tomatoes: [] };
                 await contract.functions.plant_seeds(seedType, inputAmount).call();
-                setStatus('success');
+                setUpdateNum(updateNum + 1);
+                setStatus('none');
             } catch (err) {
                 console.log("Error!!", err);
                 setStatus('error');
@@ -34,9 +38,8 @@ export default function PlantSeeds({ contract }: PlantSeedsProps) {
 
     return (
         <>
-            {status == 'loading' && <Spinner />}
+            {status == 'loading' && <BoxCentered><Spinner /></BoxCentered>}
             {status == 'error' && <div>Something went wrong, try again</div>}
-            {status == 'success' && <div>Success! You planted {amount} seeds</div>}
             {status == 'none' &&
                 <>
                     <h3>Plant Seeds</h3>

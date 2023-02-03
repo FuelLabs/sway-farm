@@ -3,23 +3,25 @@ import Harvest from "./Harvest";
 import { ContractAbi } from "../contracts";
 import { IdentityInput, AddressInput } from "../contracts/ContractAbi";
 import { BoxCentered, Flex } from "@fuel-ui/react";
+import { Dispatch, SetStateAction } from "react";
 
 interface ShowPlantedSeedsProps {
     contract: ContractAbi | null;
+    setUpdateNum: Dispatch<SetStateAction<number>>;
+    updateNum: number;
 }
 
-export default function ShowPlantedSeeds({ contract }: ShowPlantedSeedsProps) {
+export default function ShowPlantedSeeds({ contract, setUpdateNum, updateNum }: ShowPlantedSeedsProps) {
     const [length, setLength] = useState<number>(0);
 
     useEffect(() => {
-        async function getPlayer() {
+        async function getPlantedSeeds() {
             if (contract && contract.wallet) {
                 try {
                     let address: AddressInput = { value: contract.wallet.address.toB256() }
                     let id: IdentityInput = { Address: address };
                     let { value } = await contract.functions.get_planted_seeds_length(id).get();
                     let len = parseFloat(value.format()) * 1_000_000_000;
-                    console.log("LENGTH:", len)
                     setLength(len);
                 } catch (err) {
                     console.log("Error:", err)
@@ -27,8 +29,8 @@ export default function ShowPlantedSeeds({ contract }: ShowPlantedSeedsProps) {
             }
         }
 
-        getPlayer();
-    }, [contract])
+        getPlantedSeeds();
+    }, [contract, updateNum])
 
     const PlantedSeeds = () => {
         let arr: number[] = [];
@@ -42,7 +44,7 @@ export default function ShowPlantedSeeds({ contract }: ShowPlantedSeedsProps) {
                 {arr.map((i) => (
                     <BoxCentered key={i} direction={"column"}>
                         <img src="plant.png" className="planted-seed" alt="planted seed" />
-                        <Harvest index={i} contract={contract} />
+                        <Harvest updateNum={updateNum} setUpdateNum={setUpdateNum} index={i} contract={contract} />
                     </BoxCentered>
                 )
                 )}

@@ -2,14 +2,17 @@ import { useState } from "react";
 import { ContractAbi } from "../contracts";
 import { bn } from "fuels";
 import { FoodTypeInput } from "../contracts/ContractAbi";
-import { Input, Button, Spinner } from "@fuel-ui/react";
+import { Input, Button, Spinner, BoxCentered } from "@fuel-ui/react";
+import { Dispatch, SetStateAction } from "react";
 
 interface SellItemProps {
     contract: ContractAbi | null;
+    setUpdateNum: Dispatch<SetStateAction<number>>;
+    updateNum: number;
 }
-export default function SellItem({ contract }: SellItemProps) {
+export default function SellItem({ contract, setUpdateNum, updateNum }: SellItemProps) {
     const [amount, setAmount] = useState<string>("0");
-    const [status, setStatus] = useState<'success' | 'error' | 'none' | 'loading'>('none');
+    const [status, setStatus] = useState<'error' | 'none' | 'loading'>('none');
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -20,7 +23,8 @@ export default function SellItem({ contract }: SellItemProps) {
                 let inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
                 let seedType: FoodTypeInput = { tomatoes: [] };
                 await contract.functions.sell_item(seedType, inputAmount).call()
-                setStatus('success')
+                setUpdateNum(updateNum + 1);
+                setStatus('none')
             } catch (err) {
                 console.log("Error:", err)
                 setStatus('error')
@@ -33,9 +37,8 @@ export default function SellItem({ contract }: SellItemProps) {
 
     return (
         <>
-            {status == 'loading' && <Spinner />}
+            {status == 'loading' && <BoxCentered><Spinner /></BoxCentered>}
             {status == 'error' && <div>Something went wrong, try again</div>}
-            {status == 'success' && <div>Success! You sold {amount} seeds</div>}
             {status == 'none' &&
                 <>
                     <h3>Sell</h3>

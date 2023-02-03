@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { ContractAbi } from "../contracts";
-import { Button, Spinner } from "@fuel-ui/react";
+import { Button, Spinner, BoxCentered } from "@fuel-ui/react";
+import { Dispatch, SetStateAction } from "react";
 
 interface NewPlayerProps {
     contract: ContractAbi | null;
+    setUpdateNum: Dispatch<SetStateAction<number>>;
+    updateNum: number;
 }
 
-export default function NewPlayer({ contract }: NewPlayerProps){
-    const [status, setStatus] = useState<'success' | 'error' | 'loading' | 'none'>('none');
+export default function NewPlayer({ contract, setUpdateNum, updateNum }: NewPlayerProps){
+    const [status, setStatus] = useState<'error' | 'loading' | 'none'>('none');
     async function handleNewPlayer(){
         if (contract !== null) {
             try {
@@ -15,8 +18,8 @@ export default function NewPlayer({ contract }: NewPlayerProps){
                 await contract.functions.new_player()
                 .txParams({ variableOutputs: 1 })
                 .call();
-
-                setStatus('success')
+                setStatus('none')
+                setUpdateNum(updateNum + 1)
             } catch(err){
                 console.log("Error:", err)
                 setStatus('error')
@@ -29,9 +32,8 @@ export default function NewPlayer({ contract }: NewPlayerProps){
 
     return (
         <>
-        {status === 'loading' && <Spinner/>}
+        {status === 'loading' && <BoxCentered><Spinner /></BoxCentered>}
         {status === 'error' && <div>Something went wrong, try again</div>}
-        {status === 'success' && <div>Success! Refresh the page</div>}
         {status === 'none' &&
             <Button onPress={handleNewPlayer}>Make A New Player</Button>
         }

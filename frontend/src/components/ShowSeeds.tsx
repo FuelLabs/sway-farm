@@ -2,16 +2,19 @@ import { useState, useEffect } from "react";
 import PlantSeeds from "./PlantSeeds";
 import { ContractAbi } from "../contracts";
 import { FoodTypeInput, IdentityInput, AddressInput } from "../contracts/ContractAbi";
+import { Dispatch, SetStateAction } from "react";
 
 interface ShowSeedsProps {
     contract: ContractAbi | null;
+    setUpdateNum: Dispatch<SetStateAction<number>>;
+    updateNum: number;
 }
 
-export default function ShowSeeds({ contract }: ShowSeedsProps) {
+export default function ShowSeeds({ contract, setUpdateNum, updateNum }: ShowSeedsProps) {
     const [seeds, setSeeds] = useState<number>(0);
 
     useEffect(() => {
-        async function getPlayer() {
+        async function getSeeds() {
             if (contract && contract.wallet) {
                 try {
                     let address: AddressInput = { value: contract.wallet.address.toB256() }
@@ -26,13 +29,13 @@ export default function ShowSeeds({ contract }: ShowSeedsProps) {
             }
         }
 
-        getPlayer();
-    }, [contract])
+        getSeeds();
+    }, [contract,  updateNum])
 
     return (
         <div>
             <div>Seed Bag: {seeds.toLocaleString()} seeds</div>
-            {seeds > 0 && <PlantSeeds contract={contract} />}
+            {seeds > 0 && <PlantSeeds updateNum={updateNum} setUpdateNum={setUpdateNum} contract={contract} />}
         </div>
     )
 }

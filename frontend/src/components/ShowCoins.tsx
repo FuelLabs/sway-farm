@@ -3,9 +3,13 @@ import { useFuel } from "../hooks/useFuel"
 import { BN } from "fuels"
 import { Box } from "@fuel-ui/react";
 
+interface ShowCoinsProps {
+  updateNum: number;
+}
+
 const CONTRACT_ID = "0xcae2ec3ca9f6fc2a6c604f1c5cec7a8052e9379dc066acc651ea56515ddeca6e"
 
-export default function ShowCoins(){
+export default function ShowCoins({ updateNum }: ShowCoinsProps){
     const [balance, setBalance] = useState<BN>();
     const [Fuel] = useFuel();
 
@@ -17,7 +21,7 @@ export default function ShowCoins(){
           setBalance(walletBalance);
         }
         if (Fuel) getAccounts();
-      }, [Fuel]);
+      }, [Fuel, updateNum]);
 
       
     return (
