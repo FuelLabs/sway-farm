@@ -24,7 +24,7 @@ function App() {
       setWallet(tempWallet)
     }
     if (Fuel) getAccounts();
-  }, [Fuel]);
+  }, [Fuel, isConnected]);
 
   const contract = useMemo(() => {
     if (Fuel && account && wallet) {
