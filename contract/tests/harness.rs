@@ -37,12 +37,11 @@ async fn get_contract_instance() -> (MyContract, ContractId, Vec<WalletUnlocked>
 }
 
 #[tokio::test]
-async fn can_buy_and_plant_seeds() {
+async fn can_play_game() {
     let (instance, id, wallets) = get_contract_instance().await;
-
     let wallet_1 = wallets.get(0).unwrap();
     let wallet_1_id = Identity::Address(wallet_1.address().into());
-
+    
     // create a new player with wallet 1
     let response = instance
         .with_wallet(wallet_1.clone())
@@ -57,84 +56,16 @@ async fn can_buy_and_plant_seeds() {
     let contract_asset: AssetId = AssetId::new(*id);
 
     // check that tokens were minted to wallet_1
-    let balance = wallet_1.get_asset_balance(&contract_asset).await.unwrap();
-    assert_eq!(balance, 1000000);
+    let initial_balance = wallet_1.get_asset_balance(&contract_asset).await.unwrap();
+    assert_eq!(initial_balance, 1000000);
 
-    let _player = instance
+    let player = instance
         .methods()
         .get_player(wallet_1_id.clone())
         .call()
         .await
         .unwrap();
-
-    let price = 750;
-    let amount = 5;
-    let call_params = CallParameters::new(Some(price * amount), Some(contract_asset.into()), None);
-
-    // buy 5 tomato seeds from wallet_1
-    let buy_seeds_resp = instance
-        .with_wallet(wallet_1.clone())
-        .unwrap()
-        .methods()
-        .buy_seeds(FoodType::tomatoes(), amount)
-        .call_params(call_params)
-        .call()
-        .await;
-    assert!(buy_seeds_resp.is_ok());
-
-    let seed_amount = instance
-        .methods()
-        .get_seed_amount(wallet_1_id.clone(), FoodType::tomatoes())
-        .call()
-        .await
-        .unwrap();
-    assert!(seed_amount.value == amount);
-
-    // plant seeds from wallet_1
-    let plant_seeds_resp = instance
-        .with_wallet(wallet_1.clone())
-        .unwrap()
-        .methods()
-        .plant_seeds(FoodType::tomatoes(), amount)
-        .call()
-        .await;
-    assert!(plant_seeds_resp.is_ok());
-
-    let planted_seeds_length = instance
-        .methods()
-        .get_planted_seeds_length(wallet_1_id.clone())
-        .call()
-        .await
-        .unwrap();
-    assert!(planted_seeds_length.value == amount);
-
-    // Now you have an instance of your contract you can use to test each function
-}
-
-#[tokio::test]
-async fn can_harvest_and_sell_food() {
-    let (instance, id, wallets) = get_contract_instance().await;
-
-    let wallet_1 = wallets.get(0).unwrap();
-    let wallet_2 = wallets.get(1).unwrap();
-    let wallet_1_id = Identity::Address(wallet_1.address().into());
-    let wallet_2_id = Identity::Address(wallet_2.address().into());
-
-    // create a new player with wallet 1
-    let response = instance
-        .with_wallet(wallet_1.clone())
-        .unwrap()
-        .methods()
-        .new_player()
-        .append_variable_outputs(1)
-        .call()
-        .await;
-    assert!(response.is_ok());
-
-    let contract_asset: AssetId = AssetId::new(*id);
-
-    let initial_balance = wallet_1.get_asset_balance(&contract_asset).await.unwrap();
-    println!("INITIAL BALANCE: {:?}", initial_balance);
+    assert_eq!(player.value.farming_skill, 1);
 
     let price = 750;
     let amount = 5;
@@ -152,8 +83,15 @@ async fn can_harvest_and_sell_food() {
     assert!(buy_seeds_resp.is_ok());
 
     let planted_balance = wallet_1.get_asset_balance(&contract_asset).await.unwrap();
-    println!("PLANTED BALANCE: {:?}", planted_balance);
-    assert!(planted_balance == initial_balance - (amount * price));
+    assert_eq!(planted_balance, initial_balance - (amount * price));
+
+    let seed_amount = instance
+        .methods()
+        .get_seed_amount(wallet_1_id.clone(), FoodType::tomatoes())
+        .call()
+        .await
+        .unwrap();
+    assert_eq!(seed_amount.value, amount);
 
     // plant seeds from wallet_1
     let plant_seeds_resp = instance
@@ -164,6 +102,14 @@ async fn can_harvest_and_sell_food() {
         .call()
         .await;
     assert!(plant_seeds_resp.is_ok());
+
+    let planted_seeds_length = instance
+        .methods()
+        .get_planted_seeds_length(wallet_1_id.clone())
+        .call()
+        .await
+        .unwrap();
+    assert_eq!(planted_seeds_length.value, amount);
 
     let mut harvest_resp = instance
         .with_wallet(wallet_1.clone())
@@ -181,16 +127,7 @@ async fn can_harvest_and_sell_food() {
         .call()
         .await
         .unwrap();
-    assert!(item_amount.value == 1);
-
-    let planted_seeds_length = instance
-        .methods()
-        .get_planted_seeds_length(wallet_1_id.clone())
-        .call()
-        .await
-        .unwrap();
-
-    println!("PLANTED SEEDS LENGTH {:?}", planted_seeds_length.value);
+    assert_eq!(item_amount.value, 1);
 
     // harvest another one
     harvest_resp = instance
@@ -215,12 +152,12 @@ async fn can_harvest_and_sell_food() {
     assert!(sell_resp.is_ok());
 
     let can_level_up = instance
-    .methods()
-    .can_level_up(wallet_1_id.clone())
-    .call()
-    .await
-    .unwrap();
-    assert!(can_level_up.value == true);
+        .methods()
+        .can_level_up(wallet_1_id.clone())
+        .call()
+        .await
+        .unwrap();
+    assert_eq!(can_level_up.value, true);
 
     let level_up_rep = instance
         .with_wallet(wallet_1.clone())
@@ -237,23 +174,10 @@ async fn can_harvest_and_sell_food() {
         .call()
         .await
         .unwrap();
-    assert!(player.value.total_value_sold == 15000);
-    assert!(player.value.farming_skill == 2);
-    println!("UPDATED PLAYER: {:?}", player.value);
-
-    let fake_player = instance
-        .methods()
-        .get_player(wallet_2_id.clone())
-        .call()
-        .await
-        .unwrap();
-    
-        println!("FAKE PLAYER: {:?}", fake_player.value);
+    assert_eq!(player.value.total_value_sold, 15000);
+    assert_eq!(player.value.farming_skill, 2);
 
     // check that tokens were minted to wallet_1
     let final_balance = wallet_1.get_asset_balance(&contract_asset).await.unwrap();
-    println!("FINAL BALANCE: {:?}", final_balance);
-    assert!(final_balance == planted_balance + 15000);
-
-    // Now you have an instance of your contract you can use to test each function
+    assert_eq!(final_balance, planted_balance + 15000);
 }
