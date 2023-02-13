@@ -26,7 +26,7 @@ abi GameContract {
     fn sell_item(food_type: FoodType, amount: u64);
 
     #[storage(read)]
-    fn get_player(id: Identity) -> Player;
+    fn get_player(id: Identity) -> Option<Player>;
 
     #[storage(read)]
     fn get_seed_amount(id: Identity, item: FoodType) -> u64;

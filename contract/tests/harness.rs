@@ -65,7 +65,7 @@ async fn can_play_game() {
         .call()
         .await
         .unwrap();
-    assert_eq!(player.value.farming_skill, 1);
+    assert_eq!(player.value.unwrap().farming_skill, 1);
 
     let price = 750_000;
     let amount = 5;
@@ -169,14 +169,15 @@ async fn can_play_game() {
         .await;
     assert!(level_up_rep.is_ok());
 
-    let player = instance
+    let player_resp = instance
         .methods()
         .get_player(wallet_1_id.clone())
         .call()
         .await
         .unwrap();
-    assert_eq!(player.value.total_value_sold, 15_000_000);
-    assert_eq!(player.value.farming_skill, 2);
+    let player = player_resp.value.unwrap();
+    assert_eq!(player.total_value_sold, 15_000_000);
+    assert_eq!(player.farming_skill, 2);
 
     // check that tokens were minted to wallet_1
     let final_balance = wallet_1.get_asset_balance(&contract_asset).await.unwrap();

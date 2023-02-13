@@ -102,12 +102,7 @@ impl GameContract for Contract {
 
         // check how many seeds the player currenly has
         let current_amount_option = storage.player_seeds.get((sender, food_type));
-        let mut current_amount = 0;
-
-        if current_amount_option.is_some() {
-            current_amount = current_amount_option.unwrap();
-        }
-
+        let mut current_amount = current_amount_option.unwrap_or(0);
         // add the current amount to the amount they are buying
         current_amount = current_amount + amount;
 
@@ -120,10 +115,7 @@ impl GameContract for Contract {
         let sender = msg_sender().unwrap();
         // require player has this many seeds
         let current_amount_option = storage.player_seeds.get((sender, food_type));
-        let mut current_amount = 0;
-        if current_amount_option.is_some() {
-            current_amount = current_amount_option.unwrap();
-        }
+        let current_amount = current_amount_option.unwrap_or(0);
         require(current_amount >= amount, InvalidError::NotEnoughSeeds(amount));
         let new_amount = current_amount - amount;
         //  update amount from player_seeds
@@ -139,7 +131,6 @@ impl GameContract for Contract {
                 time_planted: Option::Some(timestamp()),
             };
             vec.push(food);
-
             count += 1;
         }
         storage.planted_seeds.insert(sender, vec);
@@ -199,29 +190,33 @@ impl GameContract for Contract {
     }
 
     #[storage(read)]
-    fn get_player(id: Identity) -> Player {
-        storage.players.get(id).unwrap()
+    fn get_player(id: Identity) -> Option<Player> {
+        storage.players.get(id)
     }
 
     #[storage(read)]
     fn get_seed_amount(id: Identity, item: FoodType) -> u64 {
-        storage.player_seeds.get((id, item)).unwrap()
+        storage.player_seeds.get((id, item)).unwrap_or(0)
     }
 
     #[storage(read)]
     fn get_planted_seeds_length(id: Identity) -> u64 {
-        storage.planted_seeds.get(id).unwrap().current_ix
+        storage.planted_seeds.get(id).unwrap_or(GardenVector::new()).current_ix
     }
 
     #[storage(read)]
     fn get_item_amount(id: Identity, item: FoodType) -> u64 {
-        storage.player_items.get((id, item)).unwrap()
+        storage.player_items.get((id, item)).unwrap_or(0)
     }
 
     #[storage(read)]
     fn can_level_up(id: Identity) -> bool {
         // get the player 
-        let player = storage.players.get(id).unwrap();
+        let player_result = storage.players.get(id);
+        if player_result.is_none(){
+            return false;
+        }
+        let player = player_result.unwrap();
 
         // the max skill level is 10
         if player.farming_skill < 10 {
@@ -240,7 +235,12 @@ impl GameContract for Contract {
     #[storage(read)]
     fn can_harvest(id: Identity, index: u64) -> bool {
         let sender = msg_sender().unwrap();
-        let planted_seeds = storage.planted_seeds.get(sender).unwrap();
+        let planted_seeds_result = storage.planted_seeds.get(sender);
+        if planted_seeds_result.is_none(){
+            return false;
+        }
+        let planted_seeds = planted_seeds_result.unwrap();
+
         let food = planted_seeds.inner[index].unwrap();
         let current_time = timestamp();
         let planted_time = food.time_planted.unwrap();
@@ -261,7 +261,7 @@ impl GameContract for Contract {
         let sender = msg_sender().unwrap();
 
         // check how many seeds the player currenly has
-        let mut current_amount = storage.player_seeds.get((sender, food_type)).unwrap();
+        let mut current_amount = storage.player_seeds.get((sender, food_type)).unwrap_or(0);
         // add the current amount to the amount they are buying
         current_amount = current_amount + amount;
 
