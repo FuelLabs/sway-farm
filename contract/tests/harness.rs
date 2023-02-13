@@ -57,7 +57,7 @@ async fn can_play_game() {
 
     // check that tokens were minted to wallet_1
     let initial_balance = wallet_1.get_asset_balance(&contract_asset).await.unwrap();
-    assert_eq!(initial_balance, 1000000);
+    assert_eq!(initial_balance, 1_000_000_000);
 
     let player = instance
         .methods()
@@ -67,7 +67,7 @@ async fn can_play_game() {
         .unwrap();
     assert_eq!(player.value.farming_skill, 1);
 
-    let price = 750;
+    let price = 750_000;
     let amount = 5;
     let call_params = CallParameters::new(Some(price * amount), Some(contract_asset.into()), None);
 
@@ -76,8 +76,9 @@ async fn can_play_game() {
         .with_wallet(wallet_1.clone())
         .unwrap()
         .methods()
-        .buy_seeds(FoodType::tomatoes(), amount)
+        .buy_seeds(FoodType::tomatoes, amount)
         .call_params(call_params)
+        .unwrap()
         .call()
         .await;
     assert!(buy_seeds_resp.is_ok());
@@ -87,7 +88,7 @@ async fn can_play_game() {
 
     let seed_amount = instance
         .methods()
-        .get_seed_amount(wallet_1_id.clone(), FoodType::tomatoes())
+        .get_seed_amount(wallet_1_id.clone(), FoodType::tomatoes)
         .call()
         .await
         .unwrap();
@@ -98,7 +99,7 @@ async fn can_play_game() {
         .with_wallet(wallet_1.clone())
         .unwrap()
         .methods()
-        .plant_seeds(FoodType::tomatoes(), amount)
+        .plant_seeds(FoodType::tomatoes, amount)
         .call()
         .await;
     assert!(plant_seeds_resp.is_ok());
@@ -123,7 +124,7 @@ async fn can_play_game() {
 
     let item_amount = instance
         .methods()
-        .get_item_amount(wallet_1_id.clone(), FoodType::tomatoes())
+        .get_item_amount(wallet_1_id.clone(), FoodType::tomatoes)
         .call()
         .await
         .unwrap();
@@ -145,7 +146,7 @@ async fn can_play_game() {
         .with_wallet(wallet_1.clone())
         .unwrap()
         .methods()
-        .sell_item(FoodType::tomatoes(), 2)
+        .sell_item(FoodType::tomatoes, 2)
         .append_variable_outputs(1)
         .call()
         .await;
@@ -174,10 +175,10 @@ async fn can_play_game() {
         .call()
         .await
         .unwrap();
-    assert_eq!(player.value.total_value_sold, 15000);
+    assert_eq!(player.value.total_value_sold, 15_000_000);
     assert_eq!(player.value.farming_skill, 2);
 
     // check that tokens were minted to wallet_1
     let final_balance = wallet_1.get_asset_balance(&contract_asset).await.unwrap();
-    assert_eq!(final_balance, planted_balance + 15000);
+    assert_eq!(final_balance, planted_balance + 15_000_000);
 }
