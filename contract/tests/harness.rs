@@ -43,7 +43,7 @@ async fn can_play_game() {
     let wallet_1_id = Identity::Address(wallet_1.address().into());
     
     // create a new player with wallet 1
-    let response = instance
+    let new_player_rep = instance
         .with_wallet(wallet_1.clone())
         .unwrap()
         .methods()
@@ -51,7 +51,18 @@ async fn can_play_game() {
         .append_variable_outputs(1)
         .call()
         .await;
-    assert!(response.is_ok());
+    assert!(new_player_rep.is_ok());
+
+    // make sure wallet_1 can't make a new player again
+    let new_player_err = instance
+        .with_wallet(wallet_1.clone())
+        .unwrap()
+        .methods()
+        .new_player()
+        .append_variable_outputs(1)
+        .call()
+        .await;
+    assert!(new_player_err.is_err());
 
     let contract_asset: AssetId = AssetId::new(*id);
 
@@ -104,6 +115,7 @@ async fn can_play_game() {
         .await;
     assert!(plant_seeds_resp.is_ok());
 
+    // check how many seeds are planted
     let planted_seeds_length = instance
         .methods()
         .get_planted_seeds_length(wallet_1_id.clone())
@@ -112,6 +124,7 @@ async fn can_play_game() {
         .unwrap();
     assert_eq!(planted_seeds_length.value, amount);
 
+    // harvest the first planted seed
     let mut harvest_resp = instance
         .with_wallet(wallet_1.clone())
         .unwrap()
@@ -122,6 +135,7 @@ async fn can_play_game() {
         .await;
     assert!(harvest_resp.is_ok());
 
+    // check if the player has a harvested item
     let item_amount = instance
         .methods()
         .get_item_amount(wallet_1_id.clone(), FoodType::tomatoes)
@@ -129,6 +143,15 @@ async fn can_play_game() {
         .await
         .unwrap();
     assert_eq!(item_amount.value, 1);
+
+    // make sure the number of planted seeds decreased
+    let new_planted_seeds_length = instance
+        .methods()
+        .get_planted_seeds_length(wallet_1_id.clone())
+        .simulate()
+        .await
+        .unwrap();
+    assert_eq!(new_planted_seeds_length.value, amount - 1);
 
     // harvest another one
     harvest_resp = instance

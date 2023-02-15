@@ -34,10 +34,13 @@ storage {
 }
 
 impl GameContract for Contract {
-    #[storage(write)]
+    #[storage(read, write)]
     fn new_player() {
         // get the message sender
         let sender = msg_sender().unwrap();
+
+        // make sure the player doesn't already exist
+        require(storage.players.get(sender).is_none(), "player already exists");
 
         // create a new player struct
         let new_player = Player {
@@ -46,7 +49,6 @@ impl GameContract for Contract {
         };
 
         // add the player to storage
-        // if there is already a player, this will overwrite the old one
         storage.players.insert(sender, new_player);
         // each player gets some coins to start
         mint_to(1_000_000_000, sender);

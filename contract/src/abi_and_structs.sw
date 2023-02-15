@@ -2,7 +2,7 @@ library abi_and_structs;
 
 abi GameContract {
     // initialize player, mint some coins
-    #[storage(write)]
+    #[storage(read, write)]
     fn new_player();
 
     // level up farming skill
@@ -86,8 +86,8 @@ impl GardenVector {
     }
 
     pub fn remove(ref mut self, index: u64) {
-        match index {
-            0 => self.inner = [
+        self.inner = match index {
+            0 => [
                 self.inner[1],
                 self.inner[2],
                 self.inner[3],
@@ -99,7 +99,7 @@ impl GardenVector {
                 self.inner[9],
                 Option::None,
             ],
-            1 => self.inner = [
+            1 => [
                 self.inner[0],
                 self.inner[2],
                 self.inner[3],
@@ -111,7 +111,7 @@ impl GardenVector {
                 self.inner[9],
                 Option::None,
             ],
-            2 => self.inner = [
+            2 => [
                 self.inner[0],
                 self.inner[1],
                 self.inner[3],
@@ -123,7 +123,7 @@ impl GardenVector {
                 self.inner[9],
                 Option::None,
             ],
-            3 => self.inner = [
+            3 => [
                 self.inner[0],
                 self.inner[1],
                 self.inner[2],
@@ -135,7 +135,7 @@ impl GardenVector {
                 self.inner[9],
                 Option::None,
             ],
-            4 => self.inner = [
+            4 => [
                 self.inner[0],
                 self.inner[1],
                 self.inner[2],
@@ -147,7 +147,7 @@ impl GardenVector {
                 self.inner[9],
                 Option::None,
             ],
-            5 => self.inner = [
+            5 => [
                 self.inner[0],
                 self.inner[1],
                 self.inner[2],
@@ -159,7 +159,7 @@ impl GardenVector {
                 self.inner[9],
                 Option::None,
             ],
-            6 => self.inner = [
+            6 => [
                 self.inner[0],
                 self.inner[1],
                 self.inner[2],
@@ -171,7 +171,7 @@ impl GardenVector {
                 self.inner[9],
                 Option::None,
             ],
-            7 => self.inner = [
+            7 => [
                 self.inner[0],
                 self.inner[1],
                 self.inner[2],
@@ -183,7 +183,7 @@ impl GardenVector {
                 self.inner[9],
                 Option::None,
             ],
-            8 => self.inner = [
+            8 => [
                 self.inner[0],
                 self.inner[1],
                 self.inner[2],
@@ -195,7 +195,7 @@ impl GardenVector {
                 self.inner[9],
                 Option::None,
             ],
-            9 => self.inner = [
+            9 => [
                 self.inner[0],
                 self.inner[1],
                 self.inner[2],
@@ -208,13 +208,15 @@ impl GardenVector {
                 Option::None,
             ],
             _ => revert(22),
-        }
+        };
+
+        self.current_ix = self.current_ix - 1;
     }
 
     pub fn push(ref mut self, val: Food) {
         // only update if array not full
-        match self.current_ix {
-            0 => self.inner = [
+        self.inner = match self.current_ix {
+            0 => [
                 Option::Some(val),
                 Option::None,
                 Option::None,
@@ -226,7 +228,7 @@ impl GardenVector {
                 Option::None,
                 Option::None,
             ],
-            1 => self.inner = [
+            1 => [
                 self.inner[0],
                 Option::Some(val),
                 Option::None,
@@ -238,7 +240,7 @@ impl GardenVector {
                 Option::None,
                 Option::None,
             ],
-            2 => self.inner = [
+            2 => [
                 self.inner[0],
                 self.inner[1],
                 Option::Some(val),
@@ -250,7 +252,7 @@ impl GardenVector {
                 Option::None,
                 Option::None,
             ],
-            3 => self.inner = [
+            3 => [
                 self.inner[0],
                 self.inner[1],
                 self.inner[2],
@@ -262,7 +264,7 @@ impl GardenVector {
                 Option::None,
                 Option::None,
             ],
-            4 => self.inner = [
+            4 => [
                 self.inner[0],
                 self.inner[1],
                 self.inner[2],
@@ -274,7 +276,7 @@ impl GardenVector {
                 Option::None,
                 Option::None,
             ],
-            5 => self.inner = [
+            5 => [
                 self.inner[0],
                 self.inner[1],
                 self.inner[2],
@@ -286,7 +288,7 @@ impl GardenVector {
                 Option::None,
                 Option::None,
             ],
-            6 => self.inner = [
+            6 => [
                 self.inner[0],
                 self.inner[1],
                 self.inner[2],
@@ -298,7 +300,7 @@ impl GardenVector {
                 Option::None,
                 Option::None,
             ],
-            7 => self.inner = [
+            7 => [
                 self.inner[0],
                 self.inner[1],
                 self.inner[2],
@@ -310,7 +312,7 @@ impl GardenVector {
                 Option::None,
                 Option::None,
             ],
-            8 => self.inner = [
+            8 => [
                 self.inner[0],
                 self.inner[1],
                 self.inner[2],
@@ -322,7 +324,7 @@ impl GardenVector {
                 Option::Some(val),
                 Option::None,
             ],
-            9 => self.inner = [
+            9 => [
                 self.inner[0],
                 self.inner[1],
                 self.inner[2],
@@ -335,7 +337,7 @@ impl GardenVector {
                 Option::Some(val),
             ],
             _ => revert(11),
-        }
+        };
         self.current_ix = self.current_ix + 1;
     }
 }
