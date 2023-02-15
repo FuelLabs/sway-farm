@@ -62,7 +62,7 @@ async fn can_play_game() {
     let player = instance
         .methods()
         .get_player(wallet_1_id.clone())
-        .call()
+        .simulate()
         .await
         .unwrap();
     assert_eq!(player.value.unwrap().farming_skill, 1);
@@ -89,7 +89,7 @@ async fn can_play_game() {
     let seed_amount = instance
         .methods()
         .get_seed_amount(wallet_1_id.clone(), FoodType::tomatoes)
-        .call()
+        .simulate()
         .await
         .unwrap();
     assert_eq!(seed_amount.value, amount);
@@ -107,7 +107,7 @@ async fn can_play_game() {
     let planted_seeds_length = instance
         .methods()
         .get_planted_seeds_length(wallet_1_id.clone())
-        .call()
+        .simulate()
         .await
         .unwrap();
     assert_eq!(planted_seeds_length.value, amount);
@@ -125,7 +125,7 @@ async fn can_play_game() {
     let item_amount = instance
         .methods()
         .get_item_amount(wallet_1_id.clone(), FoodType::tomatoes)
-        .call()
+        .simulate()
         .await
         .unwrap();
     assert_eq!(item_amount.value, 1);
@@ -155,7 +155,7 @@ async fn can_play_game() {
     let can_level_up = instance
         .methods()
         .can_level_up(wallet_1_id.clone())
-        .call()
+        .simulate()
         .await
         .unwrap();
     assert_eq!(can_level_up.value, true);
@@ -172,7 +172,7 @@ async fn can_play_game() {
     let player_resp = instance
         .methods()
         .get_player(wallet_1_id.clone())
-        .call()
+        .simulate()
         .await
         .unwrap();
     let player = player_resp.value.unwrap();
