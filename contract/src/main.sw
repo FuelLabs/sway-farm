@@ -50,6 +50,10 @@ impl GameContract for Contract {
 
         // add the player to storage
         storage.players.insert(sender, new_player);
+
+        // initialize an empty garden 
+        storage.planted_seeds.insert(sender, GardenVector::new());
+
         // each player gets some coins to start
         mint_to(1_000_000_000, sender);
     }
@@ -113,7 +117,34 @@ impl GameContract for Contract {
     }
 
     #[storage(read, write)]
-    fn plant_seeds(food_type: FoodType, amount: u64) {
+    fn plant_seed_at_index(food_type: FoodType, index: u64) {
+        // get the sender
+        let sender = msg_sender().unwrap();
+        // require player has this many seeds
+        let current_amount_option = storage.player_seeds.get((sender, food_type));
+        let current_amount = current_amount_option.unwrap_or(0);
+        require(current_amount >= 1, InvalidError::NotEnoughSeeds(current_amount));
+
+        let new_amount = current_amount - 1;
+        //  update amount from player_seeds
+        storage.player_seeds.insert((sender, food_type), new_amount);
+
+        let mut vec = storage.planted_seeds.get(sender).unwrap();
+        let food = Food {
+            name: food_type,
+            time_planted: Option::Some(timestamp()),
+        };
+        vec.plant_at_index(food, index);
+
+        storage.planted_seeds.insert(sender, vec);
+    }
+
+    #[storage(read, write)]
+    fn plant_seeds(food_type: FoodType, amount: u64, indexes: Vec<u64>) {
+        // make sure the indexes length is equal to the amount
+        require(indexes.len() == amount, "amount is not equal to indexes length");
+
+        // get the sender
         let sender = msg_sender().unwrap();
         // require player has this many seeds
         let current_amount_option = storage.player_seeds.get((sender, food_type));
@@ -132,7 +163,8 @@ impl GameContract for Contract {
                 name: food_type,
                 time_planted: Option::Some(timestamp()),
             };
-            vec.push(food);
+            let index = indexes.get(count).unwrap();
+            vec.plant_at_index(food, index);
             count += 1;
         }
         storage.planted_seeds.insert(sender, vec);
@@ -146,16 +178,16 @@ impl GameContract for Contract {
         let current_time = timestamp();
         let planted_time = food.time_planted.unwrap();
 
-        // three days
-        // let days = 86400 * 3;
-        // use for testing
-        let days = 0;
-        let finish_time = planted_time + days;
+        // let one_min = 120;
+        // use this for testing
+        let time = 0;
+        // let time = one_min * 5;
+        let finish_time = planted_time + time;
         // require X days to pass
         require(current_time >= finish_time, "too early");
 
         // remove from planted_seeds
-        planted_seeds.remove(index);
+        planted_seeds.harvest_at_index(index);
         storage.planted_seeds.insert(sender, planted_seeds);
 
         // get current amount of items
@@ -202,8 +234,8 @@ impl GameContract for Contract {
     }
 
     #[storage(read)]
-    fn get_planted_seeds_length(id: Identity) -> u64 {
-        storage.planted_seeds.get(id).unwrap_or(GardenVector::new()).current_ix
+    fn get_garden_vec(id: Identity) -> GardenVector {
+        storage.planted_seeds.get(id).unwrap_or(GardenVector::new())
     }
 
     #[storage(read)]
@@ -246,11 +278,11 @@ impl GameContract for Contract {
         let food = planted_seeds.inner[index].unwrap();
         let current_time = timestamp();
         let planted_time = food.time_planted.unwrap();
-        // three days
-        // let days = 86400 * 3;
-        // use for testing
-        let days = 0;
-        let finish_time = planted_time + days;
+        // let one_min: u64 = 120;
+        // use this for testing
+        let time = 0;
+        // let time = one_min * 5;
+        let finish_time = planted_time + time;
         if current_time >= finish_time {
             true
         } else {

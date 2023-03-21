@@ -2,25 +2,25 @@ import { useState } from "react";
 import { ContractAbi } from "../contracts";
 import { Button, Spinner, BoxCentered } from "@fuel-ui/react";
 import { Dispatch, SetStateAction } from "react";
+import { cssObj } from "@fuel-ui/css";
 
 interface NewPlayerProps {
     contract: ContractAbi | null;
-    setUpdateNum: Dispatch<SetStateAction<number>>;
-    updateNum: number;
+    updatePageNum: () => void;
 }
 
-export default function NewPlayer({ contract, setUpdateNum, updateNum }: NewPlayerProps){
+export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
     const [status, setStatus] = useState<'error' | 'loading' | 'none'>('none');
-    async function handleNewPlayer(){
+    async function handleNewPlayer() {
         if (contract !== null) {
             try {
                 setStatus('loading')
                 await contract.functions.new_player()
-                .txParams({ variableOutputs: 1 })
-                .call();
+                    .txParams({ variableOutputs: 1 })
+                    .call();
                 setStatus('none')
-                setUpdateNum(updateNum + 1)
-            } catch(err){
+                updatePageNum()
+            } catch (err) {
                 console.log("Error:", err)
                 setStatus('error')
             }
@@ -32,11 +32,19 @@ export default function NewPlayer({ contract, setUpdateNum, updateNum }: NewPlay
 
     return (
         <>
-        {status === 'loading' && <BoxCentered><Spinner /></BoxCentered>}
-        {status === 'error' && <div>Something went wrong, try again</div>}
-        {status === 'none' &&
-            <Button onPress={handleNewPlayer}>Make A New Player</Button>
-        }
+            <div className="new-player-modal">
+                {status === 'none' &&
+                    <Button css={styles.button} onPress={handleNewPlayer}>Make A New Player</Button>
+                }
+            {status === 'error' && <div>Something went wrong, try again</div>}
+            {status === 'loading' && <BoxCentered><Spinner color="#754a1e"/></BoxCentered>}
+            </div>
         </>
     )
+}
+
+const styles = {
+    button: cssObj({
+        backgroundColor: 'LightBlue'
+    })
 }

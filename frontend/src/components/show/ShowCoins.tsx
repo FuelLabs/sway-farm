@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { useFuel } from "../hooks/useFuel"
+import { useFuel } from "../../hooks/useFuel"
 import { BN } from "fuels"
 import { Box } from "@fuel-ui/react";
+import { cssObj } from "@fuel-ui/css";
+import { CONTRACT_ID } from "../../constants";
 
 interface ShowCoinsProps {
   updateNum: number;
 }
-
-const CONTRACT_ID = "0xcae2ec3ca9f6fc2a6c604f1c5cec7a8052e9379dc066acc651ea56515ddeca6e"
 
 export default function ShowCoins({ updateNum }: ShowCoinsProps){
     const [balance, setBalance] = useState<BN>();
@@ -26,7 +26,12 @@ export default function ShowCoins({ updateNum }: ShowCoinsProps){
       
     return (
         <>
-            {balance && <Box>Farm Coins: {balance.format()}</Box>}
+            {balance && <Box css={styles}>Farm Coins: {balance.format()}</Box>}
         </>
     )
 }
+
+let styles = cssObj({
+  fontFamily: 'pressStart2P',
+  fontSize: '$sm'
+})

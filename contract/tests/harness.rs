@@ -64,6 +64,15 @@ async fn can_play_game() {
         .await;
     assert!(new_player_err.is_err());
 
+    // error handling example
+    let err = new_player_err.unwrap_err();
+    let err_msg = match err {
+        Error::RevertTransactionError(string, _receipts) => string,
+        _ => String::from("not found")
+    };
+    println!("ERROR: {:?}", err_msg.contains("player already exists"));
+    println!("ERROR 2: {}", err_msg);
+
     let contract_asset: AssetId = AssetId::new(*id);
 
     // check that tokens were minted to wallet_1
@@ -105,24 +114,31 @@ async fn can_play_game() {
         .unwrap();
     assert_eq!(seed_amount.value, amount);
 
-    // plant seeds from wallet_1
+    let index_vec: Vec<u64> = [0,1,2,3,4].into();
+
+    // plant seeds from wallet_1 at the first 5 indexes
     let plant_seeds_resp = instance
         .with_wallet(wallet_1.clone())
         .unwrap()
         .methods()
-        .plant_seeds(FoodType::tomatoes, amount)
+        .plant_seeds(FoodType::tomatoes, amount, index_vec)
         .call()
         .await;
     assert!(plant_seeds_resp.is_ok());
 
     // check how many seeds are planted
-    let planted_seeds_length = instance
+    let garden_vec = instance
         .methods()
-        .get_planted_seeds_length(wallet_1_id.clone())
+        .get_garden_vec(wallet_1_id.clone())
         .simulate()
         .await
         .unwrap();
-    assert_eq!(planted_seeds_length.value, amount);
+    assert!(garden_vec.value.inner[0].is_some());
+    assert!(garden_vec.value.inner[1].is_some());
+    assert!(garden_vec.value.inner[2].is_some());
+    assert!(garden_vec.value.inner[3].is_some());
+    assert!(garden_vec.value.inner[4].is_some());
+    assert!(garden_vec.value.inner[5].is_none());
 
     // harvest the first planted seed
     let mut harvest_resp = instance
@@ -145,24 +161,38 @@ async fn can_play_game() {
     assert_eq!(item_amount.value, 1);
 
     // make sure the number of planted seeds decreased
-    let new_planted_seeds_length = instance
+    let mut new_garden_vec = instance
         .methods()
-        .get_planted_seeds_length(wallet_1_id.clone())
+        .get_garden_vec(wallet_1_id.clone())
         .simulate()
         .await
         .unwrap();
-    assert_eq!(new_planted_seeds_length.value, amount - 1);
+    assert!(new_garden_vec.value.inner[0].is_none());
+    assert!(new_garden_vec.value.inner[1].is_some());
+    assert!(new_garden_vec.value.inner[2].is_some());
+    assert!(new_garden_vec.value.inner[3].is_some());
 
-    // harvest another one
+    // harvest another one at index 3
     harvest_resp = instance
         .with_wallet(wallet_1.clone())
         .unwrap()
         .methods()
-        .harvest(0)
+        .harvest(3)
         .append_variable_outputs(1)
         .call()
         .await;
     assert!(harvest_resp.is_ok());
+
+    new_garden_vec = instance
+        .methods()
+        .get_garden_vec(wallet_1_id.clone())
+        .simulate()
+        .await
+        .unwrap();
+    assert!(new_garden_vec.value.inner[0].is_none());
+    assert!(new_garden_vec.value.inner[1].is_some());
+    assert!(new_garden_vec.value.inner[2].is_some());
+    assert!(new_garden_vec.value.inner[3].is_none());
 
     // sell 2 harvested
     let sell_resp = instance
@@ -205,4 +235,35 @@ async fn can_play_game() {
     // check that tokens were minted to wallet_1
     let final_balance = wallet_1.get_asset_balance(&contract_asset).await.unwrap();
     assert_eq!(final_balance, planted_balance + 15_000_000);
+
+    let new_call_params = CallParameters::new(Some(price), Some(contract_asset.into()), None);
+
+    let buy_seeds_again_resp = instance
+        .with_wallet(wallet_1.clone())
+        .unwrap()
+        .methods()
+        .buy_seeds(FoodType::tomatoes, 1)
+        .call_params(new_call_params)
+        .unwrap()
+        .call()
+        .await;
+    assert!(buy_seeds_again_resp.is_ok());
+
+    // test plant seeds at index
+    let plant_seeds_at_index_resp = instance
+        .with_wallet(wallet_1.clone())
+        .unwrap()
+        .methods()
+        .plant_seed_at_index(FoodType::tomatoes, 7)
+        .call()
+        .await;
+    assert!(plant_seeds_at_index_resp.is_ok());
+
+    new_garden_vec = instance
+        .methods()
+        .get_garden_vec(wallet_1_id.clone())
+        .simulate()
+        .await
+        .unwrap();
+    assert!(new_garden_vec.value.inner[7].is_some());
 }
