@@ -1,42 +1,120 @@
 .App {
   text-align: center;
+  font-family: 'pressStart2P', Arial, sans-serif;
 }
 
-h3 {
-  margin-bottom: 8px;
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
 }
 
-.game-container{
-  display: flex;
-  justify-content: space-around;
+@font-face {
+  font-family: pressStart2P;
+  src: url(../public/PressStart2P-Regular.ttf);
 }
 
-.player-container{
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
 }
 
-.farm-container{
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+#canvas-container {
+  border: 4px solid #754a1e;
+  border-radius: 8px;
+  height: calc(100vh - 8px);
+  max-width: 1000px;
+  margin: auto;
+}
+
+.plant-modal, .harvest-modal, .market-modal, .new-player-modal {
+  background: #ac7339;
+  width: 400px;
+  position: absolute;
+  margin: auto;
+  padding: 40px 20px;
+  left: 0;
+  right: 0;
+  display: grid;
+  place-items: center;
+  top: 20vh;
+  border-radius: 8px;
+  border: 4px solid #754a1e;
+}
+
+.bottom-container{
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  right: 0;
+  margin: auto;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  max-width: 400px;
+  justify-content: space-between;
+  max-width: 1000px;
 }
 
-.bunny{
-  max-width: 500px;
+.player-info {
+  background: #ac7339;
+  height: 60px;
+  width: 280px;
+  display: flex;
+  padding: 20px;
+  border-radius: 8px;
+  border: 3px solid #754a1e;
 }
 
-.planted-seed{
-  max-width: 30px;
-}
-
-.player-info-container{
+.inventory {
+  height: 60px;
+  width: 140px;
   display: flex;
   justify-content: space-around;
+  padding: 20px;
+  border-radius: 8px;
+  border: 3px solid #754a1e;
 }
 
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
--webkit-appearance: none;
-margin: 0;}             
+.market-header{
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.sell{
+  margin-top: 40px;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;;
+}
