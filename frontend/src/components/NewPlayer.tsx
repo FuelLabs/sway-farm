@@ -45,6 +45,17 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
 
 const styles = {
     button: cssObj({
-        backgroundColor: 'LightBlue'
+        fontFamily: 'pressStart2P',
+        backgroundColor: 'transparent',
+        fontSize: '$sm',
+        mr: '-8px',
+        color: '#4c2802',
+        border: '2px solid #754a1e',
+        '&:hover': {
+            color: '#ac7339',
+            background: '#754a1e !important',
+            border: '2px solid #754a1e !important',
+            boxShadow: 'none !important'
+        }
     })
 }
