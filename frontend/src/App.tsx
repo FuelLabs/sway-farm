@@ -9,13 +9,13 @@ import Game from './components/Game';
 import './App.css';
 import { CONTRACT_ID } from "./constants";
 
-const myWallet = new WalletLocked("fuel13jajm0wphz2lkuv927p0rrv2v9akjaapx4umtp7yccnc2q05s2pszhs8aq");
+const myWallet = new WalletLocked("fuel16vjrcd2aywvu7jmycj6txgvkudcrfljq2tcyarkm55mryz8m9l2qj6nq9y");
 console.log("WALLET:", myWallet.address.toB256());
 
 function App() {
   const [wallet, setWallet] = useState<WalletLocked>();
   const [isConnected] = useIsConnected();
-  const [fuel, notDetected] = useFuel();
+  const [fuel] = useFuel();
 
   useEffect(() => {
     async function getAccounts() {
@@ -28,10 +28,7 @@ function App() {
 
   const contract = useMemo(() => {
     if (fuel && wallet) {
-      // Connects out Contract instance to the deployed contract
-      // address using the given wallet.
       const contract = ContractAbi__factory.connect(CONTRACT_ID, wallet);
-
       return contract;
     }
     return null;

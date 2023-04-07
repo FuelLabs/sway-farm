@@ -1,9 +1,9 @@
 contract;
 
-dep abi_and_structs;
+mod abi_structs;
 
 use {
-    abi_and_structs::*,
+    abi_structs::*,
     std::{
         auth::msg_sender,
         block::timestamp,

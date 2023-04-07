@@ -1,4 +1,4 @@
-library abi_and_structs;
+library;
 
 abi GameContract {
     // initialize player, mint some coins

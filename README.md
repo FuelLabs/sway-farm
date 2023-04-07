@@ -39,6 +39,8 @@ Next, in the `contract` folder, run the command below to deploy the contract to 
 forc deploy --unsigned
 ```
 
+In your wallet, add a network with `http://127.0.0.1:4000/graphql` and switch to that network.
+
 The contract ID should match the `CONTRACT_ID` in `frontend/src/constants.ts`. If you update the contract and the contract ID changes, you must update it here and run the command below in the `frontend` folder to generate new types.
 
 ```shell

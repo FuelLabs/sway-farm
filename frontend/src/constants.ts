@@ -1,7 +1,7 @@
 import { BN } from 'fuels'
 import { Vector3 } from "three"
 
-export const CONTRACT_ID = "0xe9ec85146439a731dca1add1510c4c454629e834819ec3a769bfa92c2cd1a244"
+export const CONTRACT_ID = "0x73fa75267758d899d159783e6f38eccabbcbb482b41620e3a74dccb9a2ce4874"
 
 export enum Controls {
     forward = 'forward',

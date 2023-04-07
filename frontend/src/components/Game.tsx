@@ -20,7 +20,6 @@ interface GameProps {
 }
 
 
-
 export default function Game({ contract }: GameProps) {
     const [modal, setModal] = useState<Actions>('none');
     const [tileStates, setTileStates] = useState<GardenVectorOutput | undefined>();
