@@ -1,30 +1,45 @@
 import { PlayerOutput } from "../../contracts/ContractAbi";
-import { Flex, Box } from "@fuel-ui/react";
+import { Flex, Box, Tooltip, Icon } from "@fuel-ui/react";
 import { cssObj } from "@fuel-ui/css";
 import ShowCoins from "./ShowCoins";
 
 interface PlayerProps {
-    player: PlayerOutput | null;
-    updateNum: number;
+  player: PlayerOutput | null;
+  updateNum: number;
 }
 
 export default function ShowPlayerInfo({ player, updateNum }: PlayerProps) {
-    let valSold;
-    if(player !== null){
-        valSold = parseFloat(player.total_value_sold.format().toLocaleString());
-    }
+  let valSold;
+  if (player !== null) {
+    valSold = parseFloat(player.total_value_sold.format().toLocaleString());
+  }
 
-    return (
-        <div className="player-info">
-            <Flex direction={'column'} justify="space-around">
-                    <Box css={styles}>Value Sold: {valSold}</Box>
-                    <ShowCoins updateNum={updateNum} />
-                </Flex>
-        </div>
-    )
+  const tooltipContent = <>
+    Use the arrow or WASD keys to move around
+  </>
+
+  return (
+    <div className="player-info">
+      <Flex direction={"column"} justify="space-around">
+        <Flex css={styles.tooltip} justify={"flex-end"}>
+            <Tooltip content={tooltipContent}>
+            <Icon icon="Question" inline />
+            </Tooltip>
+        </Flex>
+        <Box css={styles.box}>Value Sold: {valSold}</Box>
+        <ShowCoins updateNum={updateNum} />
+      </Flex>
+    </div>
+  );
 }
 
-let styles = cssObj({
-    fontFamily: 'pressStart2P',
-    fontSize: '$sm'
-})
+let styles = {
+  box: cssObj({
+    fontFamily: "pressStart2P",
+    fontSize: "$sm",
+  }),
+  tooltip: cssObj({
+    position: "relative",
+    left: "16px"
+  }),
+};

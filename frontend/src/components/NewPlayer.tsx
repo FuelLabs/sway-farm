@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ContractAbi } from "../contracts";
 import { Button, Spinner, BoxCentered } from "@fuel-ui/react";
-import { Dispatch, SetStateAction } from "react";
 import { cssObj } from "@fuel-ui/css";
 
 interface NewPlayerProps {
@@ -10,7 +9,7 @@ interface NewPlayerProps {
 }
 
 export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
-    const [status, setStatus] = useState<'error' | 'loading' | 'none'>('none');
+    const [status, setStatus] = useState<'error' | 'loading' | 'none'>('error');
     async function handleNewPlayer() {
         if (contract !== null) {
             try {
@@ -36,7 +35,17 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
                 {status === 'none' &&
                     <Button css={styles.button} onPress={handleNewPlayer}>Make A New Player</Button>
                 }
-            {status === 'error' && <div>Something went wrong, try again</div>}
+            {status === 'error' && (
+                <div>
+                    <p>Something went wrong!</p>
+                    <Button 
+                    css={styles.button} 
+                    onPress={() => {setStatus('none'); updatePageNum()}}
+                    >
+                        Try Again
+                    </Button>
+                </div>
+            )}
             {status === 'loading' && <BoxCentered><Spinner color="#754a1e"/></BoxCentered>}
             </div>
         </>

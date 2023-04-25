@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, Dispatch, SetStateAction } from "react";
 import { ContractAbi } from "../../contracts";
 import { bn } from "fuels";
 import { FoodTypeInput } from "../../contracts/ContractAbi";
@@ -9,9 +9,10 @@ import { cssObj } from "@fuel-ui/css";
 interface BuySeedsProps {
     contract: ContractAbi | null;
     updatePageNum: () => void;
+    setCanMove: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function BuySeeds({ contract, updatePageNum }: BuySeedsProps) {
+export default function BuySeeds({ contract, updatePageNum, setCanMove }: BuySeedsProps) {
     const [amount, setAmount] = useState<string>("0");
     const [status, setStatus] = useState<'error' | 'none' | `loading`>('none');
 
@@ -19,7 +20,8 @@ export default function BuySeeds({ contract, updatePageNum }: BuySeedsProps) {
         e.preventDefault();
         if (contract !== null) {
             try {
-                setStatus('loading')
+                setStatus('loading');
+                setCanMove(false);
                 let realAmount = parseInt(amount) / 1_000_000_000;
                 let inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
                 let seedType: FoodTypeInput = { tomatoes: [] };
@@ -36,6 +38,7 @@ export default function BuySeeds({ contract, updatePageNum }: BuySeedsProps) {
                 console.log("Error:", err)
                 setStatus('error')
             }
+            setCanMove(true);
         } else {
             console.log("ERROR: contract missing");
             setStatus('error')

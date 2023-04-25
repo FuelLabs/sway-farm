@@ -9,8 +9,8 @@ import Game from './components/Game';
 import './App.css';
 import { CONTRACT_ID } from "./constants";
 
-const myWallet = new WalletLocked("fuel16vjrcd2aywvu7jmycj6txgvkudcrfljq2tcyarkm55mryz8m9l2qj6nq9y");
-console.log("WALLET:", myWallet.address.toB256());
+// const myWallet = new WalletLocked("fuel1exxxqfp0specps2cstz8a5xlvh8xcf02chakfanf8w5f8872582qpa00kz");
+// console.log("WALLET:", myWallet.address.toB256());
 
 function App() {
   const [wallet, setWallet] = useState<WalletLocked>();
@@ -45,7 +45,7 @@ function App() {
           )}
         </div>
       ) : (
-        <div style={{marginTop: "200px"}}>
+        <div style={styles.download}>
           Download the{" "}
           <Link
             target="_blank"
@@ -68,7 +68,7 @@ const styles = {
       fontFamily: 'pressStart2P',
       fontSize: '$sm',
       mr: '-8px',
-      mt: '200px',
+      mt: "30%",
       color: '#4c2802',
       border: '2px solid #754a1e',
       backgroundColor: '#754a1e',
@@ -77,5 +77,9 @@ const styles = {
         backgroundColor: '#46677d !important',
         boxShadow: 'none !important'
       }
-  })
+  }),
+  download: {
+    marginTop: "30%",
+    color: '#ddd'
+  }
 }

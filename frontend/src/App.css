@@ -58,7 +58,7 @@
   height: 60px;
   width: 280px;
   display: flex;
-  padding: 20px;
+  padding: 0 0 20px 20px;
   border-radius: 8px;
   border: 3px solid #754a1e;
 }

@@ -12,8 +12,8 @@
     "initial_state": {
       "coins": [
         {
-          "owner": "0xd3243c355d2399cf4b64c4b4b32196e37034fe4052f04e8edba5363208fb2fd4",
-          "amount": "0x00000000FFFFFFFF",
+          "owner": "0xc98c60242f807380c15882c47ed0df65ce6c25eac5fb64f6693ba8939fcaa1d4",
+          "amount": "0x000000000FFFFFFF",
           "asset_id": "0x0000000000000000000000000000000000000000000000000000000000000000"
         }
       ]

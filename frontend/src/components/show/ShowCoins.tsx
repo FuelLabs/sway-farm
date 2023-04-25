@@ -9,19 +9,36 @@ interface ShowCoinsProps {
   updateNum: number;
 }
 
+const FARM_COIN_ASSET = {
+  "assetId": CONTRACT_ID,
+  "imageUrl": "https://sway-farm.vercel.app/images/pixel-bunny.png",
+  "isCustom": true,
+  "name": "Sway Farm Coin",
+  "symbol": "FARM",
+}
+
 export default function ShowCoins({ updateNum }: ShowCoinsProps){
     const [balance, setBalance] = useState<BN>();
-    const [Fuel] = useFuel();
+    const [fuel] = useFuel();
 
     useEffect(() => {
         async function getAccounts() {
-          const currentAccount = await Fuel.currentAccount();
-          const wallet = await Fuel.getWallet(currentAccount)
+          const currentAccount = await fuel.currentAccount();
+          const wallet = await fuel.getWallet(currentAccount)
           const walletBalance = await wallet.getBalance(CONTRACT_ID);
           setBalance(walletBalance);
+          const assets = await fuel.assets();
+          let hasAsset = false;
+          for(let i = 0; i < assets.length; i++){
+            if(FARM_COIN_ASSET.assetId === assets[i].assetId){
+              hasAsset = true;
+              break;
+            }
+          }
+          if(!hasAsset) await fuel.addAssets([FARM_COIN_ASSET]);
         }
-        if (Fuel) getAccounts();
-      }, [Fuel, updateNum]);
+        if (fuel) getAccounts();
+      }, [fuel, updateNum]);
 
       
     return (

@@ -5,13 +5,12 @@ import { useKeyboardControls } from "@react-three/drei"
 import { Actions, Controls, convertTime, TILES } from "../constants"
 import { GardenVectorOutput } from "../contracts/ContractAbi"
 
-
 interface PlayerProps {
     tileStates: GardenVectorOutput | undefined;
-    setTileStates: Dispatch<SetStateAction<GardenVectorOutput | undefined>>;
     modal: Actions;
     setModal: Dispatch<SetStateAction<Actions>>;
     setTileArray: Dispatch<SetStateAction<number[]>>;
+    canMove: boolean;
 }
 
 const bounds = {
@@ -34,7 +33,7 @@ const marketBounds = {
     y: 1.7,
 }
 
-export default function Player({ tileStates, setTileStates, setModal, setTileArray }: PlayerProps) {
+export default function Player({ tileStates, setModal, setTileArray, canMove }: PlayerProps) {
     const [currentTile, setCurrentTile] = useState<number>(0);
     const [spriteMap, setSpriteMap] = useState<Texture>();
     const ref = useRef<Sprite>(null)
@@ -57,10 +56,9 @@ export default function Player({ tileStates, setTileStates, setModal, setTileArr
     const velocity = new Vector3()
 
     useFrame((_s, dl) => {
-        const state = get()
-        checkTiles(state)
-        movePlayer(dl, state)
-
+        const state = get();
+        checkTiles(state);
+        if(canMove) movePlayer(dl, state);
     })
 
     function checkTiles(state: any) {

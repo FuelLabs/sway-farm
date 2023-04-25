@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { Vector3, TextureLoader, NearestFilter } from "three"
-import { Image, Html } from "@react-three/drei"
+import { Html } from "@react-three/drei"
 import { convertTime } from "../constants"
 import { Spinner } from "@fuel-ui/react"
 import { FoodOutput } from "../contracts/ContractAbi"

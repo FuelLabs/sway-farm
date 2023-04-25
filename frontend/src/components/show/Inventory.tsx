@@ -1,17 +1,15 @@
 import { NearestFilter, TextureLoader } from 'three'
 import { useLoader } from '@react-three/fiber'
 import { Html, RoundedBox } from '@react-three/drei'
-import { ContractAbi } from '../../contracts'
 import ShowItems from './ShowItems'
 import ShowSeeds from './ShowSeeds'
 
 interface InventoryProps {
-    contract: ContractAbi | null;
-    updateNum: number;
     seeds: number;
+    items: number;
 }
 
-export default function Inventory({ contract, updateNum, seeds }: InventoryProps) {
+export default function Inventory({ seeds, items }: InventoryProps) {
     let seedBagTexture = useLoader(TextureLoader, 'images/tomato_seed_bag.png')
     let tomatoTexture = useLoader(TextureLoader, 'images/tomato.png')
     seedBagTexture.magFilter = NearestFilter;
@@ -20,8 +18,7 @@ export default function Inventory({ contract, updateNum, seeds }: InventoryProps
     return (
         <>
             <RoundedBox scale={[1.82, 1, 1]} position={[4.07, -3.16, 3]}>
-                <meshStandardMaterial color="#ac7339" />
-
+                <meshStandardMaterial color="#9a6938" />
             </RoundedBox>
             <Html position={[3.15, -2.66, 3]}>
                 <div style={{
@@ -41,7 +38,7 @@ export default function Inventory({ contract, updateNum, seeds }: InventoryProps
                 <spriteMaterial attach="material" map={tomatoTexture} />
             </sprite>
             <Html position={[4.6, -3.25, 3.5]}>
-                <ShowItems contract={contract} updateNum={updateNum}/>
+                <ShowItems items={items}/>
             </Html>
         </>
     )
