@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useIsConnected } from "./hooks/useIsConnected";
 import { useFuel } from "./hooks/useFuel";
 import { ContractAbi__factory } from "./contracts";
-import { Link, Button, BoxCentered } from "@fuel-ui/react";
+import { Link, Button, BoxCentered, Heading } from "@fuel-ui/react";
 import { cssObj } from "@fuel-ui/css";
 import { WalletLocked } from "fuels";
 import Game from "./components/Game";
@@ -58,9 +58,12 @@ function App() {
             <Game contract={contract} />
           ) : (
             <BoxCentered css={styles.box}>
+              <BoxCentered css={styles.innerBox}>
+              <Heading css={styles.heading} as={"h1"}>SWAY FARM</Heading>
               <Button css={styles.button} onPress={() => fuel.connect()}>
                 Connect Wallet
               </Button>
+              </BoxCentered>
             </BoxCentered>
           )}
         </div>
@@ -85,9 +88,21 @@ export default App;
 
 const styles = {
   box: cssObj({
-    height: "100vh",
-    display: "grid",
-    placeItems: "center",
+    marginTop: "20%"
+  }),
+  innerBox: cssObj({
+    display: "block"
+  }),
+  heading: cssObj({
+    fontFamily: "pressStart2P",
+    fontSize: "$5xl",
+    marginBottom: "40px",
+    lineHeight: "3.5rem",
+    color: "green",
+    "@sm": {
+      fontSize: "$7xl",
+      lineHeight: "2.5rem",
+    }
   }),
   button: cssObj({
     fontFamily: "pressStart2P",

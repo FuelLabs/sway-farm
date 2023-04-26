@@ -1,23 +1,12 @@
 .App {
   text-align: center;
-  font-family: 'pressStart2P', Arial, sans-serif;
+  font-family: "pressStart2P", Arial, sans-serif;
 }
 
 @font-face {
   font-family: pressStart2P;
   src: url(../public/PressStart2P-Regular.ttf);
 }
-/* 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-} */
 
 #canvas-container {
   border: 4px solid #754a1e;
@@ -27,7 +16,10 @@
   margin: auto;
 }
 
-.plant-modal, .harvest-modal, .market-modal, .new-player-modal {
+.plant-modal,
+.harvest-modal,
+.market-modal,
+.new-player-modal {
   background: #ac7339;
   width: 400px;
   position: absolute;
@@ -42,7 +34,7 @@
   border: 4px solid #754a1e;
 }
 
-.bottom-container{
+.bottom-container {
   position: absolute;
   bottom: 4px;
   left: 0;
@@ -73,12 +65,12 @@
   border: 3px solid #754a1e;
 }
 
-.market-header{
+.market-header {
   margin-bottom: 20px;
   font-size: 1.5rem;
 }
 
-.sell{
+.sell {
   margin-top: 40px;
 }
 
@@ -90,7 +82,29 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type=number] {
+input[type="number"] {
   -moz-appearance: textfield;
-  appearance: textfield;;
+  appearance: textfield;
+}
+
+h1 {
+  animation: colorRotate 6s linear 0s infinite;
+}
+
+@keyframes colorRotate {
+  from {
+    color: #6666ff;
+  }
+  10% {
+    color: #0099ff;
+  }
+  50% {
+    color: #00ff00;
+  }
+  75% {
+    color: #ff3399;
+  }
+  100% {
+    color: #6666ff;
+  }
 }
