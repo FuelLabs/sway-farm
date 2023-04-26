@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useIsConnected } from "./hooks/useIsConnected";
 import { useFuel } from "./hooks/useFuel";
 import { ContractAbi__factory } from "./contracts";
-import { Link, Button, BoxCentered, Heading } from "@fuel-ui/react";
+import { Link, Button, Box, BoxCentered, Heading } from "@fuel-ui/react";
 import { cssObj } from "@fuel-ui/css";
 import { WalletLocked } from "fuels";
 import Game from "./components/Game";
@@ -52,34 +52,39 @@ function App() {
 
   return (
     <div className="App">
-      {fuel ? (
-        <div>
-          {isConnected ? (
-            <Game contract={contract} />
-          ) : (
-            <BoxCentered css={styles.box}>
-              <BoxCentered css={styles.innerBox}>
-              <Heading css={styles.heading} as={"h1"}>SWAY FARM</Heading>
-              <Button css={styles.button} onPress={() => fuel.connect()}>
-                Connect Wallet
-              </Button>
-              </BoxCentered>
+      <div>
+        {isConnected ? (
+          <Game contract={contract} />
+        ) : (
+          <BoxCentered css={styles.box}>
+            <BoxCentered css={styles.innerBox}>
+              <Heading css={styles.heading} as={"h1"}>
+                SWAY FARM
+              </Heading>
+              <Box css={styles.smallScreen}>
+                This game is not supported on mobile.
+              </Box>
+              {fuel ? (
+                <Button css={styles.button} onPress={() => fuel.connect()}>
+                  Connect Wallet
+                </Button>
+              ) : (
+                <Box css={styles.download}>
+                  Download the{" "}
+                  <Link
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="https://wallet.fuel.network/"
+                  >
+                    Fuel Wallet
+                  </Link>{" "}
+                  to play the game.
+                </Box>
+              )}
             </BoxCentered>
-          )}
-        </div>
-      ) : (
-        <div style={styles.download}>
-          Download the{" "}
-          <Link
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://wallet.fuel.network/"
-          >
-            Fuel Wallet
-          </Link>{" "}
-          to play the game.
-        </div>
-      )}
+          </BoxCentered>
+        )}
+      </div>
     </div>
   );
 }
@@ -88,10 +93,10 @@ export default App;
 
 const styles = {
   box: cssObj({
-    marginTop: "20%"
+    marginTop: "20%",
   }),
   innerBox: cssObj({
-    display: "block"
+    display: "block",
   }),
   heading: cssObj({
     fontFamily: "pressStart2P",
@@ -102,14 +107,19 @@ const styles = {
     "@sm": {
       fontSize: "$7xl",
       lineHeight: "2.5rem",
-    }
+    },
   }),
   button: cssObj({
     fontFamily: "pressStart2P",
     fontSize: "$sm",
+    margin: "auto",
     backgroundColor: "transparent",
     color: "#aaa",
     border: "2px solid #754a1e",
+    display: "none",
+    "@sm": {
+      display: "block",
+    },
     "&:hover": {
       color: "#ddd",
       background: "#754a1e !important",
@@ -117,8 +127,21 @@ const styles = {
       boxShadow: "none !important",
     },
   }),
-  download: {
-    marginTop: "30%",
+  download: cssObj({
     color: "#ddd",
-  },
+    fontFamily: "pressStart2P",
+    lineHeight: "24px",
+    display: "none",
+    "@sm": {
+      display: "block",
+    },
+  }),
+  smallScreen: cssObj({
+    color: "#ddd",
+    fontFamily: "pressStart2P",
+    fontSize: "12px",
+    "@sm": {
+      display: "none",
+    },
+  }),
 };
