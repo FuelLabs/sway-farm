@@ -4,6 +4,7 @@ import { useFuel } from "./hooks/useFuel";
 import { ContractAbi__factory } from "./contracts";
 import { Link, Button, Box, BoxCentered, Heading } from "@fuel-ui/react";
 import { cssObj } from "@fuel-ui/css";
+import { Analytics } from '@vercel/analytics/react';
 import { WalletLocked } from "fuels";
 import Game from "./components/Game";
 import "./App.css";
@@ -85,6 +86,7 @@ function App() {
           </BoxCentered>
         )}
       </div>
+      <Analytics/>
     </div>
   );
 }
