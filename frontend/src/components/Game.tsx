@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { KeyboardControls, KeyboardControlsEntry } from "@react-three/drei";
-import { Spinner, BoxCentered } from "@fuel-ui/react";
+import { Spinner, BoxCentered, Button } from "@fuel-ui/react";
 import { cssObj } from "@fuel-ui/css";
 import { BN } from "fuels";
-import { Actions, Controls } from "../constants";
+import { Modals, Controls, buttonStyle } from "../constants";
 import { ContractAbi } from "../contracts";
 import {
   AddressInput,
@@ -28,7 +28,7 @@ interface GameProps {
 }
 
 export default function Game({ contract }: GameProps) {
-  const [modal, setModal] = useState<Actions>("none");
+  const [modal, setModal] = useState<Modals>("none");
   const [tileStates, setTileStates] = useState<
     GardenVectorOutput | undefined
   >();
@@ -99,7 +99,20 @@ export default function Game({ contract }: GameProps) {
 
   return (
     <div id="canvas-container">
-      {status === "error" && <div>Something went wrong, try again</div>}
+      {status === "error" && (
+        <div>
+          <p>Something went wrong!</p>
+          <Button
+            css={buttonStyle}
+            onPress={() => {
+              setStatus("none");
+              updatePageNum();
+            }}
+          >
+            Try Again
+          </Button>
+        </div>
+      )}
       {status === "loading" && (
         <BoxCentered css={styles.loading}>
           <Spinner color="#754a1e" />

@@ -1,30 +1,46 @@
 import { useState, useEffect, useMemo } from "react";
-import { useIsConnected } from './hooks/useIsConnected';
-import { useFuel } from './hooks/useFuel';
+import { useIsConnected } from "./hooks/useIsConnected";
+import { useFuel } from "./hooks/useFuel";
 import { ContractAbi__factory } from "./contracts";
-import { Link, Button } from "@fuel-ui/react";
+import { Link, Button, BoxCentered } from "@fuel-ui/react";
 import { cssObj } from "@fuel-ui/css";
 import { WalletLocked } from "fuels";
-import Game from './components/Game';
-import './App.css';
-import { CONTRACT_ID } from "./constants";
+import Game from "./components/Game";
+import "./App.css";
+import { CONTRACT_ID, FARM_COIN_ASSET } from "./constants";
 
 // const myWallet = new WalletLocked("fuel1exxxqfp0specps2cstz8a5xlvh8xcf02chakfanf8w5f8872582qpa00kz");
 // console.log("WALLET:", myWallet.address.toB256());
 
 function App() {
   const [wallet, setWallet] = useState<WalletLocked>();
+  const [mounted, setMounted] = useState<boolean>(false);
   const [isConnected] = useIsConnected();
   const [fuel] = useFuel();
 
   useEffect(() => {
     async function getAccounts() {
       const currentAccount = await fuel.currentAccount();
-      const tempWallet = await fuel.getWallet(currentAccount)
-      setWallet(tempWallet)
+      const tempWallet = await fuel.getWallet(currentAccount);
+      setWallet(tempWallet);
+      if (mounted) {
+        const assets = await fuel.assets();
+        let hasAsset = false;
+        for (let i = 0; i < assets.length; i++) {
+          if (FARM_COIN_ASSET.assetId === assets[i].assetId) {
+            hasAsset = true;
+            break;
+          }
+        }
+        if (!hasAsset) {
+          await fuel.addAssets([FARM_COIN_ASSET]);
+        }
+      } else {
+        setMounted(true);
+      }
     }
     if (fuel) getAccounts();
-  }, [fuel, isConnected]);
+  }, [fuel, isConnected, mounted]);
 
   const contract = useMemo(() => {
     if (fuel && wallet) {
@@ -39,9 +55,13 @@ function App() {
       {fuel ? (
         <div>
           {isConnected ? (
-            <Game contract={contract}/>
+            <Game contract={contract} />
           ) : (
-              <Button css={styles.button} onPress={() => fuel.connect()}>Connect Wallet</Button>
+            <BoxCentered css={styles.box}>
+              <Button css={styles.button} onPress={() => fuel.connect()}>
+                Connect Wallet
+              </Button>
+            </BoxCentered>
           )}
         </div>
       ) : (
@@ -64,22 +84,26 @@ function App() {
 export default App;
 
 const styles = {
+  box: cssObj({
+    height: "100vh",
+    display: "grid",
+    placeItems: "center",
+  }),
   button: cssObj({
-      fontFamily: 'pressStart2P',
-      fontSize: '$sm',
-      mr: '-8px',
-      mt: "30%",
-      color: '#4c2802',
-      border: '2px solid #754a1e',
-      backgroundColor: '#754a1e',
-      '&:hover': {
-        color: '#ac7339',
-        backgroundColor: '#46677d !important',
-        boxShadow: 'none !important'
-      }
+    fontFamily: "pressStart2P",
+    fontSize: "$sm",
+    backgroundColor: "transparent",
+    color: "#aaa",
+    border: "2px solid #754a1e",
+    "&:hover": {
+      color: "#ddd",
+      background: "#754a1e !important",
+      border: "2px solid #754a1e !important",
+      boxShadow: "none !important",
+    },
   }),
   download: {
     marginTop: "30%",
-    color: '#ddd'
-  }
-}
+    color: "#ddd",
+  },
+};

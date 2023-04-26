@@ -2,13 +2,13 @@ import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react"
 import { Vector3, TextureLoader, NearestFilter, Texture, Sprite } from "three"
 import { useFrame, useLoader } from "@react-three/fiber"
 import { useKeyboardControls } from "@react-three/drei"
-import { Actions, Controls, convertTime, TILES } from "../constants"
+import { Modals, Controls, convertTime, TILES } from "../constants"
 import { GardenVectorOutput } from "../contracts/ContractAbi"
 
 interface PlayerProps {
     tileStates: GardenVectorOutput | undefined;
-    modal: Actions;
-    setModal: Dispatch<SetStateAction<Actions>>;
+    modal: Modals;
+    setModal: Dispatch<SetStateAction<Modals>>;
     setTileArray: Dispatch<SetStateAction<number[]>>;
     canMove: boolean;
 }

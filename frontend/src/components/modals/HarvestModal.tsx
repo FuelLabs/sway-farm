@@ -2,6 +2,7 @@ import { useState, Dispatch, SetStateAction } from "react";
 import { ContractAbi } from "../../contracts";
 import { Spinner, Button, BoxCentered } from "@fuel-ui/react";
 import { cssObj } from "@fuel-ui/css";
+import { buttonStyle } from "../../constants";
 
 interface HarvestProps {
     contract: ContractAbi | null;
@@ -39,7 +40,7 @@ export default function HarvestModal({ contract, tileArray, updatePageNum, setCa
                 <div>
                     <p>Something went wrong!</p>
                     <Button 
-                    css={styles.button} 
+                    css={buttonStyle} 
                     onPress={() => {setStatus('none'); updatePageNum()}}
                     >
                         Try Again
@@ -48,8 +49,8 @@ export default function HarvestModal({ contract, tileArray, updatePageNum, setCa
             )}
             {status === 'none' && ( 
             <>
-            <div>Harvest this item?</div>
-            <Button css={styles.items} onPress={harvestItem}>Harvest</Button>
+            <div style={styles.items}>Harvest this item?</div>
+            <Button css={buttonStyle} onPress={harvestItem}>Harvest</Button>
             </>
             )}
         </div>
@@ -57,24 +58,7 @@ export default function HarvestModal({ contract, tileArray, updatePageNum, setCa
 }
 
 const styles = {
-    button: cssObj({
-        fontFamily: 'pressStart2P',
-        backgroundColor: 'transparent',
-        fontSize: '$sm',
-        mr: '-8px',
-        color: '#4c2802',
-        border: '2px solid #754a1e',
-        '&:hover': {
-            color: '#ac7339',
-            background: '#754a1e !important',
-            border: '2px solid #754a1e !important',
-            boxShadow: 'none !important'
-        }
-    }),
-    items: cssObj({
-        fontFamily: 'pressStart2P',
-        fontSize: '$sm',
-        backgroundColor: '#46677d',
-        marginTop: '$4'
-    })
+    items: {
+        marginBottom: '20px'
+    }
 }

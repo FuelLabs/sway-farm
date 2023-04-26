@@ -2,7 +2,7 @@ import { useState, Dispatch, SetStateAction } from "react";
 import { Spinner, Button } from "@fuel-ui/react";
 import { FoodTypeInput } from "../../contracts/ContractAbi";
 import { ContractAbi } from "../../contracts";
-import { cssObj } from "@fuel-ui/css";
+import { buttonStyle } from "../../constants";
 
 interface PlantModalProps {
     contract: ContractAbi | null;
@@ -47,7 +47,7 @@ export default function PlantModal({ contract, updatePageNum, tileArray, seeds, 
                 <div>
                     <p>Something went wrong!</p>
                     <Button 
-                    css={styles.button} 
+                    css={buttonStyle} 
                     onPress={() => {setStatus('none'); updatePageNum()}}
                     >
                         Try Again
@@ -57,8 +57,8 @@ export default function PlantModal({ contract, updatePageNum, tileArray, seeds, 
             {status === 'none' && <>
                 {seeds > 0 ?
                     <>
-                        <div>Plant a seed here?</div>
-                        <Button css={styles.seeds} onPress={handlePlant}>Plant</Button>
+                        <div style={styles.seeds}>Plant a seed here?</div>
+                        <Button css={buttonStyle} onPress={handlePlant}>Plant</Button>
                     </>
                     :
                     <div>
@@ -74,24 +74,7 @@ export default function PlantModal({ contract, updatePageNum, tileArray, seeds, 
 }
 
 const styles = {
-    button: cssObj({
-        fontFamily: 'pressStart2P',
-        backgroundColor: 'transparent',
-        fontSize: '$sm',
-        mr: '-8px',
-        color: '#4c2802',
-        border: '2px solid #754a1e',
-        '&:hover': {
-            color: '#ac7339',
-            background: '#754a1e !important',
-            border: '2px solid #754a1e !important',
-            boxShadow: 'none !important'
-        }
-    }),
-    seeds: cssObj({
-        fontFamily: 'pressStart2P',
-        fontSize: '$sm',
-        backgroundColor: '#46677d',
-        marginTop: '$4'
-    })
+    seeds: {
+        marginBottom: '20px'
+    }
 }

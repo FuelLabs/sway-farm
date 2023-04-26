@@ -4,6 +4,7 @@ import { bn } from "fuels";
 import { FoodTypeInput } from "../../contracts/ContractAbi";
 import { Input, Button, Spinner, BoxCentered, Box } from "@fuel-ui/react";
 import { cssObj } from "@fuel-ui/css";
+import { buttonStyle } from "../../constants";
 
 interface SellItemProps {
   contract: ContractAbi | null;
@@ -70,14 +71,14 @@ export default function SellItem({
                   onChange={(e) => setAmount(e.target.value)}
                 />
                 <Input.ElementRight>
-                  <Button css={styles.button} type="submit" variant="outlined">
+                  <Button css={buttonStyle} type="submit" variant="outlined">
                     Sell
                   </Button>
                 </Input.ElementRight>
               </Input>
               {parseInt(amount) > items && (
                 <div style={styles.error}>
-                  You only have {items} {items > 1 ? "items" : "item"} to sell!
+                  *You only have {items} {items > 1 ? "items" : "item"} to sell!*
                 </div>
               )}
             </Box>
@@ -89,18 +90,6 @@ export default function SellItem({
 }
 
 let styles = {
-  button: cssObj({
-    fontFamily: "pressStart2P",
-    fontSize: "$sm",
-    mr: "-8px",
-    color: "#4c2802",
-    border: "2px solid #754a1e",
-    "&:hover": {
-      color: "#ac7339",
-      background: "#754a1e !important",
-      border: "2px solid #754a1e !important",
-    },
-  }),
   input: cssObj({
     backgroundColor: "transparent",
     border: "3px solid #754a1e",

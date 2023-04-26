@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ContractAbi } from "../contracts";
 import { Button, Spinner, BoxCentered } from "@fuel-ui/react";
-import { cssObj } from "@fuel-ui/css";
+import { buttonStyle } from "../constants";
 
 interface NewPlayerProps {
     contract: ContractAbi | null;
@@ -33,13 +33,13 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
         <>
             <div className="new-player-modal">
                 {status === 'none' &&
-                    <Button css={styles.button} onPress={handleNewPlayer}>Make A New Player</Button>
+                    <Button css={buttonStyle} onPress={handleNewPlayer}>Make A New Player</Button>
                 }
             {status === 'error' && (
                 <div>
                     <p>Something went wrong!</p>
                     <Button 
-                    css={styles.button} 
+                    css={buttonStyle} 
                     onPress={() => {setStatus('none'); updatePageNum()}}
                     >
                         Try Again
@@ -50,21 +50,4 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
             </div>
         </>
     )
-}
-
-const styles = {
-    button: cssObj({
-        fontFamily: 'pressStart2P',
-        backgroundColor: 'transparent',
-        fontSize: '$sm',
-        mr: '-8px',
-        color: '#4c2802',
-        border: '2px solid #754a1e',
-        '&:hover': {
-            color: '#ac7339',
-            background: '#754a1e !important',
-            border: '2px solid #754a1e !important',
-            boxShadow: 'none !important'
-        }
-    })
 }

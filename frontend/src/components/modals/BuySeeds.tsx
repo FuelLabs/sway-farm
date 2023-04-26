@@ -3,7 +3,7 @@ import { ContractAbi } from "../../contracts";
 import { bn } from "fuels";
 import { FoodTypeInput } from "../../contracts/ContractAbi";
 import { Button, Spinner, Input, BoxCentered } from "@fuel-ui/react";
-import { CONTRACT_ID } from "../../constants";
+import { CONTRACT_ID, buttonStyle } from "../../constants";
 import { cssObj } from "@fuel-ui/css";
 
 interface BuySeedsProps {
@@ -66,7 +66,7 @@ export default function BuySeeds({ contract, updatePageNum, setCanMove }: BuySee
                             />
                             <Input.ElementRight>
                                 <Button
-                                    css={styles.button}
+                                    css={buttonStyle}
                                     type="submit"
                                     variant="outlined"
                                 >
@@ -82,18 +82,6 @@ export default function BuySeeds({ contract, updatePageNum, setCanMove }: BuySee
 }
 
 let styles = {
-    button: cssObj({
-        fontFamily: 'pressStart2P',
-        fontSize: '$sm',
-        mr: '-8px',
-        color: '#4c2802',
-        border: '2px solid #754a1e',
-        '&:hover': {
-            color: '#ac7339',
-            background: '#754a1e !important',
-            border: '2px solid #754a1e !important',
-        }
-    }),
     input: cssObj({
         backgroundColor: 'transparent',
         border: '3px solid #754a1e',
