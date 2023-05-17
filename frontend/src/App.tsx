@@ -7,6 +7,7 @@ import { cssObj } from "@fuel-ui/css";
 import { Analytics } from '@vercel/analytics/react';
 import { WalletLocked } from "fuels";
 import Game from "./components/Game";
+import Instructions from "./components/Instructions";
 import "./App.css";
 import { CONTRACT_ID, FARM_COIN_ASSET } from "./constants";
 
@@ -66,9 +67,12 @@ function App() {
                 This game is not supported on mobile.
               </Box>
               {fuel ? (
+                <>
+                <Instructions/>
                 <Button css={styles.button} onPress={() => fuel.connect()}>
                   Connect Wallet
                 </Button>
+                </>
               ) : (
                 <Box css={styles.download}>
                   Download the{" "}
