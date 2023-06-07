@@ -31,6 +31,7 @@ export default function BuySeeds({ contract, updatePageNum, setCanMove }: BuySee
                     .callParams({
                         forward: [price, CONTRACT_ID],
                     })
+                    .txParams({gasPrice: 1})
                     .call();
                 updatePageNum()
                 setStatus('none')
@@ -48,7 +49,20 @@ export default function BuySeeds({ contract, updatePageNum, setCanMove }: BuySee
     return (
         <>
             {status === 'loading' && <BoxCentered><Spinner color="#754a1e"/></BoxCentered>}
-            {status === 'error' && <div>Something went wrong, try again</div>}
+            {status === "error" && (
+          <div>
+            <p>Something went wrong!</p>
+            <Button
+              css={buttonStyle}
+              onPress={() => {
+                setStatus("none");
+                updatePageNum();
+              }}
+            >
+              Try Again
+            </Button>
+          </div>
+        )}
             {status === 'none' &&
                 <>
                     <div className="market-header">Buy Seeds</div>

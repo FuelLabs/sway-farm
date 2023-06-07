@@ -31,7 +31,10 @@ export default function SellItem({
         let realAmount = parseInt(amount) / 1_000_000_000;
         let inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
         let seedType: FoodTypeInput = { tomatoes: [] };
-        await contract.functions.sell_item(seedType, inputAmount).call();
+        await contract.functions
+          .sell_item(seedType, inputAmount)
+          .txParams({ gasPrice: 1 })
+          .call();
         updatePageNum();
         setStatus("none");
       } catch (err) {
@@ -53,7 +56,20 @@ export default function SellItem({
           <Spinner color="#754a1e" />
         </BoxCentered>
       )}
-      {status === "error" && <div>Something went wrong, try again</div>}
+      {status === "error" && (
+        <div>
+          <p>Something went wrong!</p>
+          <Button
+            css={buttonStyle}
+            onPress={() => {
+              setStatus("none");
+              updatePageNum();
+            }}
+          >
+            Try Again
+          </Button>
+        </div>
+      )}
       {status === "none" && (
         <>
           <form onSubmit={handleSubmit}>
@@ -78,7 +94,8 @@ export default function SellItem({
               </Input>
               {parseInt(amount) > items && (
                 <div style={styles.error}>
-                  *You only have {items} {items > 1 ? "items" : "item"} to sell!*
+                  *You only have {items} {items > 1 ? "items" : "item"} to
+                  sell!*
                 </div>
               )}
             </Box>

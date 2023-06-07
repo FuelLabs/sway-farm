@@ -1,21 +1,22 @@
 import { useState, useEffect, useMemo } from "react";
+import { WalletLocked, Wallet, Account } from "fuels";
+import { Box, BoxCentered, Heading } from "@fuel-ui/react";
+import { cssObj } from "@fuel-ui/css";
+import { Analytics } from "@vercel/analytics/react";
+import Game from "./components/Game";
+import Home from "./components/home/Home";
 import { useIsConnected } from "./hooks/useIsConnected";
 import { useFuel } from "./hooks/useFuel";
-import { ContractAbi__factory } from "./contracts";
-import { Link, Button, Box, BoxCentered, Heading } from "@fuel-ui/react";
-import { cssObj } from "@fuel-ui/css";
-import { Analytics } from '@vercel/analytics/react';
-import { WalletLocked } from "fuels";
-import Game from "./components/Game";
-import Instructions from "./components/Instructions";
-import "./App.css";
 import { CONTRACT_ID, FARM_COIN_ASSET } from "./constants";
+import { ContractAbi__factory } from "./contracts";
+import "./App.css";
 
 // const myWallet = new WalletLocked("fuel1exxxqfp0specps2cstz8a5xlvh8xcf02chakfanf8w5f8872582qpa00kz");
 // console.log("WALLET:", myWallet.address.toB256());
 
 function App() {
   const [wallet, setWallet] = useState<WalletLocked>();
+  const [burnerWallet, setBurnerWallet] = useState<Wallet>();
   const [mounted, setMounted] = useState<boolean>(false);
   const [isConnected] = useIsConnected();
   const [fuel] = useFuel();
@@ -48,14 +49,17 @@ function App() {
     if (fuel && wallet) {
       const contract = ContractAbi__factory.connect(CONTRACT_ID, wallet);
       return contract;
+    } else if (burnerWallet) {
+      const contract = ContractAbi__factory.connect(CONTRACT_ID, burnerWallet as Account);
+      return contract;
     }
     return null;
-  }, [fuel, wallet]);
+  }, [fuel, wallet, burnerWallet]);
 
   return (
     <div className="App">
       <div>
-        {isConnected ? (
+        {isConnected || (contract && burnerWallet) ? (
           <Game contract={contract} />
         ) : (
           <BoxCentered css={styles.box}>
@@ -66,31 +70,12 @@ function App() {
               <Box css={styles.smallScreen}>
                 This game is not supported on mobile.
               </Box>
-              {fuel ? (
-                <>
-                <Instructions/>
-                <Button css={styles.button} onPress={() => fuel.connect()}>
-                  Connect Wallet
-                </Button>
-                </>
-              ) : (
-                <Box css={styles.download}>
-                  Download the{" "}
-                  <Link
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href="https://wallet.fuel.network/"
-                  >
-                    Fuel Wallet
-                  </Link>{" "}
-                  to play the game.
-                </Box>
-              )}
+              <Home setBurnerWallet={setBurnerWallet} />
             </BoxCentered>
           </BoxCentered>
         )}
       </div>
-      <Analytics/>
+      <Analytics />
     </div>
   );
 }

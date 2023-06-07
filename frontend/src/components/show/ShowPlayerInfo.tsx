@@ -2,13 +2,15 @@ import { PlayerOutput } from "../../contracts/ContractAbi";
 import { Flex, Box, Tooltip, Icon } from "@fuel-ui/react";
 import { cssObj } from "@fuel-ui/css";
 import ShowCoins from "./ShowCoins";
+import { ContractAbi } from "../../contracts/ContractAbi";
 
 interface PlayerProps {
   player: PlayerOutput | null;
+  contract: ContractAbi | null;
   updateNum: number;
 }
 
-export default function ShowPlayerInfo({ player, updateNum }: PlayerProps) {
+export default function ShowPlayerInfo({ player, contract, updateNum }: PlayerProps) {
   let valSold;
   if (player !== null) {
     valSold = parseFloat(player.total_value_sold.format().toLocaleString());
@@ -27,7 +29,7 @@ export default function ShowPlayerInfo({ player, updateNum }: PlayerProps) {
             </Tooltip>
         </Flex>
         <Box css={styles.box}>Value Sold: {valSold}</Box>
-        <ShowCoins updateNum={updateNum} />
+        <ShowCoins contract={contract} updateNum={updateNum} />
       </Flex>
     </div>
   );
