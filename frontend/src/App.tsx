@@ -42,7 +42,7 @@ function App() {
         setMounted(true);
       }
     }
-    if (fuel) getAccounts();
+    if (fuel && isConnected) getAccounts();
   }, [fuel, isConnected, mounted]);
 
   const contract = useMemo(() => {
