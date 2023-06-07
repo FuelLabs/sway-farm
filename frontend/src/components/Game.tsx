@@ -43,9 +43,10 @@ export default function Game({ contract }: GameProps) {
   useEffect(() => {
     getPlayerInfo();
 
+    // fetches player info 30 seconds
     const interval = setInterval(() => {
       setUpdateNum(updateNum + 1);
-    }, 90000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, [contract, updateNum]);
@@ -153,7 +154,7 @@ export default function Game({ contract }: GameProps) {
             <>
               {/* BOTTOM CONTAINERS */}
               <div className="bottom-container">
-                <ShowPlayerInfo player={player} updateNum={updateNum} />
+                <ShowPlayerInfo player={player} contract={contract} updateNum={updateNum} />
               </div>
 
               {/* GAME MODALS */}

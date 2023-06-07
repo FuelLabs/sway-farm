@@ -19,7 +19,10 @@ export default function HarvestModal({ contract, tileArray, updatePageNum, setCa
             try {
                 setStatus('loading')
                 setCanMove(false)
-                await contract.functions.harvest(tileArray[0]).call();
+                await contract.functions
+                .harvest(tileArray[0])
+                .txParams({ gasPrice: 1 })
+                .call();
                 updatePageNum()
                 setStatus('none')
             } catch (err) {
