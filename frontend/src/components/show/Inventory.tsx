@@ -26,8 +26,8 @@ export default function Inventory({ seeds, items }: InventoryProps) {
 
   let heightPosition = -3.2;
 
-  if (windowSize && windowSize < 740) {
-    const x = windowSize * 0.0046525 - 0.25;
+  if (windowSize) {
+    const x = windowSize * 0.0046525 - 0.26;
     heightPosition = -x;
   }
 
