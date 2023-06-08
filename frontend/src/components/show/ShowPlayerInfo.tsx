@@ -42,6 +42,6 @@ let styles = {
   }),
   tooltip: cssObj({
     position: "relative",
-    left: "16px"
+    left: "12px"
   }),
 };

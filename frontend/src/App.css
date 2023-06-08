@@ -17,7 +17,7 @@
   border-radius: 8px;
   height: calc(100vh - 8px);
   max-height: 740px;
-  max-width: 1000px;
+  width: 1000px;
   margin: auto;
 }
 
