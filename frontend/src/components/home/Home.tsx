@@ -18,6 +18,7 @@ export default function Home({ setBurnerWallet }: HomeProps) {
       provider: FUEL_PROVIDER_URL,
     });
     setBurnerWallet(newWallet);
+    window.localStorage.setItem("sway-farm-wallet-key", newWallet.privateKey)
   }
 
   return (

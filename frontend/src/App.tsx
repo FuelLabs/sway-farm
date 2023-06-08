@@ -7,7 +7,7 @@ import Game from "./components/Game";
 import Home from "./components/home/Home";
 import { useIsConnected } from "./hooks/useIsConnected";
 import { useFuel } from "./hooks/useFuel";
-import { CONTRACT_ID, FARM_COIN_ASSET } from "./constants";
+import { CONTRACT_ID, FARM_COIN_ASSET, FUEL_PROVIDER_URL } from "./constants";
 import { ContractAbi__factory } from "./contracts";
 import "./App.css";
 
@@ -42,7 +42,17 @@ function App() {
         setMounted(true);
       }
     }
+    // if wallet is installed & connected, fetch account info
     if (fuel && isConnected) getAccounts();
+    
+    // if not connected, check if has burner wallet stored
+    if(!isConnected){
+      const key = window.localStorage.getItem("sway-farm-wallet-key");
+      if(key){
+        const walletFromKey = Wallet.fromPrivateKey(key, FUEL_PROVIDER_URL);
+        setBurnerWallet(walletFromKey)
+      }
+    };
   }, [fuel, isConnected, mounted]);
 
   const contract = useMemo(() => {
