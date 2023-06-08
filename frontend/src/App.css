@@ -1,6 +1,10 @@
 .App {
   text-align: center;
   font-family: "pressStart2P", Arial, sans-serif;
+  height: 100vh;
+  width: 100vw;
+  display: grid;
+  place-items: center;
 }
 
 @font-face {
@@ -12,7 +16,8 @@
   border: 4px solid #754a1e;
   border-radius: 8px;
   height: calc(100vh - 8px);
-  max-width: 1000px;
+  max-height: 740px;
+  width: 1000px;
   margin: auto;
 }
 
@@ -35,10 +40,8 @@
 }
 
 .bottom-container {
-  position: absolute;
-  bottom: 4px;
-  left: 0;
-  right: 0;
+  position: relative;
+  top: -85px;
   margin: auto;
   display: flex;
   justify-content: space-between;

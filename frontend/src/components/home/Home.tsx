@@ -10,15 +10,16 @@ interface HomeProps {
   setBurnerWallet: Dispatch<SetStateAction<Wallet>>;
 }
 
-export default function Home( { setBurnerWallet}: HomeProps) {
+export default function Home({ setBurnerWallet }: HomeProps) {
   const [fuel] = useFuel();
 
-  function create(){
+  function create() {
     const newWallet = Wallet.generate({
       provider: FUEL_PROVIDER_URL,
     });
     setBurnerWallet(newWallet);
-  };
+    window.localStorage.setItem("sway-farm-wallet-key", newWallet.privateKey)
+  }
 
   return (
     <div>
@@ -29,7 +30,9 @@ export default function Home( { setBurnerWallet}: HomeProps) {
         </Button>
       ) : (
         <Box>
-          <Button css={styles.button} onPress={create}>Play without a wallet</Button>
+          <Button css={styles.button} onPress={create}>
+            Play with In-Browser Wallet
+          </Button>
           <Box css={styles.download}>
             or download the{" "}
             <Link
