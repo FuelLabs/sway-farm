@@ -41,7 +41,7 @@
 
 .bottom-container {
   position: relative;
-  top: -85px;
+  top: -142px;
   margin: auto;
   display: flex;
   justify-content: space-between;
@@ -64,6 +64,20 @@
   display: flex;
   justify-content: space-around;
   padding: 20px;
+  border-radius: 8px;
+  border: 3px solid #754a1e;
+}
+
+.player-info-container {
+  display: 'flex';
+  flex-direction: 'column'
+}
+
+.github-info {
+  background: #ac7339;
+  height: 50px;
+  width: 50px;
+  display: flex;
   border-radius: 8px;
   border: 3px solid #754a1e;
 }

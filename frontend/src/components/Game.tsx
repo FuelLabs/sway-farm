@@ -18,6 +18,7 @@ import Garden from "./Garden";
 import Background from "./Background";
 import ShowPlayerInfo from "./show/ShowPlayerInfo";
 import Inventory from "./show/Inventory";
+import GithubRepo from "./show/GithubRepo";
 import PlantModal from "./modals/PlantModal";
 import HarvestModal from "./modals/HarvestModal";
 import MarketModal from "./modals/MarketModal";
@@ -154,7 +155,10 @@ export default function Game({ contract }: GameProps) {
             <>
               {/* BOTTOM CONTAINERS */}
               <div className="bottom-container">
-                <ShowPlayerInfo player={player} contract={contract} updateNum={updateNum} />
+                <div className="player-info-container">
+                  <GithubRepo/>
+                  <ShowPlayerInfo player={player} contract={contract} updateNum={updateNum} />
+                </div>
               </div>
 
               {/* GAME MODALS */}
