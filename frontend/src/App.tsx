@@ -11,8 +11,8 @@ import { CONTRACT_ID, FARM_COIN_ASSET, FUEL_PROVIDER_URL } from "./constants";
 import { ContractAbi__factory } from "./contracts";
 import "./App.css";
 
- const myWallet = new WalletLocked("fuel1zrp59rrhens6epznm0ug2j2z6vdrr5v5c28w92hujfpe7s0pqkwqcnl059");
- console.log("WALLET:", myWallet.address.toB256());
+// const myWallet = new WalletLocked("fuel1exxxqfp0specps2cstz8a5xlvh8xcf02chakfanf8w5f8872582qpa00kz");
+// console.log("WALLET:", myWallet.address.toB256());
 
 function App() {
   const [wallet, setWallet] = useState<WalletLocked>();
