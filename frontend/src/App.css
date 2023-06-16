@@ -41,7 +41,7 @@
 
 .bottom-container {
   position: relative;
-  top: -85px;
+  top: -130px;
   margin: auto;
   display: flex;
   justify-content: space-between;
@@ -66,6 +66,25 @@
   padding: 20px;
   border-radius: 8px;
   border: 3px solid #754a1e;
+}
+
+.player-info-container {
+  display: 'flex';
+  flex-direction: 'column'
+}
+
+.github-info {
+  background: #ac7339;
+  height: 40px;
+  width: 128px;
+  display: flex;
+  border-radius: 8px;
+  border: 3px solid #754a1e;
+  text-decoration: "none",
+}
+
+a:link, a:visited, a:hover, a:active {
+  text-decoration: none;
 }
 
 .market-header {
