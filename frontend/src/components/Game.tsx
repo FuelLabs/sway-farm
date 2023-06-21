@@ -42,6 +42,39 @@ export default function Game({ contract }: GameProps) {
   const [canMove, setCanMove] = useState<boolean>(true);
 
   useEffect(() => {
+    async function getPlayerInfo() {
+      if (contract && contract.account) {
+        try {
+          let address: AddressInput = {
+            value: contract.account.address.toB256(),
+          };
+          let id: IdentityInput = { Address: address };
+          let seedType: FoodTypeInput = { tomatoes: [] };
+          // get the player first
+          let { value: Some } = await contract.functions.get_player(id).get();
+          if (Some?.farming_skill.gte(1)) {
+            setPlayer(Some);
+            // if there is a player found, get the rest of the player info
+            const { value: results } = await contract
+              .multiCall([
+                contract.functions.get_seed_amount(id, seedType),
+                contract.functions.get_item_amount(id, seedType),
+              ])
+              .get();
+
+            const seedAmount = new BN(results[0]).toNumber();
+            setSeeds(seedAmount);
+            const itemAmount = new BN(results[1]).toNumber();
+            setItems(itemAmount);
+          }
+        } catch (err) {
+          console.log("Error:", err);
+          setStatus("error");
+        }
+        setStatus("none");
+      }
+    }
+
     getPlayerInfo();
 
     // fetches player info 30 seconds
@@ -54,39 +87,6 @@ export default function Game({ contract }: GameProps) {
 
   function updatePageNum() {
     setUpdateNum(updateNum + 1);
-  }
-
-  async function getPlayerInfo() {
-    if (contract && contract.account) {
-      try {
-        let address: AddressInput = {
-          value: contract.account.address.toB256(),
-        };
-        let id: IdentityInput = { Address: address };
-        let seedType: FoodTypeInput = { tomatoes: [] };
-        // get the player first
-        let { value: Some } = await contract.functions.get_player(id).get();
-        if (Some?.farming_skill.gte(1)) {
-          setPlayer(Some);
-          // if there is a player found, get the rest of the player info
-          const { value: results } = await contract
-            .multiCall([
-              contract.functions.get_seed_amount(id, seedType),
-              contract.functions.get_item_amount(id, seedType),
-            ])
-            .get();
-
-          const seedAmount = new BN(results[0]).toNumber();
-          setSeeds(seedAmount);
-          const itemAmount = new BN(results[1]).toNumber();
-          setItems(itemAmount);
-        }
-      } catch (err) {
-        console.log("Error:", err);
-        setStatus("error");
-      }
-      setStatus("none");
-    }
   }
 
   const controlsMap = useMemo<KeyboardControlsEntry[]>(
@@ -146,8 +146,6 @@ export default function Game({ contract }: GameProps) {
                   />
                 </KeyboardControls>
               )}
-
-              <Inventory seeds={seeds} items={items} />
             </Suspense>
           </Canvas>
 
@@ -156,9 +154,14 @@ export default function Game({ contract }: GameProps) {
               {/* BOTTOM CONTAINERS */}
               <div className="bottom-container">
                 <div className="player-info-container">
-                  <GithubRepo/>
-                  <ShowPlayerInfo player={player} contract={contract} updateNum={updateNum} />
+                  <GithubRepo />
+                  <ShowPlayerInfo
+                    player={player}
+                    contract={contract}
+                    updateNum={updateNum}
+                  />
                 </div>
+                <Inventory seeds={seeds} items={items} />
               </div>
 
               {/* GAME MODALS */}

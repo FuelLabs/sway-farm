@@ -42,10 +42,11 @@
 .bottom-container {
   position: relative;
   top: -130px;
-  margin: auto;
   display: flex;
   justify-content: space-between;
+  align-items: flex-end;
   max-width: 1000px;
+  width: calc(100vw - 4px);
 }
 
 .player-info {
