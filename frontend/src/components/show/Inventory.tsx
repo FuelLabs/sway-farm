@@ -1,9 +1,4 @@
-import { useState, useEffect } from "react";
-import { NearestFilter, TextureLoader } from "three";
-import { useLoader } from "@react-three/fiber";
-import { Html, RoundedBox } from "@react-three/drei";
-import ShowItems from "./ShowItems";
-import ShowSeeds from "./ShowSeeds";
+import { Image } from "@fuel-ui/react";
 
 interface InventoryProps {
   seeds: number;
@@ -11,58 +6,60 @@ interface InventoryProps {
 }
 
 export default function Inventory({ seeds, items }: InventoryProps) {
-  const [windowSize, setWindowSize] = useState<number>();
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowSize(window.innerHeight);
-    };
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  let heightPosition = -3.2;
-
-  if (windowSize) {
-    const x = windowSize * 0.0046525 - 0.26;
-    heightPosition = -x;
-  }
-
-  let seedBagTexture = useLoader(TextureLoader, "images/tomato_seed_bag.png");
-  let tomatoTexture = useLoader(TextureLoader, "images/tomato.png");
-  seedBagTexture.magFilter = NearestFilter;
-  tomatoTexture.magFilter = NearestFilter;
-
   return (
-    <>
-      <RoundedBox scale={[1.82, 1, 1]} position={[4.07, heightPosition + 0.04, 3]}>
-        <meshStandardMaterial color="#9a6938" />
-      </RoundedBox>
-      <Html position={[3.15, heightPosition + 0.54, 3]}>
-        <div
-          style={{
-            border: "3px solid #754a1e",
-            width: "180px",
-            height: "96px",
-            borderRadius: "8px",
-          }}
-        />
-      </Html>
-      <sprite position={[3.6, heightPosition, 3.5]} scale={[0.5, 0.7, 1]}>
-        <spriteMaterial attach="material" map={seedBagTexture} />
-      </sprite>
-      <Html position={[3.7, heightPosition - 0.05, 3]}>
-        <ShowSeeds seeds={seeds} />
-      </Html>
-      <sprite position={[4.5, heightPosition, 3.5]} scale={[0.65, 0.65, 1]}>
-        <spriteMaterial attach="material" map={tomatoTexture} />
-      </sprite>
-      <Html position={[4.6, heightPosition - 0.05, 3.5]}>
-        <ShowItems items={items} />
-      </Html>
-    </>
+    <div style={styles.container}>
+      <div style={styles.box}>
+        <Image css={styles.img} src={"images/tomato_seed_bag.png"} />
+        <div style={styles.numContainer}>
+          <div style={styles.num}>
+            {seeds > 99 ? "99+" : seeds.toLocaleString()}
+          </div>
+        </div>
+      </div>
+
+      <div style={styles.box}>
+        <Image css={styles.img} src={"images/tomato.png"} />
+        <div style={styles.numContainer}>
+          <div style={styles.num}>{items > 99 ? "99+" : items}</div>
+        </div>
+      </div>
+    </div>
   );
 }
+
+const styles = {
+  container: {
+    display: "flex",
+    border: "3px solid #754a1e",
+    borderRadius: "8px",
+    height: "100px",
+    width: "180px",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "#ac7339",
+  },
+  img: {
+    imageRendering: "pixelated",
+    height: "70px",
+    // minWidth: "60px",
+  },
+  numContainer: {
+    position: "absolute",
+    bottom: "10px",
+    width: "80px",
+    display: "flex",
+    justifyContent: "flex-end",
+  } as React.CSSProperties,
+  num: {
+    fontSize: "10px",
+    width: "35px",
+    height: "35px",
+    backgroundColor: "rgba(255,255,255,0.5)",
+    borderRadius: "50%",
+    display: "grid",
+    placeItems: "center",
+  },
+  box: {
+    width: "80px",
+  },
+};
