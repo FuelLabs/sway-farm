@@ -44,7 +44,7 @@ abi GameContract {
     fn can_level_up(id: Identity) -> bool;
 
     #[storage(read)]
-    fn can_harvest(id: Identity, index: u64) -> bool;
+    fn can_harvest(index: u64) -> bool;
 
     //////// TEMP
     #[storage(read, write)]
