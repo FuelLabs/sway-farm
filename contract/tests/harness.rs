@@ -240,7 +240,7 @@ async fn can_play_game() {
     let final_balance = wallet_1.get_asset_balance(&contract_asset).await.unwrap();
     assert_eq!(final_balance, planted_balance + 15_000_000);
 
-    let new_call_params = CallParameters::default().with_amount(price);
+    let new_call_params = CallParameters::with_asset_id(CallParameters::default(), contract_asset).with_amount(price);
 
     let buy_seeds_again_resp = instance
         .with_account(wallet_1.clone())
