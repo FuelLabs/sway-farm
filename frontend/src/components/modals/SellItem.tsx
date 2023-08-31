@@ -30,7 +30,7 @@ export default function SellItem({
         setCanMove(false);
         let realAmount = parseInt(amount) / 1_000_000_000;
         let inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
-        let seedType: FoodTypeInput = { tomatoes: [] };
+        let seedType: FoodTypeInput = { tomatoes: [] } as any as FoodTypeInput;
         await contract.functions
           .sell_item(seedType, inputAmount)
           .txParams({ gasPrice: 1 })

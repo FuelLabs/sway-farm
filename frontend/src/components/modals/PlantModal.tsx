@@ -29,7 +29,7 @@ export default function PlantModal({
       try {
         setStatus("loading");
         setCanMove(false);
-        let seedType: FoodTypeInput = { tomatoes: [] };
+        let seedType: FoodTypeInput = { tomatoes: [] } as any as FoodTypeInput;
         await contract.functions
           .plant_seed_at_index(seedType, tileArray[0])
           .txParams({ gasPrice: 1 })

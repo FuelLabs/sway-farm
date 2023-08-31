@@ -2,10 +2,10 @@ import { BN } from "fuels";
 import { Vector3 } from "three";
 import { cssObj } from "@fuel-ui/css";
 
-export const FUEL_PROVIDER_URL = "https://beta-3.fuel.network/graphql"
+export const FUEL_PROVIDER_URL = "http://127.0.0.1:4000/graphql"
 
 export const CONTRACT_ID =
-  "0x73fa75267758d899d159783e6f38eccabbcbb482b41620e3a74dccb9a2ce4874";
+  "0x9a5fccabd7df2076e13398228d81b55b8b2d583c8b2036046bc72581abe53648";
 
 export const BASE_ASSET_ID = "0x0000000000000000000000000000000000000000000000000000000000000000"
 

@@ -49,9 +49,9 @@ export default function Game({ contract }: GameProps) {
             value: contract.account.address.toB256(),
           };
           let id: IdentityInput = { Address: address };
-          let seedType: FoodTypeInput = { tomatoes: [] };
+          let seedType: FoodTypeInput = { tomatoes: [] } as any as FoodTypeInput;
           // get the player first
-          let { value: Some } = await contract.functions.get_player(id).get();
+          let { value: Some } = await contract.functions.get_player(id).simulate();
           if (Some?.farming_skill.gte(1)) {
             setPlayer(Some);
             // if there is a player found, get the rest of the player info
@@ -60,7 +60,7 @@ export default function Game({ contract }: GameProps) {
                 contract.functions.get_seed_amount(id, seedType),
                 contract.functions.get_item_amount(id, seedType),
               ])
-              .get();
+              .simulate();
 
             const seedAmount = new BN(results[0]).toNumber();
             setSeeds(seedAmount);
