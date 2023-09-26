@@ -2,15 +2,15 @@ import { BN } from "fuels";
 import { Vector3 } from "three";
 import { cssObj } from "@fuel-ui/css";
 
-export const FUEL_PROVIDER_URL = "https://beta-3.fuel.network/graphql"
+export const FUEL_PROVIDER_URL = "https://beta-4.fuel.network/graphql"
 
 export const CONTRACT_ID =
-  "0x73fa75267758d899d159783e6f38eccabbcbb482b41620e3a74dccb9a2ce4874";
+  "0x4c6be4ed66b783f55e44a6d36290a73970a616ba33256636cf15ad5cded228d9";
 
 export const BASE_ASSET_ID = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 export const FARM_COIN_ASSET = {
-  assetId: CONTRACT_ID,
+  assetId: "0x49d87db9d69218c77efab7dc2a9ff96f818f52f63e66c6f8b9ab4bdf8435e1b1",
   imageUrl: "https://sway-farm.vercel.app/images/pixel-bunny.png",
   isCustom: true,
   name: "Sway Farm Coin",

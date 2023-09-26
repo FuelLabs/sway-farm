@@ -3,7 +3,7 @@ import { useFuel } from "../../hooks/useFuel"
 import { BN } from "fuels"
 import { Box } from "@fuel-ui/react";
 import { cssObj } from "@fuel-ui/css";
-import { CONTRACT_ID } from "../../constants";
+import { FARM_COIN_ASSET } from "../../constants";
 import { ContractAbi } from "../../contracts/ContractAbi";
 
 interface ShowCoinsProps {
@@ -19,12 +19,12 @@ export default function ShowCoins({ updateNum, contract }: ShowCoinsProps){
         async function getAccounts() {
           const currentAccount = await fuel.currentAccount();
           const wallet = await fuel.getWallet(currentAccount)
-          const walletBalance = await wallet.getBalance(CONTRACT_ID);
+          const walletBalance = await wallet.getBalance(FARM_COIN_ASSET.assetId);
           setBalance(walletBalance);
         }
         async function getBalance() {
           const account = contract!.account;
-          let bal = await account?.getBalance(CONTRACT_ID);
+          let bal = await account?.getBalance(FARM_COIN_ASSET.assetId);
           if (bal) {
             setBalance(bal);
           }

@@ -9,21 +9,25 @@ use {
         block::timestamp,
         call_frames::{
             contract_id,
-            msg_asset_id,
+            msg_asset_id
         },
+        asset_id::{
+            construct_asset_id,
+        },
+        constants::ZERO_B256,
         context::msg_amount,
         logging::log,
         token::{
             mint_to,
             transfer,
-        },
+        }
     },
 };
 
 enum InvalidError {
     NotEnoughTokens: u64,
     NotEnoughSeeds: u64,
-    IncorrectAssetId: ContractId,
+    IncorrectAssetId: AssetId,
 }
 
 storage {
@@ -40,7 +44,7 @@ impl GameContract for Contract {
         let sender = msg_sender().unwrap();
 
         // make sure the player doesn't already exist
-        require(storage.players.get(sender).is_none(), "player already exists");
+        require(storage.players.get(sender).try_read().is_none(), "player already exists");
 
         // create a new player struct
         let new_player = Player {
@@ -55,13 +59,13 @@ impl GameContract for Contract {
         storage.planted_seeds.insert(sender, GardenVector::new());
 
         // each player gets some coins to start
-        mint_to(1_000_000_000, sender);
+        mint_to(sender, ZERO_B256, 1_000_000_000);
     }
 
     #[storage(read, write)]
     fn level_up() {
         // get the player with the message sender
-        let mut player = storage.players.get(msg_sender().unwrap()).unwrap();
+        let mut player = storage.players.get(msg_sender().unwrap()).try_read().unwrap();
 
         // the max skill level is 10
         require(player.farming_skill < 10, "skill already max");
@@ -81,11 +85,9 @@ impl GameContract for Contract {
 
     #[storage(read, write), payable]
     fn buy_seeds(food_type: FoodType, amount: u64) {
-         // get the asset id for the asset sent
-        let asset_id = msg_asset_id();
-
-        // require that the asset id is for this contract's coins 
-        require(asset_id == contract_id(), InvalidError::IncorrectAssetId(asset_id));
+        let asset_id_1 = construct_asset_id(contract_id(), ZERO_B256);
+        // let asset_id_2 = msg_asset_id();
+        require(asset_id_1 == msg_asset_id(), InvalidError::IncorrectAssetId(msg_asset_id()));
 
         // get the amount of coins sent
         let message_amount = msg_amount();
@@ -107,7 +109,7 @@ impl GameContract for Contract {
         let sender = msg_sender().unwrap();
 
         // check how many seeds the player currenly has
-        let current_amount_option = storage.player_seeds.get((sender, food_type));
+        let current_amount_option = storage.player_seeds.get((sender, food_type)).try_read();
         let mut current_amount = current_amount_option.unwrap_or(0);
         // add the current amount to the amount they are buying
         current_amount = current_amount + amount;
@@ -121,7 +123,7 @@ impl GameContract for Contract {
         // get the sender
         let sender = msg_sender().unwrap();
         // require player has this many seeds
-        let current_amount_option = storage.player_seeds.get((sender, food_type));
+        let current_amount_option = storage.player_seeds.get((sender, food_type)).try_read();
         let current_amount = current_amount_option.unwrap_or(0);
         require(current_amount >= 1, InvalidError::NotEnoughSeeds(current_amount));
 
@@ -129,7 +131,7 @@ impl GameContract for Contract {
         //  update amount from player_seeds
         storage.player_seeds.insert((sender, food_type), new_amount);
 
-        let mut vec = storage.planted_seeds.get(sender).unwrap();
+        let mut vec = storage.planted_seeds.get(sender).try_read().unwrap();
         let food = Food {
             name: food_type,
             time_planted: Option::Some(timestamp()),
@@ -147,7 +149,7 @@ impl GameContract for Contract {
         // get the sender
         let sender = msg_sender().unwrap();
         // require player has this many seeds
-        let current_amount_option = storage.player_seeds.get((sender, food_type));
+        let current_amount_option = storage.player_seeds.get((sender, food_type)).try_read();
         let current_amount = current_amount_option.unwrap_or(0);
         require(current_amount >= amount, InvalidError::NotEnoughSeeds(amount));
         let new_amount = current_amount - amount;
@@ -173,7 +175,7 @@ impl GameContract for Contract {
     #[storage(read, write)]
     fn harvest(index: u64) {
         let sender = msg_sender().unwrap();
-        let mut planted_seeds = storage.planted_seeds.get(sender).unwrap();
+        let mut planted_seeds = storage.planted_seeds.get(sender).try_read().unwrap();
         let food = planted_seeds.inner[index].unwrap();
         let current_time = timestamp();
         let planted_time = food.time_planted.unwrap();
@@ -191,7 +193,7 @@ impl GameContract for Contract {
         storage.planted_seeds.insert(sender, planted_seeds);
 
         // get current amount of items
-        let current_amount = storage.player_items.get((sender, food.name)).unwrap_or(0);
+        let current_amount = storage.player_items.get((sender, food.name)).try_read().unwrap_or(0);
         // add to player_items
         storage.player_items.insert((sender, food.name), current_amount + 1);
     }
@@ -201,7 +203,7 @@ impl GameContract for Contract {
         let sender = msg_sender().unwrap();
 
         // make sure they have that amount
-        let current_amount = storage.player_items.get((sender, food_type)).unwrap();
+        let current_amount = storage.player_items.get((sender, food_type)).try_read().unwrap();
         require(current_amount >= amount, InvalidError::NotEnoughSeeds(amount));
 
         // update player_items 
@@ -215,38 +217,38 @@ impl GameContract for Contract {
         }
 
         // increase the player's total_value_sold
-        let mut player = storage.players.get(msg_sender().unwrap()).unwrap();
+        let mut player = storage.players.get(msg_sender().unwrap()).try_read().unwrap();
         player.increase_tvs(amount_to_mint);
         storage.players.insert(msg_sender().unwrap(), player);
 
         // send tokens
-        mint_to(amount_to_mint, sender);
+        mint_to(sender, ZERO_B256, amount_to_mint);
     }
 
     #[storage(read)]
     fn get_player(id: Identity) -> Option<Player> {
-        storage.players.get(id)
+        storage.players.get(id).try_read()
     }
 
     #[storage(read)]
     fn get_seed_amount(id: Identity, item: FoodType) -> u64 {
-        storage.player_seeds.get((id, item)).unwrap_or(0)
+        storage.player_seeds.get((id, item)).try_read().unwrap_or(0)
     }
 
     #[storage(read)]
     fn get_garden_vec(id: Identity) -> GardenVector {
-        storage.planted_seeds.get(id).unwrap_or(GardenVector::new())
+        storage.planted_seeds.get(id).try_read().unwrap_or(GardenVector::new())
     }
 
     #[storage(read)]
     fn get_item_amount(id: Identity, item: FoodType) -> u64 {
-        storage.player_items.get((id, item)).unwrap_or(0)
+        storage.player_items.get((id, item)).try_read().unwrap_or(0)
     }
 
     #[storage(read)]
     fn can_level_up(id: Identity) -> bool {
         // get the player 
-        let player_result = storage.players.get(id);
+        let player_result = storage.players.get(id).try_read();
         if player_result.is_none(){
             return false;
         }
@@ -267,13 +269,13 @@ impl GameContract for Contract {
     }
 
     #[storage(read)]
-    fn can_harvest(id: Identity, index: u64) -> bool {
+    fn can_harvest(index: u64) -> bool {
         let sender = msg_sender().unwrap();
         let planted_seeds_result = storage.planted_seeds.get(sender);
-        if planted_seeds_result.is_none(){
+        if planted_seeds_result.try_read().is_none(){
             return false;
         }
-        let planted_seeds = planted_seeds_result.unwrap();
+        let planted_seeds = planted_seeds_result.try_read().unwrap();
 
         let food = planted_seeds.inner[index].unwrap();
         let current_time = timestamp();
@@ -295,7 +297,7 @@ impl GameContract for Contract {
         let sender = msg_sender().unwrap();
 
         // check how many seeds the player currenly has
-        let mut current_amount = storage.player_seeds.get((sender, food_type)).unwrap_or(0);
+        let mut current_amount = storage.player_seeds.get((sender, food_type)).try_read().unwrap_or(0);
         // add the current amount to the amount they are buying
         current_amount = current_amount + amount;
 

@@ -18,7 +18,7 @@ export default function Garden({ tileStates, contract, setTileStates, updateNum 
                 try {
                     let address: AddressInput = { value: contract.account.address.toB256() }
                     let id: IdentityInput = { Address: address };
-                    let { value } = await contract.functions.get_garden_vec(id).get();
+                    let { value } = await contract.functions.get_garden_vec(id).simulate();
                     setTileStates(value)
                 } catch (err) {
                     console.log("Error:", err)

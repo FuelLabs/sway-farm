@@ -7,6 +7,11 @@
   place-items: center;
 }
 
+html, body {
+  overflow: hidden;
+}
+
+
 @font-face {
   font-family: pressStart2P;
   src: url(../public/PressStart2P-Regular.ttf);

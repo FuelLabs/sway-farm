@@ -3,7 +3,7 @@ import { ContractAbi } from "../../contracts";
 import { bn } from "fuels";
 import { FoodTypeInput } from "../../contracts/ContractAbi";
 import { Button, Spinner, Input, BoxCentered } from "@fuel-ui/react";
-import { CONTRACT_ID, buttonStyle } from "../../constants";
+import { FARM_COIN_ASSET, buttonStyle } from "../../constants";
 import { cssObj } from "@fuel-ui/css";
 
 interface BuySeedsProps {
@@ -24,12 +24,12 @@ export default function BuySeeds({ contract, updatePageNum, setCanMove }: BuySee
                 setCanMove(false);
                 let realAmount = parseInt(amount) / 1_000_000_000;
                 let inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
-                let seedType: FoodTypeInput = { tomatoes: [] };
+                let seedType: FoodTypeInput = { tomatoes: [] } as any as FoodTypeInput;
                 let price = 750_000 * Number(amount);
                 await contract.functions
                     .buy_seeds(seedType, inputAmount)
                     .callParams({
-                        forward: [price, CONTRACT_ID],
+                        forward: [price, FARM_COIN_ASSET.assetId],
                     })
                     .txParams({gasPrice: 1})
                     .call();

@@ -4,9 +4,9 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.35.0
-  Forc version: 0.35.3
-  Fuel-Core version: 0.17.3
+  Fuels version: 0.53.0
+  Forc version: 0.44.0
+  Fuel-Core version: 0.20.4
 */
 
 import type {
@@ -22,12 +22,12 @@ import type {
 
 import type { Option, Enum, Vec } from "./common";
 
-export type FoodTypeInput = Enum<{ tomatoes: [] }>;
-export type FoodTypeOutput = FoodTypeInput;
+export enum FoodTypeInput { tomatoes = 'tomatoes' };
+export enum FoodTypeOutput { tomatoes = 'tomatoes' };
 export type IdentityInput = Enum<{ Address: AddressInput, ContractId: ContractIdInput }>;
 export type IdentityOutput = Enum<{ Address: AddressOutput, ContractId: ContractIdOutput }>;
-export type InvalidErrorInput = Enum<{ NotEnoughTokens: BigNumberish, NotEnoughSeeds: BigNumberish, IncorrectAssetId: ContractIdInput }>;
-export type InvalidErrorOutput = Enum<{ NotEnoughTokens: BN, NotEnoughSeeds: BN, IncorrectAssetId: ContractIdOutput }>;
+export type InvalidErrorInput = Enum<{ NotEnoughTokens: BigNumberish, NotEnoughSeeds: BigNumberish, IncorrectAssetId: string }>;
+export type InvalidErrorOutput = Enum<{ NotEnoughTokens: BN, NotEnoughSeeds: BN, IncorrectAssetId: string }>;
 
 export type AddressInput = { value: string };
 export type AddressOutput = AddressInput;
@@ -60,7 +60,7 @@ interface ContractAbiInterface extends Interface {
 
   encodeFunctionData(functionFragment: 'buy_seeds', values: [FoodTypeInput, BigNumberish]): Uint8Array;
   encodeFunctionData(functionFragment: 'buy_seeds_free', values: [FoodTypeInput, BigNumberish]): Uint8Array;
-  encodeFunctionData(functionFragment: 'can_harvest', values: [IdentityInput, BigNumberish]): Uint8Array;
+  encodeFunctionData(functionFragment: 'can_harvest', values: [BigNumberish]): Uint8Array;
   encodeFunctionData(functionFragment: 'can_level_up', values: [IdentityInput]): Uint8Array;
   encodeFunctionData(functionFragment: 'get_garden_vec', values: [IdentityInput]): Uint8Array;
   encodeFunctionData(functionFragment: 'get_item_amount', values: [IdentityInput, FoodTypeInput]): Uint8Array;
@@ -94,7 +94,7 @@ export class ContractAbi extends Contract {
   functions: {
     buy_seeds: InvokeFunction<[food_type: FoodTypeInput, amount: BigNumberish], void>;
     buy_seeds_free: InvokeFunction<[food_type: FoodTypeInput, amount: BigNumberish], void>;
-    can_harvest: InvokeFunction<[id: IdentityInput, index: BigNumberish], boolean>;
+    can_harvest: InvokeFunction<[index: BigNumberish], boolean>;
     can_level_up: InvokeFunction<[id: IdentityInput], boolean>;
     get_garden_vec: InvokeFunction<[id: IdentityInput], GardenVectorOutput>;
     get_item_amount: InvokeFunction<[id: IdentityInput, item: FoodTypeInput], BN>;

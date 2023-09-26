@@ -4,13 +4,13 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.35.0
-  Forc version: 0.35.3
-  Fuel-Core version: 0.17.3
+  Fuels version: 0.53.0
+  Forc version: 0.44.0
+  Fuel-Core version: 0.20.4
 */
 
-import { Interface, Contract } from "fuels";
-import type { Provider, Account, AbstractAddress } from "fuels";
+import { Interface, Contract, ContractFactory } from "fuels";
+import type { Provider, Account, AbstractAddress, BytesLike, DeployContractOptions } from "fuels";
 import type { ContractAbi, ContractAbiInterface } from "../ContractAbi";
 
 const _abi = {
@@ -96,7 +96,7 @@ const _abi = {
         },
         {
           "name": "IncorrectAssetId",
-          "type": 16,
+          "type": 2,
           "typeArguments": null
         }
       ],
@@ -355,11 +355,6 @@ const _abi = {
     },
     {
       "inputs": [
-        {
-          "name": "id",
-          "type": 5,
-          "typeArguments": null
-        },
         {
           "name": "index",
           "type": 22,
@@ -767,5 +762,14 @@ export class ContractAbi__factory {
     accountOrProvider: Account | Provider
   ): ContractAbi {
     return new Contract(id, _abi, accountOrProvider) as unknown as ContractAbi
+  }
+  static async deployContract(
+    bytecode: BytesLike,
+    wallet: Account,
+    options: DeployContractOptions = {}
+  ): Promise<ContractAbi> {
+    const factory = new ContractFactory(bytecode, _abi, wallet);
+    const contract = await factory.deployContract(options);
+    return contract as unknown as ContractAbi;
   }
 }
