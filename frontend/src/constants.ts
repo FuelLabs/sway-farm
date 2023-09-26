@@ -10,7 +10,7 @@ export const CONTRACT_ID =
 export const BASE_ASSET_ID = "0x0000000000000000000000000000000000000000000000000000000000000000"
 
 export const FARM_COIN_ASSET = {
-  assetId: CONTRACT_ID,
+  assetId: "0x49d87db9d69218c77efab7dc2a9ff96f818f52f63e66c6f8b9ab4bdf8435e1b1",
   imageUrl: "https://sway-farm.vercel.app/images/pixel-bunny.png",
   isCustom: true,
   name: "Sway Farm Coin",

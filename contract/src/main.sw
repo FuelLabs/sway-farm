@@ -20,7 +20,7 @@ use {
         token::{
             mint_to,
             transfer,
-        },
+        }
     },
 };
 
@@ -86,8 +86,8 @@ impl GameContract for Contract {
     #[storage(read, write), payable]
     fn buy_seeds(food_type: FoodType, amount: u64) {
         let asset_id_1 = construct_asset_id(contract_id(), ZERO_B256);
-        let asset_id_2 = msg_asset_id();
-        require(asset_id_1 == asset_id_2, InvalidError::IncorrectAssetId(asset_id_2));
+        // let asset_id_2 = msg_asset_id();
+        require(asset_id_1 == msg_asset_id(), InvalidError::IncorrectAssetId(msg_asset_id()));
 
         // get the amount of coins sent
         let message_amount = msg_amount();

@@ -60,7 +60,7 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
           <BoxCentered css={styles.container}>
             You need some ETH to play:
             <Link
-              href={`https://faucet-beta-3.fuel.network/${
+              href={`https://faucet-beta-4.fuel.network/${
                 contract && contract.account
                   ? `?address=${contract.account.address.toAddress()}`
                   : ""

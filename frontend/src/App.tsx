@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { WalletLocked, Wallet, Account } from "fuels";
+import { WalletLocked, Wallet, Account, Provider } from "fuels";
 import { Box, BoxCentered, Heading } from "@fuel-ui/react";
 import { cssObj } from "@fuel-ui/css";
 import { Analytics } from "@vercel/analytics/react";
@@ -42,17 +42,22 @@ function App() {
         setMounted(true);
       }
     }
+
+    async function getWallet(){
+      const key = window.localStorage.getItem("sway-farm-wallet-key");
+      if(key){
+        const provider = new Provider(FUEL_PROVIDER_URL);
+        const walletFromKey = Wallet.fromPrivateKey(key, provider);
+        setBurnerWallet(walletFromKey)
+      }
+    }
+
     // if wallet is installed & connected, fetch account info
     if (fuel && isConnected) getAccounts();
     
     // if not connected, check if has burner wallet stored
-    if(!isConnected){
-      const key = window.localStorage.getItem("sway-farm-wallet-key");
-      if(key){
-        const walletFromKey = Wallet.fromPrivateKey(key, FUEL_PROVIDER_URL);
-        setBurnerWallet(walletFromKey)
-      }
-    };
+    if(!isConnected) getWallet();
+
   }, [fuel, isConnected, mounted]);
 
   const contract = useMemo(() => {
