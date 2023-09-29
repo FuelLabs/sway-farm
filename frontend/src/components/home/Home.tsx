@@ -3,7 +3,7 @@ import { useFuel } from "../../hooks/useFuel";
 import Instructions from "./Instructions";
 import { Button, Box, Link } from "@fuel-ui/react";
 import { cssObj } from "@fuel-ui/css";
-import { Wallet } from "fuels";
+import { Provider, Wallet } from "fuels";
 import { FUEL_PROVIDER_URL } from "../../constants";
 
 interface HomeProps {
@@ -13,9 +13,10 @@ interface HomeProps {
 export default function Home({ setBurnerWallet }: HomeProps) {
   const [fuel] = useFuel();
 
-  function create() {
+  async function create() {
+    const provider = await Provider.create(FUEL_PROVIDER_URL);
     const newWallet = Wallet.generate({
-      provider: FUEL_PROVIDER_URL,
+      provider
     });
     setBurnerWallet(newWallet);
     window.localStorage.setItem("sway-farm-wallet-key", newWallet.privateKey)
