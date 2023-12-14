@@ -1,9 +1,6 @@
 library;
 
-use std::{
-    bytes::Bytes,
-    hash::{Hash, Hasher},
-};
+use std::{bytes::Bytes, hash::{Hash, Hasher},};
 
 abi GameContract {
     // initialize player, mint some coins
@@ -40,7 +37,7 @@ abi GameContract {
     fn get_seed_amount(id: Identity, item: FoodType) -> u64;
 
     #[storage(read)]
-     fn get_garden_vec(id: Identity) -> GardenVector;
+    fn get_garden_vec(id: Identity) -> GardenVector;
 
     #[storage(read)]
     fn get_item_amount(id: Identity, item: FoodType) -> u64;
@@ -85,7 +82,8 @@ impl Hash for FoodType {
     fn hash(self, ref mut state: Hasher) {
         let mut bytes = Bytes::with_capacity(1);
         match self {
-            FoodType::Tomatoes => bytes.push(0u8),
+            FoodType::Tomatoes => bytes
+                .push(0u8),
         }
         state.write(bytes);
     }
@@ -106,7 +104,7 @@ impl Food {
 }
 
 pub struct GardenVector {
-    inner: [Option<Food>; 10]
+    inner: [Option<Food>; 10],
 }
 
 impl GardenVector {
@@ -241,7 +239,6 @@ impl GardenVector {
             ],
             _ => revert(22),
         };
-
     }
 
     pub fn plant_at_index(ref mut self, val: Food, index: u64) {
