@@ -11,8 +11,7 @@ use {
             contract_id,
             msg_asset_id
         },
-        // contract_id,
-        constants::ZERO_B256,
+        constants::DEFAULT_SUB_ID,
         context::msg_amount,
         logging::log,
         token::{
@@ -46,10 +45,7 @@ impl GameContract for Contract {
         require(storage.players.get(sender).try_read().is_none(), "player already exists");
 
         // create a new player struct
-        let new_player = Player {
-            farming_skill: 1,
-            total_value_sold: 0,
-        };
+        let new_player = Player::new(1, 0);
 
         // add the player to storage
         storage.players.insert(sender, new_player);
@@ -58,7 +54,7 @@ impl GameContract for Contract {
         storage.planted_seeds.insert(sender, GardenVector::new());
 
         // each player gets some coins to start
-        mint_to(sender, ZERO_B256, 1_000_000_000);
+        mint_to(sender, DEFAULT_SUB_ID, 1_000_000_000);
     }
 
     #[storage(read, write)]
@@ -84,20 +80,17 @@ impl GameContract for Contract {
 
     #[storage(read, write), payable]
     fn buy_seeds(food_type: FoodType, amount: u64) {
-        let asset_id_1 = AssetId::new(contract_id(), ZERO_B256);
-        // let asset_id_2 = msg_asset_id();
-        require(asset_id_1 == msg_asset_id(), InvalidError::IncorrectAssetId(msg_asset_id()));
+        let asset_id = msg_asset_id();
+        require(asset_id == AssetId::default(), InvalidError::IncorrectAssetId(asset_id));
 
         // get the amount of coins sent
         let message_amount = msg_amount();
 
         // set the price for each seed type 
-        let mut price = u64::max();
-
-        match food_type {
-            FoodType::tomatoes => price = 750_000,
+        let mut price = match food_type {
+            FoodType::Tomatoes => 750_000,
             // the compiler knows that other options would be unreachable
-        }
+        };
 
         // the cost will be the amount of seeds * the price
         let cost = amount * price;
@@ -131,10 +124,7 @@ impl GameContract for Contract {
         storage.player_seeds.insert((sender, food_type), new_amount);
 
         let mut vec = storage.planted_seeds.get(sender).try_read().unwrap();
-        let food = Food {
-            name: food_type,
-            time_planted: Option::Some(timestamp()),
-        };
+        let food = Food::new(food_type, Some(timestamp()));
         vec.plant_at_index(food, index);
 
         storage.planted_seeds.insert(sender, vec);
@@ -160,10 +150,7 @@ impl GameContract for Contract {
         // add the amount of food structs to planted_seeds
         let mut vec = GardenVector::new();
         while count < amount {
-            let food = Food {
-                name: food_type,
-                time_planted: Option::Some(timestamp()),
-            };
+            let food = Food::new(food_type, Some(timestamp()));
             let index = indexes.get(count).unwrap();
             vec.plant_at_index(food, index);
             count += 1;
@@ -209,11 +196,10 @@ impl GameContract for Contract {
         let new_amount = current_amount - amount;
         storage.player_items.insert((sender, food_type), new_amount);
 
-        let mut amount_to_mint = 0;
-        match food_type {
-            FoodType::tomatoes => amount_to_mint = 7_500_000 * amount,
+        let mut amount_to_mint = match food_type {
+            FoodType::Tomatoes => 7_500_000 * amount,
             // the compiler knows that other options would be unreachable
-        }
+        };
 
         // increase the player's total_value_sold
         let mut player = storage.players.get(msg_sender().unwrap()).try_read().unwrap();
@@ -221,7 +207,7 @@ impl GameContract for Contract {
         storage.players.insert(msg_sender().unwrap(), player);
 
         // send tokens
-        mint_to(sender, ZERO_B256, amount_to_mint);
+        mint_to(sender, DEFAULT_SUB_ID, amount_to_mint);
     }
 
     #[storage(read)]
@@ -248,7 +234,7 @@ impl GameContract for Contract {
     fn can_level_up(id: Identity) -> bool {
         // get the player 
         let player_result = storage.players.get(id).try_read();
-        if player_result.is_none(){
+        if player_result.is_none() {
             return false;
         }
         let player = player_result.unwrap();
@@ -257,6 +243,7 @@ impl GameContract for Contract {
         if player.farming_skill < 10 {
             let new_level = player.farming_skill + 1;
             let exp = new_level * new_level * 3000;
+
             if player.total_value_sold > exp {
                 true
             } else {

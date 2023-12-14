@@ -1,5 +1,10 @@
 library;
 
+use std::{
+    bytes::Bytes,
+    hash::{Hash, Hasher},
+};
+
 abi GameContract {
     // initialize player, mint some coins
     #[storage(read, write)]
@@ -57,6 +62,13 @@ pub struct Player {
 }
 
 impl Player {
+    pub fn new(farming_skill: u64, total_value_sold: u64) -> Self {
+        Self {
+            farming_skill,
+            total_value_sold,
+        }
+    }
+
     pub fn level_up_skill(ref mut self) {
         self.farming_skill += 1
     }
@@ -66,12 +78,31 @@ impl Player {
 }
 
 pub enum FoodType {
-    tomatoes: (),
+    Tomatoes: (),
+}
+
+impl Hash for FoodType {
+    fn hash(self, ref mut state: Hasher) {
+        let mut bytes = Bytes::with_capacity(1);
+        match self {
+            FoodType::Tomatoes => bytes.push(0u8),
+        }
+        state.write(bytes);
+    }
 }
 
 pub struct Food {
     name: FoodType,
     time_planted: Option<u64>,
+}
+
+impl Food {
+    pub fn new(name: FoodType, time_planted: Option<u64>) -> Self {
+        Self {
+            name,
+            time_planted,
+        }
+    }
 }
 
 pub struct GardenVector {
@@ -80,7 +111,7 @@ pub struct GardenVector {
 
 impl GardenVector {
     pub fn new() -> Self {
-        let initial_val: Option<Food> = Option::None;
+        let initial_val: Option<Food> = None;
         Self {
             inner: [initial_val; 10],
         }
@@ -216,7 +247,7 @@ impl GardenVector {
     pub fn plant_at_index(ref mut self, val: Food, index: u64) {
         self.inner = match index {
             0 => [
-                Option::<Food>::Some(val),
+                Some(val),
                 self.inner[1],
                 self.inner[2],
                 self.inner[3],
@@ -229,7 +260,7 @@ impl GardenVector {
             ],
             1 => [
                 self.inner[0],
-                Option::<Food>::Some(val),
+                Some(val),
                 self.inner[2],
                 self.inner[3],
                 self.inner[4],
@@ -242,7 +273,7 @@ impl GardenVector {
             2 => [
                 self.inner[0],
                 self.inner[1],
-                Option::<Food>::Some(val),
+                Some(val),
                 self.inner[3],
                 self.inner[4],
                 self.inner[5],
@@ -255,7 +286,7 @@ impl GardenVector {
                 self.inner[0],
                 self.inner[1],
                 self.inner[2],
-                Option::<Food>::Some(val),
+                Some(val),
                 self.inner[4],
                 self.inner[5],
                 self.inner[6],
@@ -268,7 +299,7 @@ impl GardenVector {
                 self.inner[1],
                 self.inner[2],
                 self.inner[3],
-                Option::<Food>::Some(val),
+                Some(val),
                 self.inner[5],
                 self.inner[6],
                 self.inner[7],
@@ -281,7 +312,7 @@ impl GardenVector {
                 self.inner[2],
                 self.inner[3],
                 self.inner[4],
-                Option::<Food>::Some(val),
+                Some(val),
                 self.inner[6],
                 self.inner[7],
                 self.inner[8],
@@ -294,7 +325,7 @@ impl GardenVector {
                 self.inner[3],
                 self.inner[4],
                 self.inner[5],
-                Option::<Food>::Some(val),
+                Some(val),
                 self.inner[7],
                 self.inner[8],
                 self.inner[9],
@@ -307,7 +338,7 @@ impl GardenVector {
                 self.inner[4],
                 self.inner[5],
                 self.inner[6],
-                Option::<Food>::Some(val),
+                Some(val),
                 self.inner[8],
                 self.inner[9],
             ],
@@ -320,7 +351,7 @@ impl GardenVector {
                 self.inner[5],
                 self.inner[6],
                 self.inner[7],
-                Option::<Food>::Some(val),
+                Some(val),
                 self.inner[9],
             ],
             9 => [
@@ -333,7 +364,7 @@ impl GardenVector {
                 self.inner[6],
                 self.inner[7],
                 self.inner[8],
-                Option::<Food>::Some(val),
+                Some(val),
             ],
             _ => revert(11),
         };

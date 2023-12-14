@@ -1,2 +1,6 @@
 [toolchain]
-channel = "calldelegation_beta_5"
+channel = "nightly-2023-12-14"
+
+[components]
+forc = "0.48.1"
+fuel-core = "0.22.0"
