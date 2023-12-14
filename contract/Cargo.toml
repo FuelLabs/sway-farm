@@ -7,7 +7,7 @@ authors = ["sarahschwartz <58856580+sarahschwartz@users.noreply.github.com>"]
 license = "Apache-2.0"
 
 [dev-dependencies]
-fuels = { version = "0.48.1", features = ["fuel-core-lib"] }
+fuels = { version = "0.53.0", features = ["fuel-core-lib"] }
 tokio = { version = "1.12", features = ["rt", "macros"] }
 
 [[test]]

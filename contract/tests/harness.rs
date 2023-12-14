@@ -17,12 +17,13 @@ async fn get_contract_instance() -> (MyContract<WalletUnlocked>, Bech32ContractI
         None,
         None,
     )
-    .await;
+    .await
+    .unwrap();
 
     let wallet = wallets.get(0).unwrap().clone();
 
     let storage_config =
-    StorageConfiguration::load_from("out/debug/contract-storage_slots.json").unwrap();
+    StorageConfiguration::default().add_slot_overrides_from_file("out/debug/contract-storage_slots.json").unwrap();
 
     let load_config = LoadConfiguration::default().with_storage_configuration(storage_config);
 
@@ -31,7 +32,7 @@ async fn get_contract_instance() -> (MyContract<WalletUnlocked>, Bech32ContractI
         load_config,
     )
     .unwrap()
-    .deploy(&wallet, TxParameters::default())
+    .deploy(&wallet, TxPolicies::default())
     .await
     .unwrap();
 
@@ -100,7 +101,7 @@ async fn can_play_game() {
         .with_account(wallet_1.clone())
         .unwrap()
         .methods()
-        .buy_seeds(FoodType::tomatoes, amount)
+        .buy_seeds(FoodType::Tomatoes, amount)
         .call_params(call_params)
         .unwrap()
         .call()
@@ -112,7 +113,7 @@ async fn can_play_game() {
 
     let seed_amount = instance
         .methods()
-        .get_seed_amount(wallet_1_id.clone(), FoodType::tomatoes)
+        .get_seed_amount(wallet_1_id.clone(), FoodType::Tomatoes)
         .simulate()
         .await
         .unwrap();
@@ -125,7 +126,7 @@ async fn can_play_game() {
         .with_account(wallet_1.clone())
         .unwrap()
         .methods()
-        .plant_seeds(FoodType::tomatoes, amount, index_vec)
+        .plant_seeds(FoodType::Tomatoes, amount, index_vec)
         .call()
         .await;
     assert!(plant_seeds_resp.is_ok());
@@ -158,7 +159,7 @@ async fn can_play_game() {
     // check if the player has a harvested item
     let item_amount = instance
         .methods()
-        .get_item_amount(wallet_1_id.clone(), FoodType::tomatoes)
+        .get_item_amount(wallet_1_id.clone(), FoodType::Tomatoes)
         .simulate()
         .await
         .unwrap();
@@ -203,7 +204,7 @@ async fn can_play_game() {
         .with_account(wallet_1.clone())
         .unwrap()
         .methods()
-        .sell_item(FoodType::tomatoes, 2)
+        .sell_item(FoodType::Tomatoes, 2)
         .append_variable_outputs(1)
         .call()
         .await;
@@ -246,7 +247,7 @@ async fn can_play_game() {
         .with_account(wallet_1.clone())
         .unwrap()
         .methods()
-        .buy_seeds(FoodType::tomatoes, 1)
+        .buy_seeds(FoodType::Tomatoes, 1)
         .call_params(new_call_params)
         .unwrap()
         .call()
@@ -258,7 +259,7 @@ async fn can_play_game() {
         .with_account(wallet_1.clone())
         .unwrap()
         .methods()
-        .plant_seed_at_index(FoodType::tomatoes, 7)
+        .plant_seed_at_index(FoodType::Tomatoes, 7)
         .call()
         .await;
     assert!(plant_seeds_at_index_resp.is_ok());
