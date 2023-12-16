@@ -46,7 +46,7 @@ function App() {
     async function getWallet(){
       const key = window.localStorage.getItem("sway-farm-wallet-key");
       if(key){
-        const provider = new Provider(FUEL_PROVIDER_URL);
+        const provider = await Provider.create(FUEL_PROVIDER_URL);
         const walletFromKey = Wallet.fromPrivateKey(key, provider);
         setBurnerWallet(walletFromKey)
       }
