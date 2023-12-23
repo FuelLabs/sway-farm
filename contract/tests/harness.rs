@@ -40,8 +40,6 @@ async fn get_contract_instance() -> (
 
     let instance = MyContract::new(id.clone(), wallet);
 
-    let tx_params = TxPolicies::new(Some(1), Some(1000000), Some(0), Some(0), Some(0));
-
     (instance, id, wallets)
 }
 
