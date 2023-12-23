@@ -2,7 +2,7 @@ import { BN } from "fuels";
 import { Vector3 } from "three";
 import { cssObj } from "@fuel-ui/css";
 
-export const FUEL_PROVIDER_URL = "https://beta-4.fuel.network/graphql"
+export const FUEL_PROVIDER_URL = "https://beta-5.fuel.network/graphql"
 
 export const CONTRACT_ID =
   "0x4c6be4ed66b783f55e44a6d36290a73970a616ba33256636cf15ad5cded228d9";
