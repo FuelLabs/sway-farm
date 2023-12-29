@@ -16,13 +16,13 @@ export default function Camera({ playerPosition, isMobile }: CameraProps) {
     if (isMobile) {
       switch (playerPosition) {
         case "center-top":
-          camera.position.set(3.1, 1.1, 100);
+          camera.position.set(3.1, 0.8, 100);
           break;
         case "center-bottom":
           camera.position.set(3.1, -1, 100);
           break;
         case "right-top":
-          camera.position.set(5.5, 1.1, 100);
+          camera.position.set(5.5, 0.8, 100);
           break;
         case "right-bottom":
           camera.position.set(5.5, -1, 100);
@@ -31,7 +31,7 @@ export default function Camera({ playerPosition, isMobile }: CameraProps) {
           camera.position.set(0, -1, 100);
           break;
         default:
-          camera.position.set(0, 1.1, 100);
+          camera.position.set(0, 0.8, 100);
       }
       camera.updateProjectionMatrix();
     } else if (!mounted) {
