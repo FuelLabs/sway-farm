@@ -12,6 +12,12 @@ body {
   overflow: hidden;
 }
 
+* {
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 @font-face {
   font-family: pressStart2P;
   src: url(../public/PressStart2P-Regular.ttf);
@@ -51,7 +57,6 @@ body {
   .new-player-modal {
     width: 300px;
   }
-  
 }
 
 a:link,
@@ -68,12 +73,6 @@ a:active {
 
 .sell {
   margin-top: 40px;
-}
-
-.mobile-button{
-  user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: transparent;
 }
 
 /* Chrome, Safari, Edge, Opera */

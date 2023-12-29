@@ -31,7 +31,6 @@ const MobileButton = ({
       height="45"
       viewBox="-41.5 95 165 125"
       style={{ transform: `rotate(${degrees}deg)` }}
-      className="mobile-button"
       onTouchStart={() => setMobileControlState(direction)}
       onTouchEnd={() => setMobileControlState("none")}
       onTouchCancel={() => setMobileControlState("none")}
