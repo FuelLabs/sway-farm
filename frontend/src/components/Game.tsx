@@ -15,7 +15,7 @@ import {
 import Player from "./Player";
 import Garden from "./Garden";
 import Background from "./Background";
-import Info from "./show/Info"
+import Info from "./show/Info";
 import PlantModal from "./modals/PlantModal";
 import HarvestModal from "./modals/HarvestModal";
 import MarketModal from "./modals/MarketModal";
@@ -29,7 +29,13 @@ interface GameProps {
   isMobile: boolean;
 }
 
-export type Position = 'left-top' | 'center-top' | 'right-top' | 'left-bottom' | 'center-bottom' | 'right-bottom';
+export type Position =
+  | "left-top"
+  | "center-top"
+  | "right-top"
+  | "left-bottom"
+  | "center-bottom"
+  | "right-bottom";
 export type MobileControls = "none" | "up" | "down" | "left" | "right";
 
 export default function Game({ contract, isMobile }: GameProps) {
@@ -44,8 +50,9 @@ export default function Game({ contract, isMobile }: GameProps) {
   const [seeds, setSeeds] = useState<number>(0);
   const [items, setItems] = useState<number>(0);
   const [canMove, setCanMove] = useState<boolean>(true);
-  const [playerPosition, setPlayerPosition] = useState<Position>('left-top');
-  const [mobileControlState, setMobileControlState] = useState<MobileControls>("none");
+  const [playerPosition, setPlayerPosition] = useState<Position>("left-top");
+  const [mobileControlState, setMobileControlState] =
+    useState<MobileControls>("none");
 
   useEffect(() => {
     async function getPlayerInfo() {
@@ -55,9 +62,13 @@ export default function Game({ contract, isMobile }: GameProps) {
             value: contract.account.address.toB256(),
           };
           let id: IdentityInput = { Address: address };
-          let seedType: FoodTypeInput = { tomatoes: [] } as any as FoodTypeInput;
+          let seedType: FoodTypeInput = {
+            tomatoes: [],
+          } as any as FoodTypeInput;
           // get the player first
-          let { value: Some } = await contract.functions.get_player(id).simulate();
+          let { value: Some } = await contract.functions
+            .get_player(id)
+            .simulate();
           if (Some?.farming_skill.gte(1)) {
             setPlayer(Some);
             // if there is a player found, get the rest of the player info
@@ -121,13 +132,11 @@ export default function Game({ contract, isMobile }: GameProps) {
           </Button>
         </div>
       )}
-      {status === "loading" && (
-        <Loading/>
-      )}
+      {status === "loading" && <Loading />}
       {status === "none" && (
         <>
           <Canvas orthographic>
-            <Camera playerPosition={playerPosition} isMobile={isMobile}/>
+            <Camera playerPosition={playerPosition} isMobile={isMobile} />
             <Suspense fallback={null}>
               <Background />
 
@@ -157,16 +166,20 @@ export default function Game({ contract, isMobile }: GameProps) {
             </Suspense>
           </Canvas>
 
-          {isMobile && <MobileControlButtons setMobileControlState={setMobileControlState}/>}
+          {isMobile && (
+            <MobileControlButtons
+              setMobileControlState={setMobileControlState}
+            />
+          )}
 
           {/* INFO CONTAINERS */}
           <Info
-             player={player}
-             contract={contract}
-             updateNum={updateNum}
-             seeds={seeds}
-             items={items}
-             />
+            player={player}
+            contract={contract}
+            updateNum={updateNum}
+            seeds={seeds}
+            items={items}
+          />
 
           {player !== null && (
             <>

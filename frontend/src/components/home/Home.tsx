@@ -18,7 +18,7 @@ export default function Home({ setBurnerWallet }: HomeProps) {
       provider: FUEL_PROVIDER_URL,
     });
     setBurnerWallet(newWallet);
-    window.localStorage.setItem("sway-farm-wallet-key", newWallet.privateKey)
+    window.localStorage.setItem("sway-farm-wallet-key", newWallet.privateKey);
   }
 
   return (
@@ -57,10 +57,10 @@ const styles = {
     backgroundColor: "transparent",
     color: "#aaa",
     border: "2px solid #754a1e",
-    width: '320px',
+    width: "320px",
     "@sm": {
       display: "block",
-      width: '100%',
+      width: "100%",
     },
     "&:hover": {
       color: "#ddd",

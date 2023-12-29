@@ -38,25 +38,25 @@ export default function Info({
 
 const styles = {
   container: cssObj({
-    position: 'fixed',
-    right: '0',
-    top: '0',
+    position: "fixed",
+    right: "0",
+    top: "0",
     display: "flex",
     justifyContent: "space-between",
     maxWidth: "1000px",
     width: "calc(100vw - 4px)",
-    '@sm': {
-      position: 'relative',
-      top: '-150px',
+    "@sm": {
+      position: "relative",
+      top: "-150px",
       alignItems: "flex-end",
       width: "100%",
     },
   }),
   playerInfo: cssObj({
-    display: 'flex',
-    flexDirection: 'column-reverse',
-    '@sm': {
-      flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column-reverse",
+    "@sm": {
+      flexDirection: "column",
     },
-  })
+  }),
 };

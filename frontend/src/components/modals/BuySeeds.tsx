@@ -72,7 +72,9 @@ export default function BuySeeds({
       {status === "none" && (
         <>
           <div className="market-header">Buy Seeds</div>
-          <Button css={buttonStyle} variant="outlined" onPress={buySeeds}>Buy 10 seeds</Button>
+          <Button css={buttonStyle} variant="outlined" onPress={buySeeds}>
+            Buy 10 seeds
+          </Button>
         </>
       )}
     </>

@@ -49,9 +49,9 @@ const styles = {
     width: "80px",
     display: "flex",
     justifyContent: "flex-end",
-    '@sm': {
-      bottom: '8px',
-    }
+    "@sm": {
+      bottom: "8px",
+    },
   }),
   num: {
     fontSize: "$sm",

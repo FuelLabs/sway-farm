@@ -68,9 +68,13 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
               }`}
               isExternal
             >
-              <Button css={styles.link} variant="link">Go to Faucet</Button>
+              <Button css={styles.link} variant="link">
+                Go to Faucet
+              </Button>
             </Link>
-              <Button css={buttonStyle} onPress={checkBalance}>Check again</Button>
+            <Button css={buttonStyle} onPress={checkBalance}>
+              Check again
+            </Button>
           </BoxCentered>
         )}
         {status === "error" && (
@@ -87,23 +91,21 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
             </Button>
           </div>
         )}
-        {status === "loading" && (
-          <Loading/>
-        )}
+        {status === "loading" && <Loading />}
       </div>
     </>
   );
 }
 
 const styles = {
-    container: cssObj({
-        flexDirection: "column",
-        fontFamily: 'pressStart2P',
-        fontSize: '14px',
-        gap: "20px"
-    }),
-    link: cssObj({
-        fontFamily: 'pressStart2P',
-        fontSize: '14px'
-    })
-}
+  container: cssObj({
+    flexDirection: "column",
+    fontFamily: "pressStart2P",
+    fontSize: "14px",
+    gap: "20px",
+  }),
+  link: cssObj({
+    fontFamily: "pressStart2P",
+    fontSize: "14px",
+  }),
+};

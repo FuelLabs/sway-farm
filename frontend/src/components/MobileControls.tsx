@@ -62,7 +62,7 @@ export default function MobileControlButtons({
         direction={"left"}
         setMobileControlState={setMobileControlState}
       />
-      <Flex direction={"column"} gap={'$3'}>
+      <Flex direction={"column"} gap={"$3"}>
         <MobileButton
           aria-label="Arrow Up"
           direction={"up"}

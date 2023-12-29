@@ -34,23 +34,23 @@ const styles = {
   box: cssObj({
     fontFamily: "pressStart2P",
     fontSize: "$sm",
-    maxWidth: '180px',
-    textAlign: 'left',
-    lineHeight: '120%',
-    '@sm': {
-      maxWidth: 'none',
-    }
+    maxWidth: "180px",
+    textAlign: "left",
+    lineHeight: "120%",
+    "@sm": {
+      maxWidth: "none",
+    },
   }),
   playerInfo: cssObj({
-    background: '#ac7339',
-    height: '80px',
-    display: 'flex',
-    py: '10px',
-    pl: '20px',
-    borderRadius: '8px',
-    border: '3px solid #754a1e',
-    '@sm': {
-      width: '280px',
-    }
-  })
+    background: "#ac7339",
+    height: "80px",
+    display: "flex",
+    py: "10px",
+    pl: "20px",
+    borderRadius: "8px",
+    border: "3px solid #754a1e",
+    "@sm": {
+      width: "280px",
+    },
+  }),
 };

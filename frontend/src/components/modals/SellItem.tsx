@@ -49,9 +49,7 @@ export default function SellItem({
   return (
     <>
       <div className="market-header sell">Sell Items</div>
-      {status === "loading" && (
-        <Loading/>
-      )}
+      {status === "loading" && <Loading />}
       {status === "error" && (
         <div>
           <p>Something went wrong!</p>
@@ -69,7 +67,7 @@ export default function SellItem({
       {status === "none" && (
         <Button onPress={sellItems} css={buttonStyle} variant="outlined">
           Sell All Items
-      </Button>
+        </Button>
       )}
     </>
   );

@@ -41,7 +41,7 @@ export default function ShowCoins({ updateNum, contract }: ShowCoinsProps) {
 }
 
 let styles = cssObj({
-  lineHeight: '120%',
+  lineHeight: "120%",
   fontFamily: "pressStart2P",
   fontSize: "$sm",
   maxWidth: "180px",

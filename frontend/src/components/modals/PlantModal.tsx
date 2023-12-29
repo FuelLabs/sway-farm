@@ -79,7 +79,7 @@ export default function PlantModal({
           )}
         </>
       )}
-      {status === "loading" && <Loading/>}
+      {status === "loading" && <Loading />}
     </div>
   );
 }
