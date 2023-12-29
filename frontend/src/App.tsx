@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { WalletLocked, Wallet, Account, Provider } from "fuels";
-import { Box, BoxCentered, Heading } from "@fuel-ui/react";
+import { BoxCentered, Heading } from "@fuel-ui/react";
 import { cssObj } from "@fuel-ui/css";
 import { Analytics } from "@vercel/analytics/react";
 import Game from "./components/Game";
@@ -11,15 +11,21 @@ import { CONTRACT_ID, FARM_COIN_ASSET, FUEL_PROVIDER_URL } from "./constants";
 import { ContractAbi__factory } from "./contracts";
 import "./App.css";
 
-// const myWallet = new WalletLocked("fuel1exxxqfp0specps2cstz8a5xlvh8xcf02chakfanf8w5f8872582qpa00kz");
-// console.log("WALLET:", myWallet.address.toB256());
-
 function App() {
   const [wallet, setWallet] = useState<WalletLocked>();
   const [burnerWallet, setBurnerWallet] = useState<Wallet>();
   const [mounted, setMounted] = useState<boolean>(false);
   const [isConnected] = useIsConnected();
   const [fuel] = useFuel();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const mobile = /(iphone|ipod|ipad|android|blackberry|windows phone)/.test(
+      userAgent
+    );
+    setIsMobile(mobile);
+  }, []);
 
   useEffect(() => {
     async function getAccounts() {
@@ -43,21 +49,20 @@ function App() {
       }
     }
 
-    async function getWallet(){
+    async function getWallet() {
       const key = window.localStorage.getItem("sway-farm-wallet-key");
-      if(key){
+      if (key) {
         const provider = new Provider(FUEL_PROVIDER_URL);
         const walletFromKey = Wallet.fromPrivateKey(key, provider);
-        setBurnerWallet(walletFromKey)
+        setBurnerWallet(walletFromKey);
       }
     }
 
     // if wallet is installed & connected, fetch account info
     if (fuel && isConnected) getAccounts();
-    
-    // if not connected, check if has burner wallet stored
-    if(!isConnected) getWallet();
 
+    // if not connected, check if has burner wallet stored
+    if (!isConnected) getWallet();
   }, [fuel, isConnected, mounted]);
 
   const contract = useMemo(() => {
@@ -65,7 +70,10 @@ function App() {
       const contract = ContractAbi__factory.connect(CONTRACT_ID, wallet);
       return contract;
     } else if (burnerWallet) {
-      const contract = ContractAbi__factory.connect(CONTRACT_ID, burnerWallet as Account);
+      const contract = ContractAbi__factory.connect(
+        CONTRACT_ID,
+        burnerWallet as Account
+      );
       return contract;
     }
     return null;
@@ -73,23 +81,18 @@ function App() {
 
   return (
     <div className="App">
-      <div>
-        {isConnected || (contract && burnerWallet) ? (
-          <Game contract={contract} />
-        ) : (
-          <BoxCentered css={styles.box}>
-            <BoxCentered css={styles.innerBox}>
-              <Heading css={styles.heading} as={"h1"}>
-                SWAY FARM
-              </Heading>
-              <Box css={styles.smallScreen}>
-                This game is not supported on mobile.
-              </Box>
-              <Home setBurnerWallet={setBurnerWallet} />
-            </BoxCentered>
+      {isConnected || (contract && burnerWallet) ? (
+        <Game contract={contract} isMobile={isMobile} />
+      ) : (
+        <BoxCentered css={styles.box}>
+          <BoxCentered css={styles.innerBox}>
+            <Heading css={styles.heading} as={"h1"}>
+              SWAY FARM
+            </Heading>
+            <Home setBurnerWallet={setBurnerWallet} />
           </BoxCentered>
-        )}
-      </div>
+        </BoxCentered>
+      )}
       <Analytics />
     </div>
   );
@@ -122,10 +125,6 @@ const styles = {
     backgroundColor: "transparent",
     color: "#aaa",
     border: "2px solid #754a1e",
-    display: "none",
-    "@sm": {
-      display: "block",
-    },
     "&:hover": {
       color: "#ddd",
       background: "#754a1e !important",
@@ -137,10 +136,6 @@ const styles = {
     color: "#ddd",
     fontFamily: "pressStart2P",
     lineHeight: "24px",
-    display: "none",
-    "@sm": {
-      display: "block",
-    },
   }),
   smallScreen: cssObj({
     color: "#ddd",

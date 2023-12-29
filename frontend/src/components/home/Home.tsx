@@ -57,9 +57,10 @@ const styles = {
     backgroundColor: "transparent",
     color: "#aaa",
     border: "2px solid #754a1e",
-    display: "none",
+    width: '320px',
     "@sm": {
       display: "block",
+      width: '100%',
     },
     "&:hover": {
       color: "#ddd",

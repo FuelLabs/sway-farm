@@ -1,7 +1,6 @@
 import { useState, Dispatch, SetStateAction } from "react";
 import { ContractAbi } from "../../contracts";
 import { Spinner, Button, BoxCentered } from "@fuel-ui/react";
-import { cssObj } from "@fuel-ui/css";
 import { buttonStyle } from "../../constants";
 
 interface HarvestProps {

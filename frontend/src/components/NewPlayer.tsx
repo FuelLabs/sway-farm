@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { ContractAbi } from "../contracts";
-import { Button, Spinner, BoxCentered, Link } from "@fuel-ui/react";
+import { Button, BoxCentered, Link } from "@fuel-ui/react";
 import { BASE_ASSET_ID, buttonStyle } from "../constants";
 import { cssObj } from "@fuel-ui/css";
+import Loading from "./Loading";
 
 interface NewPlayerProps {
   contract: ContractAbi | null;
@@ -87,9 +88,7 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
           </div>
         )}
         {status === "loading" && (
-          <BoxCentered>
-            <Spinner color="#754a1e" />
-          </BoxCentered>
+          <Loading/>
         )}
       </div>
     </>

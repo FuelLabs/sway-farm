@@ -1,8 +1,9 @@
 import { useState, Dispatch, SetStateAction } from "react";
-import { Spinner, Button } from "@fuel-ui/react";
+import { Button } from "@fuel-ui/react";
 import { FoodTypeInput } from "../../contracts/ContractAbi";
 import { ContractAbi } from "../../contracts";
 import { buttonStyle } from "../../constants";
+import Loading from "../Loading";
 
 interface PlantModalProps {
   contract: ContractAbi | null;
@@ -78,7 +79,7 @@ export default function PlantModal({
           )}
         </>
       )}
-      {status === "loading" && <Spinner color="#754a1e" />}
+      {status === "loading" && <Loading/>}
     </div>
   );
 }

@@ -2,10 +2,10 @@ import { useState, useEffect } from "react"
 import { Vector3, TextureLoader, NearestFilter } from "three"
 import { Html } from "@react-three/drei"
 import { convertTime } from "../constants"
-import { Spinner } from "@fuel-ui/react"
 import { FoodOutput } from "../contracts/ContractAbi"
 import { Option } from "../contracts/common"
 import { useLoader } from "@react-three/fiber"
+import Loading from "./Loading"
 
 interface GardenTileProps {
     position: Vector3;
@@ -53,7 +53,7 @@ export default function GardenTile({ position, state, updateNum }: GardenTilePro
         <>
             {status === 'loading' && (
                 <Html position={[position.x - 0.1, position.y + 0.1, position.z]}>
-                    <Spinner color="#754a1e" />
+                    <Loading/>
                 </Html>
             )}
 

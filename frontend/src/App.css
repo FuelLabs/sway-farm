@@ -7,10 +7,10 @@
   place-items: center;
 }
 
-html, body {
+html,
+body {
   overflow: hidden;
 }
-
 
 @font-face {
   font-family: pressStart2P;
@@ -39,57 +39,25 @@ html, body {
   right: 0;
   display: grid;
   place-items: center;
-  top: 20vh;
+  top: 30vh;
   border-radius: 8px;
   border: 4px solid #754a1e;
 }
 
-.bottom-container {
-  position: relative;
-  top: -130px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  max-width: 1000px;
-  width: calc(100vw - 4px);
+@media screen and (max-width: 640px) {
+  .plant-modal,
+  .harvest-modal,
+  .market-modal,
+  .new-player-modal {
+    width: 300px;
+  }
+  
 }
 
-.player-info {
-  background: #ac7339;
-  height: 60px;
-  width: 280px;
-  display: flex;
-  padding: 0 0 20px 20px;
-  border-radius: 8px;
-  border: 3px solid #754a1e;
-}
-
-.inventory {
-  height: 60px;
-  width: 140px;
-  display: flex;
-  justify-content: space-around;
-  padding: 20px;
-  border-radius: 8px;
-  border: 3px solid #754a1e;
-}
-
-.player-info-container {
-  display: 'flex';
-  flex-direction: 'column'
-}
-
-.github-info {
-  background: #ac7339;
-  height: 40px;
-  width: 128px;
-  display: flex;
-  border-radius: 8px;
-  border: 3px solid #754a1e;
-  text-decoration: "none",
-}
-
-a:link, a:visited, a:hover, a:active {
+a:link,
+a:visited,
+a:hover,
+a:active {
   text-decoration: none;
 }
 
@@ -100,6 +68,12 @@ a:link, a:visited, a:hover, a:active {
 
 .sell {
   margin-top: 40px;
+}
+
+.mobile-button{
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Chrome, Safari, Edge, Opera */

@@ -1,4 +1,5 @@
-import { Image } from "@fuel-ui/react";
+import { cssObj } from "@fuel-ui/css";
+import { Image, Box } from "@fuel-ui/react";
 
 interface InventoryProps {
   seeds: number;
@@ -7,28 +8,28 @@ interface InventoryProps {
 
 export default function Inventory({ seeds, items }: InventoryProps) {
   return (
-    <div style={styles.container}>
+    <Box css={styles.container}>
       <div style={styles.box}>
         <Image css={styles.img} src={"images/tomato_seed_bag.png"} />
-        <div style={styles.numContainer}>
+        <Box css={styles.numContainer}>
           <div style={styles.num}>
             {seeds > 99 ? "99+" : seeds.toLocaleString()}
           </div>
-        </div>
+        </Box>
       </div>
 
       <div style={styles.box}>
         <Image css={styles.img} src={"images/tomato.png"} />
-        <div style={styles.numContainer}>
+        <Box css={styles.numContainer}>
           <div style={styles.num}>{items > 99 ? "99+" : items}</div>
-        </div>
+        </Box>
       </div>
-    </div>
+    </Box>
   );
 }
 
 const styles = {
-  container: {
+  container: cssObj({
     display: "flex",
     border: "3px solid #754a1e",
     borderRadius: "8px",
@@ -37,21 +38,24 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     background: "#ac7339",
-  },
+  }),
   img: {
     imageRendering: "pixelated",
     height: "70px",
-    // minWidth: "60px",
   },
-  numContainer: {
+  numContainer: cssObj({
     position: "absolute",
-    bottom: "10px",
+    bottom: "54px",
     width: "80px",
     display: "flex",
     justifyContent: "flex-end",
-  } as React.CSSProperties,
+    '@sm': {
+      bottom: '8px',
+    }
+  }),
   num: {
-    fontSize: "10px",
+    fontSize: "$sm",
+    fontFamily: "pressStart2P",
     width: "35px",
     height: "35px",
     backgroundColor: "rgba(255,255,255,0.5)",

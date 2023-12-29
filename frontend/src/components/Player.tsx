@@ -4,13 +4,17 @@ import { useFrame, useLoader } from "@react-three/fiber"
 import { useKeyboardControls } from "@react-three/drei"
 import { Modals, Controls, convertTime, TILES } from "../constants"
 import { GardenVectorOutput } from "../contracts/ContractAbi"
+import type { MobileControls, Position } from "./Game"
 
 interface PlayerProps {
     tileStates: GardenVectorOutput | undefined;
     modal: Modals;
     setModal: Dispatch<SetStateAction<Modals>>;
     setTileArray: Dispatch<SetStateAction<number[]>>;
+    setPlayerPosition: Dispatch<SetStateAction<Position>>;
+    playerPosition: Position;
     canMove: boolean;
+    mobileControlState: MobileControls;
 }
 
 const bounds = {
@@ -33,7 +37,13 @@ const marketBounds = {
     y: 1.7,
 }
 
-export default function Player({ tileStates, setModal, setTileArray, canMove }: PlayerProps) {
+const playerBounds = {
+    left: -2,
+    center: 2,
+    bottom: -1.2,
+}
+
+export default function Player({ tileStates, setModal, setTileArray, setPlayerPosition, playerPosition, canMove, mobileControlState }: PlayerProps) {
     const [currentTile, setCurrentTile] = useState<number>(0);
     const [spriteMap, setSpriteMap] = useState<Texture>();
     const ref = useRef<Sprite>(null)
@@ -49,17 +59,39 @@ export default function Player({ tileStates, setModal, setTileArray, canMove }: 
         const xOffset = (currentTile % tilesHoriz) / tilesHoriz;
         const yOffset = (tilesVert - Math.floor(currentTile / tilesHoriz) - 1) / tilesVert;
         tempSpriteMap.offset.x = xOffset;
-        tempSpriteMap.offset.y = yOffset;
-        setSpriteMap(tempSpriteMap)
+        tempSpriteMap.offset.y = yOffset - 0.01;
+        setSpriteMap(tempSpriteMap);
     }, [currentTile, tempSpriteMap])
 
-    const velocity = new Vector3()
+    const velocity = new Vector3();
 
     useFrame((_s, dl) => {
         const state = get();
         checkTiles(state);
-        if(canMove) movePlayer(dl, state);
+        updateCameraPosition();
+
+        if(canMove) movePlayer(dl, state, mobileControlState);
     })
+
+    function updateCameraPosition() {
+        const position = ref.current?.position;
+        if (!position) return;
+        if(position.x < playerBounds.left){
+            updatePlayerPosition('left', position);
+        } else if (position.x < playerBounds.center){
+            updatePlayerPosition('center', position);
+        } else {
+            updatePlayerPosition('right', position);
+        }
+    }
+
+    function updatePlayerPosition(side: 'left' | 'center' | 'right', position: Vector3){
+        if(position.y < playerBounds.bottom && playerPosition !==  `${side}-bottom`){
+            setPlayerPosition(`${side}-bottom`);
+        } else if (position.y > playerBounds.bottom && playerPosition !== `${side}-top`){
+            setPlayerPosition(`${side}-top`);
+        }
+    }
 
     function checkTiles(state: any) {
         if (!ref.current) return
@@ -120,29 +152,29 @@ export default function Player({ tileStates, setModal, setTileArray, canMove }: 
         }
     }
 
-    function movePlayer(dl: number, state: any) {
+    function movePlayer(dl: number, state: any, mobileControlState: MobileControls) {
         if (!ref.current) return
-        if (state.left && !state.right) {
+        if ((state.left && !state.right) || mobileControlState === 'left') {
             velocity.x = -1
             setCurrentTile(12)
         }
-        if (state.right && !state.left){
+        if ((state.right && !state.left) || mobileControlState === 'right'){
             velocity.x = 1
             setCurrentTile(8)
         } 
-        if (!state.left && !state.right) velocity.x = 0
+        if (!state.left && !state.right && mobileControlState !== 'left' && mobileControlState !== 'right') velocity.x = 0
 
-        if (state.forward && !state.back){
+        if ((state.forward && !state.back) || (mobileControlState === 'up')){
             velocity.y = 1
             setCurrentTile(4)
         }
-        if (state.back && !state.forward){
+        if ((state.back && !state.forward) || (mobileControlState === 'down')){
             velocity.y = -1
             setCurrentTile(0)
         } 
-        if (!state.forward && !state.back) velocity.y = 0
+        if (!state.forward && !state.back && mobileControlState !== 'up' && mobileControlState !== 'down') velocity.y = 0
 
-        if (state.left || state.right) {
+        if (state.left || state.right || mobileControlState === 'left' || mobileControlState === 'right') {
             if (ref.current.position.x <= bounds.right && ref.current.position.x >= bounds.left) {
                 ref.current.translateX(4 * dl * velocity.x)
             } else if (ref.current.position.x > bounds.right) {
@@ -152,7 +184,7 @@ export default function Player({ tileStates, setModal, setTileArray, canMove }: 
             }
         }
 
-        if (state.back || state.forward) {
+        if (state.back || state.forward || mobileControlState === 'up' || mobileControlState === 'down') {
             if (ref.current.position.y <= bounds.top && ref.current.position.y >= bounds.bottom) {
                 ref.current.translateY(4 * dl * velocity.y)
             } else if (ref.current.position.y > bounds.top) {
@@ -163,13 +195,13 @@ export default function Player({ tileStates, setModal, setTileArray, canMove }: 
         }
     }
 
-    return (
-        <>
-        {spriteMap && (
+    if(spriteMap){
+        return (
             <sprite ref={ref} position={[-3, 1.7, 2]}>
                 <spriteMaterial attach="material" map={spriteMap}/>
             </sprite>
-        )}
-        </>
-    )
+        )
+    }
+
+    return null;
 }

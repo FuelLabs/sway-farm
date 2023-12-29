@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { KeyboardControls, KeyboardControlsEntry } from "@react-three/drei";
-import { Spinner, BoxCentered, Button } from "@fuel-ui/react";
-import { cssObj } from "@fuel-ui/css";
+import { Button } from "@fuel-ui/react";
 import { BN } from "fuels";
 import { Modals, Controls, buttonStyle } from "../constants";
 import { ContractAbi } from "../contracts";
@@ -16,19 +15,24 @@ import {
 import Player from "./Player";
 import Garden from "./Garden";
 import Background from "./Background";
-import ShowPlayerInfo from "./show/ShowPlayerInfo";
-import Inventory from "./show/Inventory";
-import GithubRepo from "./show/GithubRepo";
+import Info from "./show/Info"
 import PlantModal from "./modals/PlantModal";
 import HarvestModal from "./modals/HarvestModal";
 import MarketModal from "./modals/MarketModal";
 import NewPlayer from "./NewPlayer";
+import Camera from "./Camera";
+import Loading from "./Loading";
+import MobileControlButtons from "./MobileControls";
 
 interface GameProps {
   contract: ContractAbi | null;
+  isMobile: boolean;
 }
 
-export default function Game({ contract }: GameProps) {
+export type Position = 'left-top' | 'center-top' | 'right-top' | 'left-bottom' | 'center-bottom' | 'right-bottom';
+export type MobileControls = "none" | "up" | "down" | "left" | "right";
+
+export default function Game({ contract, isMobile }: GameProps) {
   const [modal, setModal] = useState<Modals>("none");
   const [tileStates, setTileStates] = useState<
     GardenVectorOutput | undefined
@@ -40,6 +44,8 @@ export default function Game({ contract }: GameProps) {
   const [seeds, setSeeds] = useState<number>(0);
   const [items, setItems] = useState<number>(0);
   const [canMove, setCanMove] = useState<boolean>(true);
+  const [playerPosition, setPlayerPosition] = useState<Position>('left-top');
+  const [mobileControlState, setMobileControlState] = useState<MobileControls>("none");
 
   useEffect(() => {
     async function getPlayerInfo() {
@@ -116,13 +122,12 @@ export default function Game({ contract }: GameProps) {
         </div>
       )}
       {status === "loading" && (
-        <BoxCentered css={styles.loading}>
-          <Spinner color="#754a1e" />
-        </BoxCentered>
+        <Loading/>
       )}
       {status === "none" && (
         <>
-          <Canvas orthographic camera={{ position: [0, 0, 100], zoom: 100 }}>
+          <Canvas orthographic>
+            <Camera playerPosition={playerPosition} isMobile={isMobile}/>
             <Suspense fallback={null}>
               <Background />
 
@@ -142,28 +147,29 @@ export default function Game({ contract }: GameProps) {
                     modal={modal}
                     setModal={setModal}
                     setTileArray={setTileArray}
+                    setPlayerPosition={setPlayerPosition}
+                    playerPosition={playerPosition}
                     canMove={canMove}
+                    mobileControlState={mobileControlState}
                   />
                 </KeyboardControls>
               )}
             </Suspense>
           </Canvas>
 
+          {isMobile && <MobileControlButtons setMobileControlState={setMobileControlState}/>}
+
+          {/* INFO CONTAINERS */}
+          <Info
+             player={player}
+             contract={contract}
+             updateNum={updateNum}
+             seeds={seeds}
+             items={items}
+             />
+
           {player !== null && (
             <>
-              {/* BOTTOM CONTAINERS */}
-              <div className="bottom-container">
-                <div className="player-info-container">
-                  <GithubRepo />
-                  <ShowPlayerInfo
-                    player={player}
-                    contract={contract}
-                    updateNum={updateNum}
-                  />
-                </div>
-                <Inventory seeds={seeds} items={items} />
-              </div>
-
               {/* GAME MODALS */}
               {modal === "plant" && (
                 <PlantModal
@@ -203,9 +209,3 @@ export default function Game({ contract }: GameProps) {
     </div>
   );
 }
-
-const styles = {
-  loading: cssObj({
-    height: "100%",
-  }),
-};

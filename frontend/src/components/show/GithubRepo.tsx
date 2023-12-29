@@ -3,18 +3,18 @@ import { cssObj } from "@fuel-ui/css";
 
 export default function GithubRepo() {
   return (
-    <div className="github-info">
+    <Box css={styles.githubInfo}>
       <a
         href="https://github.com/FuelLabs/sway-farm"
         rel="noreferrer"
         target="_blank"
       >
         <Box css={styles.smallBox}>
-          <text>GitHub</text>
+          <span>GitHub</span>
           <img src="../../../images/github-icon.png" alt="GitHub logo" />
         </Box>
       </a>
-    </div>
+    </Box>
   );
 }
 
@@ -29,5 +29,14 @@ let styles = {
     padding: "4px",
     gap: "6px",
     color: "black",
+  }),
+  githubInfo: cssObj({
+    background: "#ac7339",
+    height: "40px",
+    width: "128px",
+    display: "flex",
+    borderRadius: "8px",
+    border: "3px solid #754a1e",
+    textDecoration: "none",
   }),
 };
