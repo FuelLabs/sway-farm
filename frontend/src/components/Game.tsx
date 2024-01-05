@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { KeyboardControls, KeyboardControlsEntry } from "@react-three/drei";
-import { Button } from "@fuel-ui/react";
+import { Box, Button } from "@fuel-ui/react";
 import { BN } from "fuels";
 import { Modals, Controls, buttonStyle } from "../constants";
 import { ContractAbi } from "../contracts";
@@ -23,6 +23,7 @@ import NewPlayer from "./NewPlayer";
 import Camera from "./Camera";
 import Loading from "./Loading";
 import MobileControlButtons from "./MobileControls";
+import { cssObj } from "@fuel-ui/css";
 
 interface GameProps {
   contract: ContractAbi | null;
@@ -117,7 +118,7 @@ export default function Game({ contract, isMobile }: GameProps) {
   );
 
   return (
-    <div id="canvas-container">
+    <Box css={styles.canvasContainer}>
       {status === "error" && (
         <div>
           <p>Something went wrong!</p>
@@ -219,6 +220,19 @@ export default function Game({ contract, isMobile }: GameProps) {
           )}
         </>
       )}
-    </div>
+    </Box>
   );
 }
+
+const styles = {
+  canvasContainer: cssObj({
+    border: "4px solid #754a1e",
+    borderRadius: "8px",
+    height: " calc(100vh - 8px)",
+    width: "1000px",
+    margin: "auto",
+    "@sm": {
+      maxHeight: "740px",
+    },
+  }),
+};

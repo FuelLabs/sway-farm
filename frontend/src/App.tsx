@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { WalletLocked, Wallet, Account, Provider } from "fuels";
-import { BoxCentered, Heading } from "@fuel-ui/react";
+import { Box, BoxCentered, Heading } from "@fuel-ui/react";
 import { cssObj } from "@fuel-ui/css";
 import { Analytics } from "@vercel/analytics/react";
 import Game from "./components/Game";
@@ -80,7 +80,7 @@ function App() {
   }, [fuel, wallet, burnerWallet]);
 
   return (
-    <div className="App">
+    <Box css={styles.root}>
       {isConnected || (contract && burnerWallet) ? (
         <Game contract={contract} isMobile={isMobile} />
       ) : (
@@ -94,13 +94,23 @@ function App() {
         </BoxCentered>
       )}
       <Analytics />
-    </div>
+    </Box>
   );
 }
 
 export default App;
 
 const styles = {
+  root: cssObj({
+    textAlign: "center",
+    fontFamily: "pressStart2P, Arial, sans-serif",
+    height: "100vh",
+    width: "100vw",
+    "@sm": {
+      display: "grid",
+      placeItems: "center",
+    },
+  }),
   box: cssObj({
     marginTop: "20%",
   }),

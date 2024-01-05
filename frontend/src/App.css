@@ -1,12 +1,3 @@
-.App {
-  text-align: center;
-  font-family: "pressStart2P", Arial, sans-serif;
-  height: 100vh;
-  width: 100vw;
-  display: grid;
-  place-items: center;
-}
-
 html,
 body {
   overflow: hidden;
@@ -21,15 +12,6 @@ body {
 @font-face {
   font-family: pressStart2P;
   src: url(../public/PressStart2P-Regular.ttf);
-}
-
-#canvas-container {
-  border: 4px solid #754a1e;
-  border-radius: 8px;
-  height: calc(100vh - 8px);
-  max-height: 740px;
-  width: 1000px;
-  margin: auto;
 }
 
 .plant-modal,
