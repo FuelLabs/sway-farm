@@ -23,9 +23,7 @@ function App() {
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
-    const mobile = /(iphone|ipod|ipad|android|blackberry|windows phone)/.test(
-      userAgent
-    );
+    const mobile = /(iphone|android|windows phone)/.test(userAgent);
     setIsMobile(mobile);
   }, []);
 

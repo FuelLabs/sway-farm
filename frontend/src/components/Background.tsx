@@ -4,7 +4,7 @@ export default function Background() {
   return (
     <>
       <ambientLight />
-      <Image scale={[10, 7.4]} url={"/images/farm_map.png"} />
+      <Image scale={[13.57, 11.51]} url={"/images/farm_map.png"} />
     </>
   );
 }
