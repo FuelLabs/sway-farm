@@ -103,7 +103,6 @@ export default App;
 const styles = {
   root: cssObj({
     textAlign: "center",
-    fontFamily: "pressStart2P, Arial, sans-serif",
     height: "100vh",
     width: "100vw",
     "@sm": {
