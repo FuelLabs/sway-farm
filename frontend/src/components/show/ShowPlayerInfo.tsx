@@ -33,17 +33,17 @@ export default function ShowPlayerInfo({
 const styles = {
   box: cssObj({
     fontFamily: "pressStart2P",
-    fontSize: "$sm",
-    maxWidth: "180px",
+    fontSize: "$xs",
     textAlign: "left",
     lineHeight: "120%",
     "@sm": {
       maxWidth: "none",
+      fontSize: "$sm",
     },
   }),
   playerInfo: cssObj({
     background: "#ac7339",
-    height: "80px",
+    height: "40px",
     display: "flex",
     py: "10px",
     pl: "20px",
@@ -51,6 +51,7 @@ const styles = {
     border: "3px solid #754a1e",
     "@sm": {
       width: "280px",
+      height: "80px",
     },
   }),
 };

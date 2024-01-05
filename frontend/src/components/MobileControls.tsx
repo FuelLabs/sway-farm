@@ -38,13 +38,13 @@ const MobileButton = ({
       <path
         d="M 0 100 L 80 100 L 80 180 L 40 230 L 0 180 Z"
         fill="none"
-        stroke="#754a1e"
+        stroke="#65401a"
         strokeWidth="10"
       />
       <path
         d="M 15 150 L 40 125 L 65 150 Z"
         fill="none"
-        stroke="#754a1e"
+        stroke="#65401a"
         strokeWidth="6"
       />
     </svg>
@@ -87,8 +87,8 @@ const styles = {
   root: cssObj({
     position: "fixed",
     bottom: "0",
-    left: "0",
-    width: "calc(100vw - 5px)",
+    right: "0",
+    px: "$2",
     height: "100px",
     border: "3px solid #754a1e",
     borderRadius: "8px",

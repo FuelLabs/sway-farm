@@ -38,13 +38,6 @@ export default function Info({
 
 const styles = {
   container: cssObj({
-    position: "fixed",
-    right: "0",
-    top: "0",
-    display: "flex",
-    justifyContent: "space-between",
-    maxWidth: "1000px",
-    width: "calc(100vw - 4px)",
     "@sm": {
       position: "relative",
       top: "-150px",
@@ -55,8 +48,14 @@ const styles = {
   playerInfo: cssObj({
     display: "flex",
     flexDirection: "column-reverse",
+    position: "fixed",
+    left: "0",
+    top: "0",
+    width: "270px",
     "@sm": {
+      position: "relative",
       flexDirection: "column",
+      width: "100%",
     },
   }),
 };

@@ -24,11 +24,14 @@ let styles = {
     justifyContent: "center",
     alignItems: "center",
     fontFamily: "pressStart2P",
-    fontSize: "10pt",
+    fontSize: "$xs",
     margin: "4px",
     padding: "4px",
     gap: "6px",
     color: "black",
+    "@sm": {
+      fontSize: "$sm",
+    },
   }),
   githubInfo: cssObj({
     background: "#ac7339",
