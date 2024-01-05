@@ -8,9 +8,10 @@ import { FUEL_PROVIDER_URL } from "../../constants";
 
 interface HomeProps {
   setBurnerWallet: Dispatch<SetStateAction<Wallet>>;
+  isMobile: boolean;
 }
 
-export default function Home({ setBurnerWallet }: HomeProps) {
+export default function Home({ setBurnerWallet, isMobile }: HomeProps) {
   const [fuel] = useFuel();
 
   function create() {
@@ -23,7 +24,7 @@ export default function Home({ setBurnerWallet }: HomeProps) {
 
   return (
     <div>
-      <Instructions />
+      <Instructions isMobile={isMobile} />
       {fuel ? (
         <Button css={styles.button} onPress={() => fuel.connect()}>
           Connect Wallet

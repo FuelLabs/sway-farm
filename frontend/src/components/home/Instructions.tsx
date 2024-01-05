@@ -1,11 +1,20 @@
 import { Box } from "@fuel-ui/react";
 import { cssObj } from "@fuel-ui/css";
 
-export default function Instructions() {
+export default function Instructions({ isMobile }: { isMobile: boolean }) {
   return (
     <Box css={styles.box}>
       <h3>Instructions:</h3>
-      <p style={styles.text}>Use WASD or arrow keys to move around the game.</p>
+      {isMobile ? (
+        <p style={styles.text}>
+          Tap the arrow buttons to move around the game.
+        </p>
+      ) : (
+        <p style={styles.text}>
+          Use WASD or arrow keys to move around the game.
+        </p>
+      )}
+
       <p style={styles.text}>
         Grow and sell tomatoes to become a Sway Farm hero.
       </p>

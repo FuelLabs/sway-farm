@@ -10,7 +10,6 @@ import { useFuel } from "./hooks/useFuel";
 import { CONTRACT_ID, FARM_COIN_ASSET, FUEL_PROVIDER_URL } from "./constants";
 import { ContractAbi__factory } from "./contracts";
 import "./App.css";
-import usePreventLongPressMenu from "./hooks/usePreventLongPressMenu";
 
 function App() {
   const [wallet, setWallet] = useState<WalletLocked>();
@@ -19,7 +18,6 @@ function App() {
   const [isConnected] = useIsConnected();
   const [fuel] = useFuel();
   const [isMobile, setIsMobile] = useState(false);
-  usePreventLongPressMenu();
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -89,7 +87,7 @@ function App() {
             <Heading css={styles.heading} as={"h1"}>
               SWAY FARM
             </Heading>
-            <Home setBurnerWallet={setBurnerWallet} />
+            <Home setBurnerWallet={setBurnerWallet} isMobile={isMobile} />
           </BoxCentered>
         </BoxCentered>
       )}
