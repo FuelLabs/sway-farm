@@ -24,6 +24,14 @@ const MobileButton = ({
   } else if (direction === "down") {
     degrees = 180;
   }
+
+  function handleTouch() {
+    setMobileControlState(direction);
+    setTimeout(() => {
+      setMobileControlState("none");
+    }, 100);
+  }
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -31,9 +39,7 @@ const MobileButton = ({
       height="45"
       viewBox="-41.5 95 165 125"
       style={{ transform: `rotate(${degrees}deg)` }}
-      onTouchStart={() => setMobileControlState(direction)}
-      onTouchEnd={() => setMobileControlState("none")}
-      onTouchCancel={() => setMobileControlState("none")}
+      onTouchStart={handleTouch}
     >
       <path
         d="M 0 100 L 80 100 L 80 180 L 40 230 L 0 180 Z"

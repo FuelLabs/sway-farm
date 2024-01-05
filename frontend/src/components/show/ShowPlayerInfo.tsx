@@ -23,7 +23,7 @@ export default function ShowPlayerInfo({
   return (
     <Box css={styles.playerInfo}>
       <Flex direction={"column"} justify="space-around">
-        <Box css={styles.box}>Value Sold: {valSold}</Box>
+        <Box css={styles.box}>Value Sold: {valSold ?? "0"}</Box>
         <ShowCoins contract={contract} updateNum={updateNum} />
       </Flex>
     </Box>
