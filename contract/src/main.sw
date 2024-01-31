@@ -15,7 +15,7 @@ use {
         context::msg_amount,
         hash::Hash,
         logging::log,
-        token::{
+        asset::{
             mint_to,
             transfer,
         },
