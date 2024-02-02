@@ -21,5 +21,6 @@ jobs:
       - name: Run lint
         run: |
           cd frontend
+          npm install
           npm run lint
           npm run prettier:check
