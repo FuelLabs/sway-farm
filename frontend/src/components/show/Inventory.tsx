@@ -69,7 +69,7 @@ const styles = {
     },
   }),
   num: cssObj({
-    fontSize: "10px",
+    fontSize: '10px',
     fontFamily: 'pressStart2P',
     width: '25px',
     height: '25px',
