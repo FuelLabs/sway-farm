@@ -1,10 +1,12 @@
-import { Dispatch, SetStateAction } from "react";
-import { useFuel } from "../../hooks/useFuel";
-import Instructions from "./Instructions";
-import { Button, Box, Link } from "@fuel-ui/react";
-import { cssObj } from "@fuel-ui/css";
-import { Wallet } from "fuels";
-import { FUEL_PROVIDER_URL } from "../../constants";
+import { cssObj } from '@fuel-ui/css';
+import { Button, Box, Link } from '@fuel-ui/react';
+import { Wallet } from 'fuels';
+import type { Dispatch, SetStateAction } from 'react';
+
+import { FUEL_PROVIDER_URL } from '../../constants';
+import { useFuel } from '../../hooks/useFuel';
+
+import Instructions from './Instructions';
 
 interface HomeProps {
   setBurnerWallet: Dispatch<SetStateAction<Wallet>>;
@@ -19,7 +21,7 @@ export default function Home({ setBurnerWallet, isMobile }: HomeProps) {
       provider: FUEL_PROVIDER_URL,
     });
     setBurnerWallet(newWallet);
-    window.localStorage.setItem("sway-farm-wallet-key", newWallet.privateKey);
+    window.localStorage.setItem('sway-farm-wallet-key', newWallet.privateKey);
   }
 
   return (
@@ -35,7 +37,7 @@ export default function Home({ setBurnerWallet, isMobile }: HomeProps) {
             Play with In-Browser Wallet
           </Button>
           <Box css={styles.download}>
-            or download the{" "}
+            or download the{' '}
             <Link
               target="_blank"
               rel="noopener noreferrer"
@@ -52,31 +54,31 @@ export default function Home({ setBurnerWallet, isMobile }: HomeProps) {
 
 const styles = {
   button: cssObj({
-    fontFamily: "pressStart2P",
-    fontSize: "$sm",
-    margin: "10px auto 20px auto",
-    backgroundColor: "transparent",
-    color: "#aaa",
-    border: "2px solid #754a1e",
-    width: "320px",
-    "@sm": {
-      display: "block",
-      width: "100%",
+    fontFamily: 'pressStart2P',
+    fontSize: '$sm',
+    margin: '10px auto 20px auto',
+    backgroundColor: 'transparent',
+    color: '#aaa',
+    border: '2px solid #754a1e',
+    width: '320px',
+    '@sm': {
+      display: 'block',
+      width: '100%',
     },
-    "&:hover": {
-      color: "#ddd",
-      background: "#754a1e !important",
-      border: "2px solid #754a1e !important",
-      boxShadow: "none !important",
+    '&:hover': {
+      color: '#ddd',
+      background: '#754a1e !important',
+      border: '2px solid #754a1e !important',
+      boxShadow: 'none !important',
     },
   }),
   download: cssObj({
-    color: "#aaa",
-    fontFamily: "pressStart2P",
-    lineHeight: "24px",
-    display: "none",
-    "@sm": {
-      display: "block",
+    color: '#aaa',
+    fontFamily: 'pressStart2P',
+    lineHeight: '24px',
+    display: 'none',
+    '@sm': {
+      display: 'block',
     },
   }),
 };

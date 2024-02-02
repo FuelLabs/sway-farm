@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
-import { useFuel } from "../../hooks/useFuel";
-import { BN } from "fuels";
-import { Box } from "@fuel-ui/react";
-import { cssObj } from "@fuel-ui/css";
-import { FARM_COIN_ASSET } from "../../constants";
-import { ContractAbi } from "../../contracts/ContractAbi";
+import { cssObj } from '@fuel-ui/css';
+import { Box } from '@fuel-ui/react';
+import type { BN } from 'fuels';
+import { useState, useEffect } from 'react';
+
+import { FARM_COIN_ASSET } from '../../constants';
+import type { ContractAbi } from '../../contracts/ContractAbi';
+import { useFuel } from '../../hooks/useFuel';
 
 interface ShowCoinsProps {
   updateNum: number;
@@ -24,7 +25,7 @@ export default function ShowCoins({ updateNum, contract }: ShowCoinsProps) {
     }
     async function getBalance() {
       const account = contract!.account;
-      let bal = await account?.getBalance(FARM_COIN_ASSET.assetId);
+      const bal = await account?.getBalance(FARM_COIN_ASSET.assetId);
       if (bal) {
         setBalance(bal);
       }
@@ -40,13 +41,13 @@ export default function ShowCoins({ updateNum, contract }: ShowCoinsProps) {
   return null;
 }
 
-let styles = cssObj({
-  lineHeight: "120%",
-  fontFamily: "pressStart2P",
-  fontSize: "$xs",
-  textAlign: "left",
-  "@sm": {
-    maxWidth: "none",
-    fontSize: "$sm",
+const styles = cssObj({
+  lineHeight: '120%',
+  fontFamily: 'pressStart2P',
+  fontSize: '$xs',
+  textAlign: 'left',
+  '@sm': {
+    maxWidth: 'none',
+    fontSize: '$sm',
   },
 });

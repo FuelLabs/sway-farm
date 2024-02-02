@@ -1,5 +1,5 @@
-import { Box } from "@fuel-ui/react";
-import { cssObj } from "@fuel-ui/css";
+import { cssObj } from '@fuel-ui/css';
+import { Box } from '@fuel-ui/react';
 
 export default function Instructions({ isMobile }: { isMobile: boolean }) {
   return (
@@ -24,12 +24,12 @@ export default function Instructions({ isMobile }: { isMobile: boolean }) {
 
 const styles = {
   box: cssObj({
-    padding: "$4 0",
-    fontFamily: "pressStart2P",
-    color: "#aaa",
-    maxWidth: "800px",
+    padding: '$4 0',
+    fontFamily: 'pressStart2P',
+    color: '#aaa',
+    maxWidth: '800px',
   }),
   text: {
-    fontSize: "14px",
+    fontSize: '14px',
   },
 };

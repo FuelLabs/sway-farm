@@ -1,5 +1,5 @@
-import { cssObj } from "@fuel-ui/css";
-import { BoxCentered, Spinner } from "@fuel-ui/react";
+import { cssObj } from '@fuel-ui/css';
+import { BoxCentered, Spinner } from '@fuel-ui/react';
 
 export default function Loading() {
   return (
@@ -11,6 +11,6 @@ export default function Loading() {
 
 const styles = {
   loading: cssObj({
-    height: "100%",
+    height: '100%',
   }),
 };

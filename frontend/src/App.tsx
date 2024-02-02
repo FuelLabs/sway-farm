@@ -1,15 +1,17 @@
-import { useState, useEffect, useMemo } from "react";
-import { WalletLocked, Wallet, Account, Provider } from "fuels";
-import { Box, BoxCentered, Heading } from "@fuel-ui/react";
-import { cssObj } from "@fuel-ui/css";
-import { Analytics } from "@vercel/analytics/react";
-import Game from "./components/Game";
-import Home from "./components/home/Home";
-import { useIsConnected } from "./hooks/useIsConnected";
-import { useFuel } from "./hooks/useFuel";
-import { CONTRACT_ID, FARM_COIN_ASSET, FUEL_PROVIDER_URL } from "./constants";
-import { ContractAbi__factory } from "./contracts";
-import "./App.css";
+import { cssObj } from '@fuel-ui/css';
+import { Box, BoxCentered, Heading } from '@fuel-ui/react';
+import { Analytics } from '@vercel/analytics/react';
+import { Wallet, Provider } from 'fuels';
+import type { WalletLocked, Account } from 'fuels';
+import { useState, useEffect, useMemo } from 'react';
+
+import Game from './components/Game';
+import Home from './components/home/Home';
+import { CONTRACT_ID, FARM_COIN_ASSET, FUEL_PROVIDER_URL } from './constants';
+import { ContractAbi__factory } from './contracts';
+import { useFuel } from './hooks/useFuel';
+import { useIsConnected } from './hooks/useIsConnected';
+import './App.css';
 
 function App() {
   const [wallet, setWallet] = useState<WalletLocked>();
@@ -48,7 +50,7 @@ function App() {
     }
 
     async function getWallet() {
-      const key = window.localStorage.getItem("sway-farm-wallet-key");
+      const key = window.localStorage.getItem('sway-farm-wallet-key');
       if (key) {
         const provider = new Provider(FUEL_PROVIDER_URL);
         const walletFromKey = Wallet.fromPrivateKey(key, provider);
@@ -84,7 +86,7 @@ function App() {
       ) : (
         <BoxCentered css={styles.box}>
           <BoxCentered css={styles.innerBox}>
-            <Heading css={styles.heading} as={"h1"}>
+            <Heading css={styles.heading} as={'h1'}>
               SWAY FARM
             </Heading>
             <Home setBurnerWallet={setBurnerWallet} isMobile={isMobile} />
@@ -100,56 +102,56 @@ export default App;
 
 const styles = {
   root: cssObj({
-    textAlign: "center",
-    height: "100vh",
-    width: "100vw",
-    "@sm": {
-      display: "grid",
-      placeItems: "center",
+    textAlign: 'center',
+    height: '100vh',
+    width: '100vw',
+    '@sm': {
+      display: 'grid',
+      placeItems: 'center',
     },
   }),
   box: cssObj({
-    marginTop: "20%",
+    marginTop: '20%',
   }),
   innerBox: cssObj({
-    display: "block",
+    display: 'block',
   }),
   heading: cssObj({
-    fontFamily: "pressStart2P",
-    fontSize: "$5xl",
-    marginBottom: "40px",
-    lineHeight: "3.5rem",
-    color: "green",
-    "@sm": {
-      fontSize: "$7xl",
-      lineHeight: "2.5rem",
+    fontFamily: 'pressStart2P',
+    fontSize: '$5xl',
+    marginBottom: '40px',
+    lineHeight: '3.5rem',
+    color: 'green',
+    '@sm': {
+      fontSize: '$7xl',
+      lineHeight: '2.5rem',
     },
   }),
   button: cssObj({
-    fontFamily: "pressStart2P",
-    fontSize: "$sm",
-    margin: "auto",
-    backgroundColor: "transparent",
-    color: "#aaa",
-    border: "2px solid #754a1e",
-    "&:hover": {
-      color: "#ddd",
-      background: "#754a1e !important",
-      border: "2px solid #754a1e !important",
-      boxShadow: "none !important",
+    fontFamily: 'pressStart2P',
+    fontSize: '$sm',
+    margin: 'auto',
+    backgroundColor: 'transparent',
+    color: '#aaa',
+    border: '2px solid #754a1e',
+    '&:hover': {
+      color: '#ddd',
+      background: '#754a1e !important',
+      border: '2px solid #754a1e !important',
+      boxShadow: 'none !important',
     },
   }),
   download: cssObj({
-    color: "#ddd",
-    fontFamily: "pressStart2P",
-    lineHeight: "24px",
+    color: '#ddd',
+    fontFamily: 'pressStart2P',
+    lineHeight: '24px',
   }),
   smallScreen: cssObj({
-    color: "#ddd",
-    fontFamily: "pressStart2P",
-    fontSize: "12px",
-    "@sm": {
-      display: "none",
+    color: '#ddd',
+    fontFamily: 'pressStart2P',
+    fontSize: '12px',
+    '@sm': {
+      display: 'none',
     },
   }),
 };

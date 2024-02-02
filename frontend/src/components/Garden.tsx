@@ -1,12 +1,15 @@
-import { useEffect, Dispatch, SetStateAction } from "react";
-import GardenTile from "./GardenTile";
-import { ContractAbi } from "../contracts";
-import {
+import type { Dispatch, SetStateAction } from 'react';
+import { useEffect } from 'react';
+
+import { TILES } from '../constants';
+import type { ContractAbi } from '../contracts';
+import type {
   IdentityInput,
   AddressInput,
   GardenVectorOutput,
-} from "../contracts/ContractAbi";
-import { TILES } from "../constants";
+} from '../contracts/ContractAbi';
+
+import GardenTile from './GardenTile';
 
 interface GardenProps {
   tileStates: GardenVectorOutput | undefined;
@@ -25,16 +28,16 @@ export default function Garden({
     async function getPlantedSeeds() {
       if (contract && contract.account) {
         try {
-          let address: AddressInput = {
+          const address: AddressInput = {
             value: contract.account.address.toB256(),
           };
-          let id: IdentityInput = { Address: address };
-          let { value } = await contract.functions
+          const id: IdentityInput = { Address: address };
+          const { value } = await contract.functions
             .get_garden_vec(id)
             .simulate();
           setTileStates(value);
         } catch (err) {
-          console.log("Error:", err);
+          console.log('Error:', err);
         }
       }
     }

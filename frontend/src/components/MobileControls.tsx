@@ -1,7 +1,8 @@
-import { cssObj } from "@fuel-ui/css";
-import { Box, Flex } from "@fuel-ui/react";
-import { Dispatch, SetStateAction } from "react";
-import type { MobileControls } from "./Game";
+import { cssObj } from '@fuel-ui/css';
+import { Box, Flex } from '@fuel-ui/react';
+import type { Dispatch, SetStateAction } from 'react';
+
+import type { MobileControls } from './Game';
 
 interface MobileControlsProps {
   setMobileControlState: Dispatch<SetStateAction<MobileControls>>;
@@ -17,18 +18,18 @@ const MobileButton = ({
   setMobileControlState,
 }: MobileButtonProps) => {
   let degrees = 0;
-  if (direction === "left") {
+  if (direction === 'left') {
     degrees = -90;
-  } else if (direction === "right") {
+  } else if (direction === 'right') {
     degrees = 90;
-  } else if (direction === "down") {
+  } else if (direction === 'down') {
     degrees = 180;
   }
 
   function handleTouch() {
     setMobileControlState(direction);
     setTimeout(() => {
-      setMobileControlState("none");
+      setMobileControlState('none');
     }, 100);
   }
 
@@ -64,25 +65,25 @@ export default function MobileControlButtons({
     <Box css={styles.root}>
       <MobileButton
         aria-label="Arrow Left"
-        direction={"left"}
+        direction={'left'}
         setMobileControlState={setMobileControlState}
       />
-      <Flex direction={"column"} gap={"$3"}>
+      <Flex direction={'column'} gap={'$1'}>
         <MobileButton
           aria-label="Arrow Up"
-          direction={"up"}
+          direction={'up'}
           setMobileControlState={setMobileControlState}
         />
 
         <MobileButton
           aria-label="Arrow Down"
-          direction={"down"}
+          direction={'down'}
           setMobileControlState={setMobileControlState}
         />
       </Flex>
       <MobileButton
         aria-label="Arrow Right"
-        direction={"right"}
+        direction={'right'}
         setMobileControlState={setMobileControlState}
       />
     </Box>
@@ -91,16 +92,15 @@ export default function MobileControlButtons({
 
 const styles = {
   root: cssObj({
-    position: "fixed",
-    bottom: "0",
-    right: "0",
-    px: "$2",
-    height: "100px",
-    border: "3px solid #754a1e",
-    borderRadius: "8px",
-    background: "#ac7339",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+    position: 'fixed',
+    bottom: '0',
+    right: '0',
+    height: '100px',
+    border: '3px solid #754a1e',
+    borderRadius: '8px',
+    background: '#ac7339',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   }),
 };

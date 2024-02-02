@@ -1,11 +1,14 @@
-import { useState, useEffect } from "react";
-import { Vector3, TextureLoader, NearestFilter } from "three";
-import { Html } from "@react-three/drei";
-import { convertTime } from "../constants";
-import { FoodOutput } from "../contracts/ContractAbi";
-import { Option } from "../contracts/common";
-import { useLoader } from "@react-three/fiber";
-import Loading from "./Loading";
+import { Html } from '@react-three/drei';
+import { useLoader } from '@react-three/fiber';
+import { useState, useEffect } from 'react';
+import type { Vector3 } from 'three';
+import { TextureLoader, NearestFilter } from 'three';
+
+import { convertTime } from '../constants';
+import type { FoodOutput } from '../contracts/ContractAbi';
+import type { Option } from '../contracts/common';
+
+import Loading from './Loading';
 
 interface GardenTileProps {
   position: Vector3;
@@ -21,12 +24,30 @@ export default function GardenTile({
   const [tileState, setTileState] = useState<number | undefined>(undefined);
   const [status, setStatus] = useState<"loading" | "loaded">("loading");
 
-  let seedTexture = useLoader(TextureLoader, "images/seeds.png");
-  let plantTexture1 = useLoader(TextureLoader, "images/tomato_plant_1.png");
-  let plantTexture2 = useLoader(TextureLoader, "images/tomato_plant_2.png");
-  let plantTexture3 = useLoader(TextureLoader, "images/tomato_plant_3.png");
-  let plantTexture4 = useLoader(TextureLoader, "images/tomato_plant_4.png");
-  let finalTexture = useLoader(TextureLoader, "images/tomato_plant_final.png");
+  const [
+    seedTexture, 
+    plantTexture1, 
+    plantTexture2, 
+    plantTexture3, 
+    plantTexture4, 
+    finalTexture
+  ] = useLoader(TextureLoader, 
+    [
+      'images/seeds.png', 
+      'images/tomato_plant_1.png',
+      'images/tomato_plant_2.png',
+      'images/tomato_plant_3.png',
+      'images/tomato_plant_4.png',
+      'images/tomato_plant_final.png'
+    ]);
+  // const plantTexture1 = useLoader<any>(TextureLoader, 'images/tomato_plant_1.png');
+  // const plantTexture2 = useLoader<any>(TextureLoader, 'images/tomato_plant_2.png');
+  // const plantTexture3 = useLoader<any>(TextureLoader, 'images/tomato_plant_3.png');
+  // const plantTexture4 = useLoader<any>(TextureLoader, 'images/tomato_plant_4.png');
+  // const finalTexture = useLoader<any>(
+  //   TextureLoader,
+  //   'images/tomato_plant_final.png'
+  // );
   seedTexture.magFilter = NearestFilter;
   plantTexture1.magFilter = NearestFilter;
   plantTexture2.magFilter = NearestFilter;
@@ -35,32 +56,32 @@ export default function GardenTile({
   finalTexture.magFilter = NearestFilter;
 
   useEffect(() => {
-    setStatus("loading");
+    setStatus('loading');
     if (state === undefined) setTileState(undefined);
     if (state !== undefined && state.time_planted) {
-      let now = Date.now();
-      let unix = convertTime(state.time_planted);
+      const now = Date.now();
+      const unix = convertTime(state.time_planted);
       let diff = (now - unix) / 1000;
       diff /= 60;
-      let minutesAgo = Math.abs(Math.floor(diff));
+      const minutesAgo = Math.abs(Math.floor(diff));
       if (minutesAgo < 20) {
         setTileState(minutesAgo);
       } else {
         setTileState(20);
       }
     }
-    setStatus("loaded");
+    setStatus('loaded');
   }, [state, updateNum]);
 
   return (
     <>
-      {status === "loading" && (
+      {status === 'loading' && (
         <Html position={[position.x - 0.1, position.y + 0.1, position.z]}>
           <Loading />
         </Html>
       )}
 
-      {tileState !== undefined && status === "loaded" && (
+      {tileState !== undefined && status === 'loaded' && (
         <>
           {tileState < 4 && (
             <sprite

@@ -1,9 +1,11 @@
-import { useState, Dispatch, SetStateAction } from "react";
-import { ContractAbi } from "../../contracts";
-import { bn } from "fuels";
-import { FoodTypeInput } from "../../contracts/ContractAbi";
-import { Button, Spinner, BoxCentered } from "@fuel-ui/react";
-import { FARM_COIN_ASSET, buttonStyle } from "../../constants";
+import { Button, Spinner, BoxCentered } from '@fuel-ui/react';
+import { bn } from 'fuels';
+import type { Dispatch, SetStateAction } from 'react';
+import { useState } from 'react';
+
+import { FARM_COIN_ASSET, buttonStyle } from '../../constants';
+import type { ContractAbi } from '../../contracts';
+import type { FoodTypeInput } from '../../contracts/ContractAbi';
 
 interface BuySeedsProps {
   contract: ContractAbi | null;
@@ -16,18 +18,21 @@ export default function BuySeeds({
   updatePageNum,
   setCanMove,
 }: BuySeedsProps) {
-  const [status, setStatus] = useState<"error" | "none" | `loading`>("none");
+  const [status, setStatus] = useState<'error' | 'none' | `loading`>('none');
 
   async function buySeeds() {
     if (contract !== null) {
       try {
-        setStatus("loading");
+        setStatus('loading');
         setCanMove(false);
         const amount = 10;
-        let realAmount = amount / 1_000_000_000;
-        let inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
-        let seedType: FoodTypeInput = { tomatoes: [] } as any as FoodTypeInput;
-        let price = 750_000 * amount;
+        const realAmount = amount / 1_000_000_000;
+        const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
+        const seedType: FoodTypeInput = {
+          tomatoes: [],
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any as FoodTypeInput;
+        const price = 750_000 * amount;
         await contract.functions
           .buy_seeds(seedType, inputAmount)
           .callParams({
@@ -36,32 +41,32 @@ export default function BuySeeds({
           .txParams({ gasPrice: 1 })
           .call();
         updatePageNum();
-        setStatus("none");
+        setStatus('none');
       } catch (err) {
-        console.log("Error:", err);
-        setStatus("error");
+        console.log('Error:', err);
+        setStatus('error');
       }
       setCanMove(true);
     } else {
-      console.log("ERROR: contract missing");
-      setStatus("error");
+      console.log('ERROR: contract missing');
+      setStatus('error');
     }
   }
 
   return (
     <>
-      {status === "loading" && (
+      {status === 'loading' && (
         <BoxCentered>
           <Spinner color="#754a1e" />
         </BoxCentered>
       )}
-      {status === "error" && (
+      {status === 'error' && (
         <div>
           <p>Something went wrong!</p>
           <Button
             css={buttonStyle}
             onPress={() => {
-              setStatus("none");
+              setStatus('none');
               updatePageNum();
             }}
           >
@@ -69,7 +74,7 @@ export default function BuySeeds({
           </Button>
         </div>
       )}
-      {status === "none" && (
+      {status === 'none' && (
         <>
           <div className="market-header">Buy Seeds</div>
           <Button css={buttonStyle} variant="outlined" onPress={buySeeds}>

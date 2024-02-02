@@ -1,7 +1,9 @@
-import { useState, Dispatch, SetStateAction } from "react";
-import { ContractAbi } from "../../contracts";
-import { Spinner, Button, BoxCentered } from "@fuel-ui/react";
-import { buttonStyle } from "../../constants";
+import { Spinner, Button, BoxCentered } from '@fuel-ui/react';
+import type { Dispatch, SetStateAction } from 'react';
+import { useState } from 'react';
+
+import { buttonStyle } from '../../constants';
+import type { ContractAbi } from '../../contracts';
 
 interface HarvestProps {
   contract: ContractAbi | null;
@@ -16,44 +18,44 @@ export default function HarvestModal({
   updatePageNum,
   setCanMove,
 }: HarvestProps) {
-  const [status, setStatus] = useState<"error" | "none" | "loading">("none");
+  const [status, setStatus] = useState<'error' | 'none' | 'loading'>('none');
 
   async function harvestItem() {
     if (contract !== null) {
       try {
-        setStatus("loading");
+        setStatus('loading');
         setCanMove(false);
         await contract.functions
           .harvest(tileArray[0])
           .txParams({ gasPrice: 1 })
           .call();
         updatePageNum();
-        setStatus("none");
+        setStatus('none');
       } catch (err) {
-        console.log("Error:", err);
-        setStatus("error");
+        console.log('Error:', err);
+        setStatus('error');
       }
       setCanMove(true);
     } else {
-      console.log("ERROR: contract missing");
-      setStatus("error");
+      console.log('ERROR: contract missing');
+      setStatus('error');
     }
   }
 
   return (
     <div className="harvest-modal">
-      {status === "loading" && (
+      {status === 'loading' && (
         <BoxCentered>
           <Spinner color="#754a1e" />
         </BoxCentered>
       )}
-      {status === "error" && (
+      {status === 'error' && (
         <div>
           <p>Something went wrong!</p>
           <Button
             css={buttonStyle}
             onPress={() => {
-              setStatus("none");
+              setStatus('none');
               updatePageNum();
             }}
           >
@@ -61,7 +63,7 @@ export default function HarvestModal({
           </Button>
         </div>
       )}
-      {status === "none" && (
+      {status === 'none' && (
         <>
           <div style={styles.items}>Harvest this item?</div>
           <Button css={buttonStyle} onPress={harvestItem}>
@@ -75,6 +77,6 @@ export default function HarvestModal({
 
 const styles = {
   items: {
-    marginBottom: "20px",
+    marginBottom: '20px',
   },
 };

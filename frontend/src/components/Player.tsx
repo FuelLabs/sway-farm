@@ -1,10 +1,15 @@
-import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
-import { Vector3, TextureLoader, NearestFilter, Texture, Sprite } from "three";
-import { useFrame, useLoader } from "@react-three/fiber";
-import { useKeyboardControls } from "@react-three/drei";
-import { Modals, Controls, convertTime, TILES } from "../constants";
-import { GardenVectorOutput } from "../contracts/ContractAbi";
-import type { MobileControls, Position } from "./Game";
+import { useKeyboardControls } from '@react-three/drei';
+import { useFrame, useLoader } from '@react-three/fiber';
+import type { Dispatch, SetStateAction } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import type { Texture, Sprite } from 'three';
+import { Vector3, TextureLoader, NearestFilter } from 'three';
+
+import type { Modals, Controls } from '../constants';
+import { convertTime, TILES } from '../constants';
+import type { GardenVectorOutput } from '../contracts/ContractAbi';
+
+import type { MobileControls, Position } from './Game';
 
 interface PlayerProps {
   tileStates: GardenVectorOutput | undefined;
@@ -59,7 +64,7 @@ export default function Player({
 
   const tilesHoriz = 4;
   const tilesVert = 5;
-  let tempSpriteMap = useLoader(TextureLoader, "images/bunny_animations.png");
+  const tempSpriteMap = useLoader(TextureLoader, 'images/bunny_animations.png');
   tempSpriteMap.magFilter = NearestFilter;
   tempSpriteMap.repeat.set(1 / tilesHoriz, 1 / tilesVert);
 
@@ -76,7 +81,7 @@ export default function Player({
 
   useFrame((_s, dl) => {
     const state = get();
-    checkTiles(state);
+    checkTiles();
     updateCameraPosition();
 
     if (canMove) movePlayer(dl, state, mobileControlState);
@@ -86,16 +91,16 @@ export default function Player({
     const position = ref.current?.position;
     if (!position) return;
     if (position.x < playerBounds.left) {
-      updatePlayerPosition("left", position);
+      updatePlayerPosition('left', position);
     } else if (position.x < playerBounds.center) {
-      updatePlayerPosition("center", position);
+      updatePlayerPosition('center', position);
     } else {
-      updatePlayerPosition("right", position);
+      updatePlayerPosition('right', position);
     }
   }
 
   function updatePlayerPosition(
-    side: "left" | "center" | "right",
+    side: 'left' | 'center' | 'right',
     position: Vector3
   ) {
     if (
@@ -111,17 +116,17 @@ export default function Player({
     }
   }
 
-  function checkTiles(state: any) {
+  function checkTiles() {
     if (!ref.current) return;
     if (!tileStates) return;
-    let isInGarden = checkIfInGarden();
-    let isAtMarket = checkIfAtMarket();
+    const isInGarden = checkIfInGarden();
+    const isAtMarket = checkIfAtMarket();
     if (!isInGarden && !isAtMarket) {
-      setModal("none");
+      setModal('none');
       return;
     }
     if (isInGarden) {
-      let distances = [];
+      const distances = [];
       for (let i = 0; i < TILES.length; i++) {
         distances.push({
           i,
@@ -132,24 +137,24 @@ export default function Player({
         return a.distance - b.distance;
       });
       if (tileStates.inner[distances[0].i] === undefined) {
-        setModal("plant");
+        setModal('plant');
         setTileArray([distances[0].i]);
       } else {
-        let now = Date.now();
-        let timePlanted = tileStates.inner[distances[0].i]?.time_planted;
-        let unix = convertTime(timePlanted!);
+        const now = Date.now();
+        const timePlanted = tileStates.inner[distances[0].i]?.time_planted;
+        const unix = convertTime(timePlanted!);
         let diff = (now - unix) / 1000;
         diff /= 60;
-        let minutesAgo = Math.abs(Math.floor(diff));
+        const minutesAgo = Math.abs(Math.floor(diff));
         if (minutesAgo < 20) {
-          setModal("none");
+          setModal('none');
         } else {
-          setModal("harvest");
+          setModal('harvest');
           setTileArray([distances[0].i]);
         }
       }
     } else if (isAtMarket) {
-      setModal("market");
+      setModal('market');
     }
   }
 
@@ -180,47 +185,48 @@ export default function Player({
 
   function movePlayer(
     dl: number,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     state: any,
     mobileControlState: MobileControls
   ) {
     if (!ref.current) return;
-    if ((state.left && !state.right) || mobileControlState === "left") {
+    if ((state.left && !state.right) || mobileControlState === 'left') {
       velocity.x = -1;
       setCurrentTile(12);
     }
-    if ((state.right && !state.left) || mobileControlState === "right") {
+    if ((state.right && !state.left) || mobileControlState === 'right') {
       velocity.x = 1;
       setCurrentTile(8);
     }
     if (
       !state.left &&
       !state.right &&
-      mobileControlState !== "left" &&
-      mobileControlState !== "right"
+      mobileControlState !== 'left' &&
+      mobileControlState !== 'right'
     )
       velocity.x = 0;
 
-    if ((state.forward && !state.back) || mobileControlState === "up") {
+    if ((state.forward && !state.back) || mobileControlState === 'up') {
       velocity.y = 1;
       setCurrentTile(4);
     }
-    if ((state.back && !state.forward) || mobileControlState === "down") {
+    if ((state.back && !state.forward) || mobileControlState === 'down') {
       velocity.y = -1;
       setCurrentTile(0);
     }
     if (
       !state.forward &&
       !state.back &&
-      mobileControlState !== "up" &&
-      mobileControlState !== "down"
+      mobileControlState !== 'up' &&
+      mobileControlState !== 'down'
     )
       velocity.y = 0;
 
     if (
       state.left ||
       state.right ||
-      mobileControlState === "left" ||
-      mobileControlState === "right"
+      mobileControlState === 'left' ||
+      mobileControlState === 'right'
     ) {
       if (
         ref.current.position.x <= bounds.right &&
@@ -237,8 +243,8 @@ export default function Player({
     if (
       state.back ||
       state.forward ||
-      mobileControlState === "up" ||
-      mobileControlState === "down"
+      mobileControlState === 'up' ||
+      mobileControlState === 'down'
     ) {
       if (
         ref.current.position.y <= bounds.top &&

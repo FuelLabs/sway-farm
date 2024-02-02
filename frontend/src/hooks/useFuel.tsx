@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 export function useFuel() {
-  const globalWindow = typeof window !== "undefined" ? window : ({} as Window);
-  const [error, setError] = useState("");
+  const globalWindow = typeof window !== 'undefined' ? window : ({} as Window);
+  const [error, setError] = useState('');
   const [isLoading, setLoading] = useState(true);
-  const [fuel, setFuel] = useState<Window["fuel"]>(globalWindow.fuel);
+  const [fuel, setFuel] = useState<Window['fuel']>(globalWindow.fuel);
 
   useEffect(() => {
     // Create a timeout to make sure it fails
@@ -12,7 +12,7 @@ export function useFuel() {
     const timeoutNotFound = setTimeout(() => {
       setLoading(false);
       clearTimeout(timeoutNotFound);
-      setError("fuel not detected on the window!");
+      setError('fuel not detected on the window!');
     }, 1000);
 
     // On fuelLoaded event, set the fuel state and clear the timeout
@@ -20,7 +20,7 @@ export function useFuel() {
       setLoading(false);
       setFuel(globalWindow.fuel);
       clearTimeout(timeoutNotFound);
-      setError("");
+      setError('');
     };
 
     if (globalWindow.fuel) {
@@ -28,14 +28,14 @@ export function useFuel() {
     }
 
     // Listen for the fuelLoaded event
-    document.addEventListener("FuelLoaded", onFuelLoaded);
+    document.addEventListener('FuelLoaded', onFuelLoaded);
 
     // On unmount, remove the event listener and clear the timeout
     return () => {
-      document.removeEventListener("FuelLoaded", onFuelLoaded);
+      document.removeEventListener('FuelLoaded', onFuelLoaded);
       clearTimeout(timeoutNotFound);
     };
   }, []);
 
-  return [fuel as NonNullable<Window["fuel"]>, error, isLoading] as const;
+  return [fuel as NonNullable<Window['fuel']>, error, isLoading] as const;
 }

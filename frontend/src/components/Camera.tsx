@@ -1,6 +1,7 @@
-import { useThree } from "@react-three/fiber";
-import { useEffect, useState } from "react";
-import type { Position } from "./Game";
+import { useThree } from '@react-three/fiber';
+import { useEffect, useState } from 'react';
+
+import type { Position } from './Game';
 
 interface CameraProps {
   playerPosition?: Position;
@@ -15,19 +16,19 @@ export default function Camera({ playerPosition, isMobile }: CameraProps) {
   useEffect(() => {
     if (isMobile) {
       switch (playerPosition) {
-        case "center-top":
+        case 'center-top':
           camera.position.set(3.1, 1, 100);
           break;
-        case "center-bottom":
+        case 'center-bottom':
           camera.position.set(3.1, -1, 100);
           break;
-        case "right-top":
+        case 'right-top':
           camera.position.set(5.5, 1, 100);
           break;
-        case "right-bottom":
+        case 'right-bottom':
           camera.position.set(5.5, -1, 100);
           break;
-        case "left-bottom":
+        case 'left-bottom':
           camera.position.set(0, -1, 100);
           break;
         default:

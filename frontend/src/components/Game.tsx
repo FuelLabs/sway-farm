@@ -1,29 +1,33 @@
-import { useState, useEffect, useMemo, Suspense } from "react";
-import { Canvas } from "@react-three/fiber";
-import { KeyboardControls, KeyboardControlsEntry } from "@react-three/drei";
-import { Box, Button } from "@fuel-ui/react";
-import { BN } from "fuels";
-import { Modals, Controls, buttonStyle } from "../constants";
-import { ContractAbi } from "../contracts";
-import {
+import { cssObj } from '@fuel-ui/css';
+import { Box, Button } from '@fuel-ui/react';
+import type { KeyboardControlsEntry } from '@react-three/drei';
+import { KeyboardControls } from '@react-three/drei';
+import { Canvas } from '@react-three/fiber';
+import { BN } from 'fuels';
+import { useState, useEffect, useMemo, Suspense } from 'react';
+
+import type { Modals } from '../constants';
+import { Controls, buttonStyle } from '../constants';
+import type { ContractAbi } from '../contracts';
+import type {
   AddressInput,
   GardenVectorOutput,
   IdentityInput,
   PlayerOutput,
   FoodTypeInput,
-} from "../contracts/ContractAbi";
-import Player from "./Player";
-import Garden from "./Garden";
-import Background from "./Background";
-import Info from "./show/Info";
-import PlantModal from "./modals/PlantModal";
-import HarvestModal from "./modals/HarvestModal";
-import MarketModal from "./modals/MarketModal";
-import NewPlayer from "./NewPlayer";
-import Camera from "./Camera";
-import Loading from "./Loading";
-import MobileControlButtons from "./MobileControls";
-import { cssObj } from "@fuel-ui/css";
+} from '../contracts/ContractAbi';
+
+import Background from './Background';
+import Camera from './Camera';
+import Garden from './Garden';
+import Loading from './Loading';
+import MobileControlButtons from './MobileControls';
+import NewPlayer from './NewPlayer';
+import Player from './Player';
+import HarvestModal from './modals/HarvestModal';
+import MarketModal from './modals/MarketModal';
+import PlantModal from './modals/PlantModal';
+import Info from './show/Info';
 
 interface GameProps {
   contract: ContractAbi | null;
@@ -31,43 +35,44 @@ interface GameProps {
 }
 
 export type Position =
-  | "left-top"
-  | "center-top"
-  | "right-top"
-  | "left-bottom"
-  | "center-bottom"
-  | "right-bottom";
-export type MobileControls = "none" | "up" | "down" | "left" | "right";
+  | 'left-top'
+  | 'center-top'
+  | 'right-top'
+  | 'left-bottom'
+  | 'center-bottom'
+  | 'right-bottom';
+export type MobileControls = 'none' | 'up' | 'down' | 'left' | 'right';
 
 export default function Game({ contract, isMobile }: GameProps) {
-  const [modal, setModal] = useState<Modals>("none");
+  const [modal, setModal] = useState<Modals>('none');
   const [tileStates, setTileStates] = useState<
     GardenVectorOutput | undefined
   >();
   const [tileArray, setTileArray] = useState<number[]>([]);
   const [player, setPlayer] = useState<PlayerOutput | null>(null);
-  const [status, setStatus] = useState<"error" | "none" | "loading">("loading");
+  const [status, setStatus] = useState<'error' | 'none' | 'loading'>('loading');
   const [updateNum, setUpdateNum] = useState<number>(0);
   const [seeds, setSeeds] = useState<number>(0);
   const [items, setItems] = useState<number>(0);
   const [canMove, setCanMove] = useState<boolean>(true);
-  const [playerPosition, setPlayerPosition] = useState<Position>("left-top");
+  const [playerPosition, setPlayerPosition] = useState<Position>('left-top');
   const [mobileControlState, setMobileControlState] =
-    useState<MobileControls>("none");
+    useState<MobileControls>('none');
 
   useEffect(() => {
     async function getPlayerInfo() {
       if (contract && contract.account) {
         try {
-          let address: AddressInput = {
+          const address: AddressInput = {
             value: contract.account.address.toB256(),
           };
-          let id: IdentityInput = { Address: address };
-          let seedType: FoodTypeInput = {
+          const id: IdentityInput = { Address: address };
+          const seedType: FoodTypeInput = {
             tomatoes: [],
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } as any as FoodTypeInput;
           // get the player first
-          let { value: Some } = await contract.functions
+          const { value: Some } = await contract.functions
             .get_player(id)
             .simulate();
           if (Some?.farming_skill.gte(1)) {
@@ -86,10 +91,10 @@ export default function Game({ contract, isMobile }: GameProps) {
             setItems(itemAmount);
           }
         } catch (err) {
-          console.log("Error:", err);
-          setStatus("error");
+          console.log('Error:', err);
+          setStatus('error');
         }
-        setStatus("none");
+        setStatus('none');
       }
     }
 
@@ -109,23 +114,23 @@ export default function Game({ contract, isMobile }: GameProps) {
 
   const controlsMap = useMemo<KeyboardControlsEntry[]>(
     () => [
-      { name: Controls.forward, keys: ["ArrowUp", "w", "W"] },
-      { name: Controls.back, keys: ["ArrowDown", "s", "S"] },
-      { name: Controls.left, keys: ["ArrowLeft", "a", "A"] },
-      { name: Controls.right, keys: ["ArrowRight", "d", "D"] },
+      { name: Controls.forward, keys: ['ArrowUp', 'w', 'W'] },
+      { name: Controls.back, keys: ['ArrowDown', 's', 'S'] },
+      { name: Controls.left, keys: ['ArrowLeft', 'a', 'A'] },
+      { name: Controls.right, keys: ['ArrowRight', 'd', 'D'] },
     ],
     []
   );
 
   return (
     <Box css={styles.canvasContainer}>
-      {status === "error" && (
+      {status === 'error' && (
         <div>
           <p>Something went wrong!</p>
           <Button
             css={buttonStyle}
             onPress={() => {
-              setStatus("none");
+              setStatus('none');
               updatePageNum();
             }}
           >
@@ -133,8 +138,8 @@ export default function Game({ contract, isMobile }: GameProps) {
           </Button>
         </div>
       )}
-      {status === "loading" && <Loading />}
-      {status === "none" && (
+      {status === 'loading' && <Loading />}
+      {status === 'none' && (
         <>
           <Canvas orthographic>
             <Camera playerPosition={playerPosition} isMobile={isMobile} />
@@ -185,7 +190,7 @@ export default function Game({ contract, isMobile }: GameProps) {
           {player !== null && (
             <>
               {/* GAME MODALS */}
-              {modal === "plant" && (
+              {modal === 'plant' && (
                 <PlantModal
                   updatePageNum={updatePageNum}
                   contract={contract}
@@ -194,7 +199,7 @@ export default function Game({ contract, isMobile }: GameProps) {
                   setCanMove={setCanMove}
                 />
               )}
-              {modal === "harvest" && (
+              {modal === 'harvest' && (
                 <HarvestModal
                   tileArray={tileArray}
                   contract={contract}
@@ -203,7 +208,7 @@ export default function Game({ contract, isMobile }: GameProps) {
                 />
               )}
 
-              {modal === "market" && (
+              {modal === 'market' && (
                 <MarketModal
                   contract={contract}
                   updatePageNum={updatePageNum}
@@ -226,13 +231,13 @@ export default function Game({ contract, isMobile }: GameProps) {
 
 const styles = {
   canvasContainer: cssObj({
-    border: "4px solid #754a1e",
-    borderRadius: "8px",
-    height: " calc(100vh - 8px)",
-    width: "1000px",
-    margin: "auto",
-    "@sm": {
-      maxHeight: "740px",
+    border: '4px solid #754a1e',
+    borderRadius: '8px',
+    height: ' calc(100vh - 8px)',
+    width: '1000px',
+    margin: 'auto',
+    '@sm': {
+      maxHeight: '740px',
     },
   }),
 };

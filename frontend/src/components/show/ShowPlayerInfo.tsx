@@ -1,8 +1,9 @@
-import type { PlayerOutput } from "../../contracts/ContractAbi";
-import { Flex, Box } from "@fuel-ui/react";
-import { cssObj } from "@fuel-ui/css";
-import ShowCoins from "./ShowCoins";
-import type { ContractAbi } from "../../contracts/ContractAbi";
+import { cssObj } from '@fuel-ui/css';
+import { Flex, Box } from '@fuel-ui/react';
+
+import type { PlayerOutput, ContractAbi } from '../../contracts/ContractAbi';
+
+import ShowCoins from './ShowCoins';
 
 interface PlayerProps {
   player: PlayerOutput | null;
@@ -22,8 +23,8 @@ export default function ShowPlayerInfo({
 
   return (
     <Box css={styles.playerInfo}>
-      <Flex direction={"column"} justify="space-around">
-        <Box css={styles.box}>Value Sold: {valSold ?? "0"}</Box>
+      <Flex direction={'column'} justify="space-around">
+        <Box css={styles.box}>Value Sold: {valSold ?? '0'}</Box>
         <ShowCoins contract={contract} updateNum={updateNum} />
       </Flex>
     </Box>
@@ -32,26 +33,26 @@ export default function ShowPlayerInfo({
 
 const styles = {
   box: cssObj({
-    fontFamily: "pressStart2P",
-    fontSize: "$xs",
-    textAlign: "left",
-    lineHeight: "120%",
-    "@sm": {
-      maxWidth: "none",
-      fontSize: "$sm",
+    fontFamily: 'pressStart2P',
+    fontSize: '$xs',
+    textAlign: 'left',
+    lineHeight: '120%',
+    '@sm': {
+      maxWidth: 'none',
+      fontSize: '$sm',
     },
   }),
   playerInfo: cssObj({
-    background: "#ac7339",
-    height: "40px",
-    display: "flex",
-    py: "10px",
-    pl: "20px",
-    borderRadius: "8px",
-    border: "3px solid #754a1e",
-    "@sm": {
-      width: "280px",
-      height: "80px",
+    background: '#ac7339',
+    height: '40px',
+    display: 'flex',
+    py: '10px',
+    pl: '20px',
+    borderRadius: '8px',
+    border: '3px solid #754a1e',
+    '@sm': {
+      width: '280px',
+      height: '80px',
     },
   }),
 };
