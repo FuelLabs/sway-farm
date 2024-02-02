@@ -87,6 +87,6 @@ const styles = {
     width: '60px',
     '@sm': {
       width: '80px',
-    }
+    },
   },
 };

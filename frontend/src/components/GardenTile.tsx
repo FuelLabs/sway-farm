@@ -22,32 +22,23 @@ export default function GardenTile({
   updateNum,
 }: GardenTileProps) {
   const [tileState, setTileState] = useState<number | undefined>(undefined);
-  const [status, setStatus] = useState<"loading" | "loaded">("loading");
+  const [status, setStatus] = useState<'loading' | 'loaded'>('loading');
 
   const [
-    seedTexture, 
-    plantTexture1, 
-    plantTexture2, 
-    plantTexture3, 
-    plantTexture4, 
-    finalTexture
-  ] = useLoader(TextureLoader, 
-    [
-      'images/seeds.png', 
-      'images/tomato_plant_1.png',
-      'images/tomato_plant_2.png',
-      'images/tomato_plant_3.png',
-      'images/tomato_plant_4.png',
-      'images/tomato_plant_final.png'
-    ]);
-  // const plantTexture1 = useLoader<any>(TextureLoader, 'images/tomato_plant_1.png');
-  // const plantTexture2 = useLoader<any>(TextureLoader, 'images/tomato_plant_2.png');
-  // const plantTexture3 = useLoader<any>(TextureLoader, 'images/tomato_plant_3.png');
-  // const plantTexture4 = useLoader<any>(TextureLoader, 'images/tomato_plant_4.png');
-  // const finalTexture = useLoader<any>(
-  //   TextureLoader,
-  //   'images/tomato_plant_final.png'
-  // );
+    seedTexture,
+    plantTexture1,
+    plantTexture2,
+    plantTexture3,
+    plantTexture4,
+    finalTexture,
+  ] = useLoader(TextureLoader, [
+    'images/seeds.png',
+    'images/tomato_plant_1.png',
+    'images/tomato_plant_2.png',
+    'images/tomato_plant_3.png',
+    'images/tomato_plant_4.png',
+    'images/tomato_plant_final.png',
+  ]);
   seedTexture.magFilter = NearestFilter;
   plantTexture1.magFilter = NearestFilter;
   plantTexture2.magFilter = NearestFilter;
