@@ -1,0 +1,26 @@
+name: "PR Checks"
+
+on:
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+
+      - name: Run lint
+        run: |
+          cd frontend
+          npm install
+          npm run lint
+          npm run prettier:check

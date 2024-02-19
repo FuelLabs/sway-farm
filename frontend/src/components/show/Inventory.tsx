@@ -1,4 +1,5 @@
-import { Image } from "@fuel-ui/react";
+import { cssObj } from '@fuel-ui/css';
+import { Image, Box } from '@fuel-ui/react';
 
 interface InventoryProps {
   seeds: number;
@@ -7,59 +8,84 @@ interface InventoryProps {
 
 export default function Inventory({ seeds, items }: InventoryProps) {
   return (
-    <div style={styles.container}>
-      <div style={styles.box}>
-        <Image css={styles.img} src={"images/tomato_seed_bag.png"} />
-        <div style={styles.numContainer}>
-          <div style={styles.num}>
-            {seeds > 99 ? "99+" : seeds.toLocaleString()}
-          </div>
-        </div>
-      </div>
+    <Box css={styles.container}>
+      <Box css={styles.box}>
+        {/* eslint-disable-next-line jsx-a11y/alt-text */}
+        <Image css={styles.img} src={'images/tomato_seed_bag.png'} />
+        <Box css={styles.numContainer}>
+          <Box css={styles.num}>
+            {seeds > 99 ? '99+' : seeds.toLocaleString()}
+          </Box>
+        </Box>
+      </Box>
 
-      <div style={styles.box}>
-        <Image css={styles.img} src={"images/tomato.png"} />
-        <div style={styles.numContainer}>
-          <div style={styles.num}>{items > 99 ? "99+" : items}</div>
-        </div>
-      </div>
-    </div>
+      <Box css={styles.box}>
+        {/* eslint-disable-next-line jsx-a11y/alt-text */}
+        <Image css={styles.img} src={'images/tomato.png'} />
+        <Box css={styles.numContainer}>
+          <Box css={styles.num}>{items > 99 ? '99+' : items}</Box>
+        </Box>
+      </Box>
+    </Box>
   );
 }
 
 const styles = {
-  container: {
-    display: "flex",
-    border: "3px solid #754a1e",
-    borderRadius: "8px",
-    height: "100px",
-    width: "180px",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "#ac7339",
-  },
+  container: cssObj({
+    display: 'flex',
+    border: '3px solid #754a1e',
+    borderRadius: '8px',
+    height: '100px',
+    width: '132px',
+    alignItems: 'center',
+    background: '#ac7339',
+    position: 'fixed',
+    bottom: '0',
+    left: '0',
+    '@sm': {
+      position: 'relative',
+      top: '-108px',
+      justifyContent: 'center',
+      ml: '82.2%',
+      width: '172px',
+    },
+  }),
   img: {
-    imageRendering: "pixelated",
-    height: "70px",
-    // minWidth: "60px",
+    imageRendering: 'pixelated',
+    height: '50px',
+    '@sm': {
+      height: '70px',
+    },
   },
-  numContainer: {
-    position: "absolute",
-    bottom: "10px",
-    width: "80px",
-    display: "flex",
-    justifyContent: "flex-end",
-  } as React.CSSProperties,
-  num: {
-    fontSize: "10px",
-    width: "35px",
-    height: "35px",
-    backgroundColor: "rgba(255,255,255,0.5)",
-    borderRadius: "50%",
-    display: "grid",
-    placeItems: "center",
-  },
-  box: {
-    width: "80px",
-  },
+  numContainer: cssObj({
+    position: 'absolute',
+    bottom: '20px',
+    width: '60px',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    '@sm': {
+      bottom: '8px',
+      width: '80px',
+    },
+  }),
+  num: cssObj({
+    fontSize: '10px',
+    fontFamily: 'pressStart2P',
+    width: '25px',
+    height: '25px',
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    borderRadius: '50%',
+    display: 'grid',
+    placeItems: 'center',
+    '@sm': {
+      width: '35px',
+      height: '35px',
+    },
+  }),
+  box: cssObj({
+    width: '60px',
+    '@sm': {
+      width: '80px',
+    },
+  }),
 };

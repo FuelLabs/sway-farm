@@ -1,7 +1,9 @@
-import { Dispatch, SetStateAction } from "react";
-import BuySeeds from "./BuySeeds";
-import SellItem from "./SellItem";
-import { ContractAbi } from "../../contracts";
+import type { Dispatch, SetStateAction } from 'react';
+
+import type { ContractAbi } from '../../contracts';
+
+import BuySeeds from './BuySeeds';
+import SellItem from './SellItem';
 
 interface MarketModalProps {
   contract: ContractAbi | null;

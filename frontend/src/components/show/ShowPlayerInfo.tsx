@@ -1,8 +1,9 @@
-import { PlayerOutput } from "../../contracts/ContractAbi";
-import { Flex, Box, Tooltip, Icon } from "@fuel-ui/react";
-import { cssObj } from "@fuel-ui/css";
-import ShowCoins from "./ShowCoins";
-import { ContractAbi } from "../../contracts/ContractAbi";
+import { cssObj } from '@fuel-ui/css';
+import { Flex, Box } from '@fuel-ui/react';
+
+import type { PlayerOutput, ContractAbi } from '../../contracts/ContractAbi';
+
+import ShowCoins from './ShowCoins';
 
 interface PlayerProps {
   player: PlayerOutput | null;
@@ -10,38 +11,48 @@ interface PlayerProps {
   updateNum: number;
 }
 
-export default function ShowPlayerInfo({ player, contract, updateNum }: PlayerProps) {
+export default function ShowPlayerInfo({
+  player,
+  contract,
+  updateNum,
+}: PlayerProps) {
   let valSold;
   if (player !== null) {
     valSold = parseFloat(player.total_value_sold.format().toLocaleString());
   }
 
-  const tooltipContent = <>
-    Use the arrow or WASD keys to move around
-  </>
-
   return (
-    <div className="player-info">
-      <Flex direction={"column"} justify="space-around">
-        <Flex css={styles.tooltip} justify={"flex-end"}>
-            <Tooltip content={tooltipContent}>
-            <Icon icon="Question" inline />
-            </Tooltip>
-        </Flex>
-        <Box css={styles.box}>Value Sold: {valSold}</Box>
+    <Box css={styles.playerInfo}>
+      <Flex direction={'column'} justify="space-around">
+        <Box css={styles.box}>Value Sold: {valSold ?? '0'}</Box>
         <ShowCoins contract={contract} updateNum={updateNum} />
       </Flex>
-    </div>
+    </Box>
   );
 }
 
-let styles = {
+const styles = {
   box: cssObj({
-    fontFamily: "pressStart2P",
-    fontSize: "$sm",
+    fontFamily: 'pressStart2P',
+    fontSize: '$xs',
+    textAlign: 'left',
+    lineHeight: '120%',
+    '@sm': {
+      maxWidth: 'none',
+      fontSize: '$sm',
+    },
   }),
-  tooltip: cssObj({
-    position: "relative",
-    left: "12px"
+  playerInfo: cssObj({
+    background: '#ac7339',
+    height: '40px',
+    display: 'flex',
+    py: '10px',
+    pl: '20px',
+    borderRadius: '8px',
+    border: '3px solid #754a1e',
+    '@sm': {
+      width: '280px',
+      height: '80px',
+    },
   }),
 };
