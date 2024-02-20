@@ -8,14 +8,7 @@ import { useState, useEffect, useMemo, Suspense } from 'react';
 
 import type { Modals } from '../constants';
 import { Controls, buttonStyle } from '../constants';
-import type { ContractAbi } from '../contracts';
-import type {
-  AddressInput,
-  GardenVectorOutput,
-  IdentityInput,
-  PlayerOutput,
-  FoodTypeInput,
-} from '../contracts/ContractAbi';
+import type { AddressInput, ContractAbi, FoodTypeInput, GardenVectorOutput, IdentityInput, PlayerOutput } from '../sway-api/contracts/ContractAbi';
 
 import Background from './Background';
 import Camera from './Camera';
@@ -74,6 +67,10 @@ export default function Game({ contract, isMobile }: GameProps) {
           // get the player first
           const { value: Some } = await contract.functions
             .get_player(id)
+            .txParams({
+              gasPrice: 1,
+              gasLimit: 800_000,
+            })
             .simulate();
           if (Some?.farming_skill.gte(1)) {
             setPlayer(Some);
@@ -83,6 +80,10 @@ export default function Game({ contract, isMobile }: GameProps) {
                 contract.functions.get_seed_amount(id, seedType),
                 contract.functions.get_item_amount(id, seedType),
               ])
+              .txParams({
+                gasPrice: 1,
+                gasLimit: 800_000,
+              })
               .simulate();
 
             const seedAmount = new BN(results[0]).toNumber();
@@ -100,12 +101,12 @@ export default function Game({ contract, isMobile }: GameProps) {
 
     getPlayerInfo();
 
-    // fetches player info 30 seconds
-    const interval = setInterval(() => {
-      setUpdateNum(updateNum + 1);
-    }, 30000);
+    // // fetches player info 30 seconds
+    // const interval = setInterval(() => {
+    //   setUpdateNum(updateNum + 1);
+    // }, 30000);
 
-    return () => clearInterval(interval);
+    // return () => clearInterval(interval);
   }, [contract, updateNum]);
 
   function updatePageNum() {

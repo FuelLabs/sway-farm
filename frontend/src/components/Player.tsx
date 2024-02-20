@@ -7,7 +7,7 @@ import { Vector3, TextureLoader, NearestFilter } from 'three';
 
 import type { Modals, Controls } from '../constants';
 import { convertTime, TILES } from '../constants';
-import type { GardenVectorOutput } from '../contracts/ContractAbi';
+import type { GardenVectorOutput } from '../sway-api/contracts/ContractAbi';
 
 import type { MobileControls, Position } from './Game';
 

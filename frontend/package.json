@@ -5,7 +5,8 @@
   "dependencies": {
     "@fuel-ui/css": "^0.12.4",
     "@fuel-ui/react": "^0.12.4",
-    "@fuel-wallet/sdk": "^0.12.3",
+    "@fuel-wallet/react": "^0.15.2",
+    "@fuel-wallet/sdk": "^0.15.2",
     "@fuels/eslint-plugin": "^0.1.4",
     "@fuels/prettier-config": "^0.1.4",
     "@react-three/drei": "^9.97.0",
@@ -18,7 +19,7 @@
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@vercel/analytics": "^1.0.0",
-    "fuels": "^0.57.0",
+    "fuels": "^0.73.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",

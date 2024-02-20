@@ -1,7 +1,7 @@
 import { cssObj } from '@fuel-ui/css';
 import { Box } from '@fuel-ui/react';
 
-import type { ContractAbi, PlayerOutput } from '../../contracts/ContractAbi';
+import type { ContractAbi, PlayerOutput } from '../../sway-api/contracts/ContractAbi';
 
 import GithubRepo from './GithubRepo';
 import Inventory from './Inventory';

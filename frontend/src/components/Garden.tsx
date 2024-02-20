@@ -2,12 +2,8 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useEffect } from 'react';
 
 import { TILES } from '../constants';
-import type { ContractAbi } from '../contracts';
-import type {
-  IdentityInput,
-  AddressInput,
-  GardenVectorOutput,
-} from '../contracts/ContractAbi';
+import type { ContractAbi } from '../sway-api';
+import type { GardenVectorOutput, AddressInput, IdentityInput } from '../sway-api/contracts/ContractAbi';
 
 import GardenTile from './GardenTile';
 
@@ -34,6 +30,10 @@ export default function Garden({
           const id: IdentityInput = { Address: address };
           const { value } = await contract.functions
             .get_garden_vec(id)
+            .txParams({
+              gasPrice: 1,
+              gasLimit: 800_000,
+            })
             .simulate();
           setTileStates(value);
         } catch (err) {

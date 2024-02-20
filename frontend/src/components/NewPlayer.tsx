@@ -1,9 +1,10 @@
 import { cssObj } from '@fuel-ui/css';
 import { Button, BoxCentered, Link } from '@fuel-ui/react';
+import { useWallet } from '@fuel-wallet/react';
 import { useState, useEffect } from 'react';
 
 import { BASE_ASSET_ID, buttonStyle } from '../constants';
-import type { ContractAbi } from '../contracts';
+import type { ContractAbi } from '../sway-api';
 
 import Loading from './Loading';
 
@@ -13,32 +14,43 @@ interface NewPlayerProps {
 }
 
 export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
-  const [status, setStatus] = useState<'error' | 'loading' | 'none'>('loading');
-  const [hasFunds, setHasFunds] = useState<boolean>();
+  const [status, setStatus] = useState<'error' | 'loading' | 'none'>('none');
+  const [hasFunds, setHasFunds] = useState<boolean>(false);
+  const { wallet } = useWallet();
+  // const { balance } = useBalance({
+  //   address: account ?? contract?.account?.address.toAddress(),
+  //   assetId:  BASE_ASSET_ID,
+  // });
 
   useEffect(() => {
-    if (contract) checkBalance();
-  }, [contract]);
+    async function getBalance() {
+      const thisWallet = wallet ?? contract?.account;
+      const balance = await thisWallet!.getBalance(BASE_ASSET_ID);
+      const balanceNum = balance?.toNumber();
+      
+      if(balanceNum){
+        setHasFunds(balanceNum > 0);
+      }
 
-  async function checkBalance() {
-    const account = contract!.account;
-    const balance = await account?.getBalance(BASE_ASSET_ID);
-    if (balance && balance.toNumber() > 0) {
-      setHasFunds(true);
-    } else {
-      setHasFunds(false);
     }
-    setStatus('none');
-  }
+    getBalance();
+  }, [wallet]);
+ 
 
   async function handleNewPlayer() {
     if (contract !== null) {
       try {
+        console.log("TRYING")
         setStatus('loading');
-        await contract.functions
+        const response = await contract.functions
           .new_player()
-          .txParams({ variableOutputs: 1, gasPrice: 1 })
+          .txParams({
+            variableOutputs: 1,
+            gasPrice: 1,
+            gasLimit: 800_000,
+          })
           .call();
+          console.log("RESPONSE:", response)
         setStatus('none');
         updatePageNum();
       } catch (err) {
@@ -64,7 +76,7 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
             You need some ETH to play:
             <Link
               isExternal
-              href={`https://faucet-beta-4.fuel.network/${
+              href={`https://faucet-beta-5.fuel.network/${
                 contract && contract.account
                   ? `?address=${contract.account.address.toAddress()}`
                   : ''
@@ -74,9 +86,6 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
                 Go to Faucet
               </Button>
             </Link>
-            <Button css={buttonStyle} onPress={checkBalance}>
-              Check again
-            </Button>
           </BoxCentered>
         )}
         {status === 'error' && (

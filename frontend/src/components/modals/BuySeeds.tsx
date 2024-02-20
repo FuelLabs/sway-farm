@@ -4,8 +4,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 
 import { FARM_COIN_ASSET, buttonStyle } from '../../constants';
-import type { ContractAbi } from '../../contracts';
-import type { FoodTypeInput } from '../../contracts/ContractAbi';
+import type { ContractAbi, FoodTypeInput } from '../../sway-api/contracts/ContractAbi';
 
 interface BuySeedsProps {
   contract: ContractAbi | null;
@@ -21,10 +20,11 @@ export default function BuySeeds({
   const [status, setStatus] = useState<'error' | 'none' | `loading`>('none');
 
   async function buySeeds() {
-    if (contract !== null) {
+    if (contract !== null && "assetId" in FARM_COIN_ASSET.networks[0]) {
       try {
         setStatus('loading');
         setCanMove(false);
+        const asset = FARM_COIN_ASSET.networks[0].assetId;
         const amount = 10;
         const realAmount = amount / 1_000_000_000;
         const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
@@ -36,7 +36,7 @@ export default function BuySeeds({
         await contract.functions
           .buy_seeds(seedType, inputAmount)
           .callParams({
-            forward: [price, FARM_COIN_ASSET.assetId],
+            forward: [price, asset],
           })
           .txParams({ gasPrice: 1 })
           .call();

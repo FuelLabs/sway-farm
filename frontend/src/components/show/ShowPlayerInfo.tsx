@@ -1,7 +1,7 @@
 import { cssObj } from '@fuel-ui/css';
 import { Flex, Box } from '@fuel-ui/react';
 
-import type { PlayerOutput, ContractAbi } from '../../contracts/ContractAbi';
+import type { ContractAbi, PlayerOutput } from '../../sway-api/contracts/ContractAbi';
 
 import ShowCoins from './ShowCoins';
 
