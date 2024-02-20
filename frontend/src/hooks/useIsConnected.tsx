@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import { useFuel } from "./useFuel";
+import { useFuel } from './useFuel';
 
 export function useIsConnected() {
   const [fuel] = useFuel();
