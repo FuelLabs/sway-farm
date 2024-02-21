@@ -2,8 +2,8 @@ import { Button } from '@fuel-ui/react';
 import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 
-import { buttonStyle } from '../../constants';
-import type { ContractAbi, FoodTypeInput } from '../../sway-api/contracts/ContractAbi';
+import { buttonStyle, FoodTypeInput } from '../../constants';
+import type { ContractAbi } from '../../sway-api/contracts/ContractAbi';
 import Loading from '../Loading';
 
 interface PlantModalProps {
@@ -31,13 +31,10 @@ export default function PlantModal({
       try {
         setStatus('loading');
         setCanMove(false);
-        const seedType: FoodTypeInput = {
-          tomatoes: [],
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any as FoodTypeInput;
+        const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
         await contract.functions
           .plant_seed_at_index(seedType, tileArray[0])
-          .txParams({ gasPrice: 1 })
+          .txParams({ gasPrice: 1, gasLimit: 800_000 })
           .call();
 
         updatePageNum();

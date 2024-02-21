@@ -17,11 +17,7 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
   const [status, setStatus] = useState<'error' | 'loading' | 'none'>('none');
   const [hasFunds, setHasFunds] = useState<boolean>(false);
   const { wallet } = useWallet();
-  // const { balance } = useBalance({
-  //   address: account ?? contract?.account?.address.toAddress(),
-  //   assetId:  BASE_ASSET_ID,
-  // });
-
+  
   useEffect(() => {
     async function getBalance() {
       const thisWallet = wallet ?? contract?.account;
@@ -40,9 +36,8 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
   async function handleNewPlayer() {
     if (contract !== null) {
       try {
-        console.log("TRYING")
         setStatus('loading');
-        const response = await contract.functions
+        await contract.functions
           .new_player()
           .txParams({
             variableOutputs: 1,
@@ -50,7 +45,6 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
             gasLimit: 800_000,
           })
           .call();
-          console.log("RESPONSE:", response)
         setStatus('none');
         updatePageNum();
       } catch (err) {

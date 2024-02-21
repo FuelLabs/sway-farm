@@ -13,7 +13,7 @@ import { useState, useEffect, useMemo } from 'react';
 
 import Game from './components/Game';
 import Home from './components/home/Home';
-import { CONTRACT_ID, FARM_COIN_ASSET, FUEL_PROVIDER_URL } from './constants';
+import { CONTRACT_ID, FARM_COIN_ASSET, FARM_COIN_ASSET_ID, FUEL_PROVIDER_URL } from './constants';
 import './App.css';
 import { ContractAbi__factory } from './sway-api';
 
@@ -35,10 +35,11 @@ function App() {
   useEffect(() => {
     async function getAccounts() {
       if (mounted) {
-        console.log("ASSETS:", assets)
         let hasAsset = false;
         for (let i = 0; i < assets.length; i++) {
-          if (assets[i].networks.includes(FARM_COIN_ASSET.networks[0])) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const thisAsset = assets[i] as any;
+          if (thisAsset.assetId && thisAsset.assetId === FARM_COIN_ASSET_ID) {
             hasAsset = true;
             break;
           }

@@ -12,9 +12,9 @@ export const CONTRACT_ID =
 export const BASE_ASSET_ID =
   '0x0000000000000000000000000000000000000000000000000000000000000000';
 
-const assetId = '0x0cfabde7bbe58d253cf3103d8f55d26987b3dc4691205b9299ac6826c613a2e2';
+export const FARM_COIN_ASSET_ID = '0x0cfabde7bbe58d253cf3103d8f55d26987b3dc4691205b9299ac6826c613a2e2';
 
-const networkAsset = {
+export const FARM_COIN_NETWORK_ASSET = {
   /** type of network */
   type: 'fuel',
   /** chain id of the network */
@@ -22,7 +22,7 @@ const networkAsset = {
   /** number of decimals of the asset */
   decimals: 9,
   /** assetId on the Fuel Network */
-  assetId: assetId,
+  assetId: FARM_COIN_ASSET_ID,
   /** the contractId of that generated the Asset on the Fuel Network */
   contractId: CONTRACT_ID,
 };
@@ -31,7 +31,7 @@ export const FARM_COIN_ASSET: Asset = {
   icon: 'https://sway-farm.vercel.app/images/pixel-bunny.png',
   name: 'Sway Farm Coin',
   symbol: 'FARM',
-  networks: [networkAsset as Fuel],
+  networks: [FARM_COIN_NETWORK_ASSET as Fuel],
 };
 
 export enum Controls {
@@ -79,3 +79,5 @@ export const buttonStyle = cssObj({
     boxShadow: 'none !important',
   },
 });
+
+export enum FoodTypeInput { Tomatoes = 'Tomatoes' };

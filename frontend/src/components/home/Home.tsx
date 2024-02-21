@@ -16,9 +16,7 @@ interface HomeProps {
 
 export default function Home({ setBurnerWallet, isMobile }: HomeProps) {
   const [provider, setProvider] = useState<Provider | null>(null);
-  const { connect, setTheme, isConnecting } = useConnectUI();
-
-  setTheme('dark');
+  const { connect, isConnecting } = useConnectUI();
 
   useEffect(() => {
     async function setupProvider() {
@@ -55,7 +53,7 @@ export default function Home({ setBurnerWallet, isMobile }: HomeProps) {
           </Button>
         <p>or use a burner wallet</p>
         </Box>
-        <Button css={styles.button} onPress={create}>
+        <Button css={styles.button} onPress={() => create()}>
           Play with In-Browser Wallet
         </Button>
       </Box>

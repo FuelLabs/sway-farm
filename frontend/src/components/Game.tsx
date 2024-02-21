@@ -7,8 +7,8 @@ import { BN } from 'fuels';
 import { useState, useEffect, useMemo, Suspense } from 'react';
 
 import type { Modals } from '../constants';
-import { Controls, buttonStyle } from '../constants';
-import type { AddressInput, ContractAbi, FoodTypeInput, GardenVectorOutput, IdentityInput, PlayerOutput } from '../sway-api/contracts/ContractAbi';
+import { Controls, buttonStyle, FoodTypeInput } from '../constants';
+import type { AddressInput, ContractAbi, GardenVectorOutput, IdentityInput, PlayerOutput } from '../sway-api/contracts/ContractAbi';
 
 import Background from './Background';
 import Camera from './Camera';
@@ -60,12 +60,9 @@ export default function Game({ contract, isMobile }: GameProps) {
             value: contract.account.address.toB256(),
           };
           const id: IdentityInput = { Address: address };
-          const seedType: FoodTypeInput = {
-            tomatoes: [],
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any as FoodTypeInput;
+          const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
           // get the player first
-          const { value: Some } = await contract.functions
+          const { value: Some} = await contract.functions
             .get_player(id)
             .txParams({
               gasPrice: 1,
@@ -85,7 +82,6 @@ export default function Game({ contract, isMobile }: GameProps) {
                 gasLimit: 800_000,
               })
               .simulate();
-
             const seedAmount = new BN(results[0]).toNumber();
             setSeeds(seedAmount);
             const itemAmount = new BN(results[1]).toNumber();
@@ -101,12 +97,12 @@ export default function Game({ contract, isMobile }: GameProps) {
 
     getPlayerInfo();
 
-    // // fetches player info 30 seconds
-    // const interval = setInterval(() => {
-    //   setUpdateNum(updateNum + 1);
-    // }, 30000);
+    // fetches player info 30 seconds
+    const interval = setInterval(() => {
+      setUpdateNum(updateNum + 1);
+    }, 30000);
 
-    // return () => clearInterval(interval);
+    return () => clearInterval(interval);
   }, [contract, updateNum]);
 
   function updatePageNum() {

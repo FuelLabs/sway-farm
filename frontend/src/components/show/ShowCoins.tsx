@@ -4,7 +4,7 @@ import { useWallet } from '@fuel-wallet/react';
 import type { BN } from 'fuels';
 import { useState, useEffect } from 'react';
 
-import { FARM_COIN_ASSET } from '../../constants';
+import { FARM_COIN_ASSET_ID } from '../../constants';
 import type { ContractAbi } from '../../sway-api';
 
 interface ShowCoinsProps {
@@ -18,12 +18,9 @@ export default function ShowCoins({ updateNum, contract }: ShowCoinsProps) {
   
   useEffect(() => {
     async function getBalance() {
-      if("assetId" in FARM_COIN_ASSET.networks[0]){
-        const asset = FARM_COIN_ASSET.networks[0].assetId;
         const thisWallet = wallet ?? contract?.account;
-        const balanceBN = await thisWallet!.getBalance(asset);
+        const balanceBN = await thisWallet!.getBalance(FARM_COIN_ASSET_ID);
         setBalance(balanceBN);
-      }
     }
     getBalance();
   }, [wallet, updateNum, contract]);

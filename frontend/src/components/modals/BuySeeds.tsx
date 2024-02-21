@@ -3,8 +3,8 @@ import { bn } from 'fuels';
 import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 
-import { FARM_COIN_ASSET, buttonStyle } from '../../constants';
-import type { ContractAbi, FoodTypeInput } from '../../sway-api/contracts/ContractAbi';
+import { FARM_COIN_ASSET_ID, buttonStyle, FoodTypeInput } from '../../constants';
+import type { ContractAbi } from '../../sway-api/contracts/ContractAbi';
 
 interface BuySeedsProps {
   contract: ContractAbi | null;
@@ -20,25 +20,21 @@ export default function BuySeeds({
   const [status, setStatus] = useState<'error' | 'none' | `loading`>('none');
 
   async function buySeeds() {
-    if (contract !== null && "assetId" in FARM_COIN_ASSET.networks[0]) {
+    if (contract !== null) {
       try {
         setStatus('loading');
         setCanMove(false);
-        const asset = FARM_COIN_ASSET.networks[0].assetId;
         const amount = 10;
         const realAmount = amount / 1_000_000_000;
         const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
-        const seedType: FoodTypeInput = {
-          tomatoes: [],
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any as FoodTypeInput;
+        const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
         const price = 750_000 * amount;
         await contract.functions
           .buy_seeds(seedType, inputAmount)
           .callParams({
-            forward: [price, asset],
+            forward: [price, FARM_COIN_ASSET_ID],
           })
-          .txParams({ gasPrice: 1 })
+          .txParams({ gasPrice: 1, gasLimit: 800_000})
           .call();
         updatePageNum();
         setStatus('none');
