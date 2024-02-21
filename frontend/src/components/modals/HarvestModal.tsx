@@ -27,7 +27,7 @@ export default function HarvestModal({
         setCanMove(false);
         await contract.functions
           .harvest(tileArray[0])
-          .txParams({ gasPrice: 1 })
+          .txParams({ gasPrice: 1, gasLimit: 800_000 })
           .call();
         updatePageNum();
         setStatus('none');
