@@ -3,7 +3,11 @@ import { bn } from 'fuels';
 import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 
-import { FARM_COIN_ASSET_ID, buttonStyle, FoodTypeInput } from '../../constants';
+import {
+  FARM_COIN_ASSET_ID,
+  buttonStyle,
+  FoodTypeInput,
+} from '../../constants';
 import type { ContractAbi } from '../../sway-api/contracts/ContractAbi';
 
 interface BuySeedsProps {
@@ -34,7 +38,7 @@ export default function BuySeeds({
           .callParams({
             forward: [price, FARM_COIN_ASSET_ID],
           })
-          .txParams({ gasPrice: 1, gasLimit: 800_000})
+          .txParams({ gasPrice: 1, gasLimit: 800_000 })
           .call();
         updatePageNum();
         setStatus('none');

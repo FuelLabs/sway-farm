@@ -8,7 +8,13 @@ import { useState, useEffect, useMemo, Suspense } from 'react';
 
 import type { Modals } from '../constants';
 import { Controls, buttonStyle, FoodTypeInput } from '../constants';
-import type { AddressInput, ContractAbi, GardenVectorOutput, IdentityInput, PlayerOutput } from '../sway-api/contracts/ContractAbi';
+import type {
+  AddressInput,
+  ContractAbi,
+  GardenVectorOutput,
+  IdentityInput,
+  PlayerOutput,
+} from '../sway-api/contracts/ContractAbi';
 
 import Background from './Background';
 import Camera from './Camera';
@@ -62,7 +68,7 @@ export default function Game({ contract, isMobile }: GameProps) {
           const id: IdentityInput = { Address: address };
           const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
           // get the player first
-          const { value: Some} = await contract.functions
+          const { value: Some } = await contract.functions
             .get_player(id)
             .txParams({
               gasPrice: 1,

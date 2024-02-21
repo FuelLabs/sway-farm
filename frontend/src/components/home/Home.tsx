@@ -51,7 +51,7 @@ export default function Home({ setBurnerWallet, isMobile }: HomeProps) {
           >
             {isConnecting ? 'Connecting' : 'Connect'}
           </Button>
-        <p>or use a burner wallet</p>
+          <p>or use a burner wallet</p>
         </Box>
         <Button css={styles.button} onPress={() => create()}>
           Play with In-Browser Wallet

@@ -11,11 +11,11 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <FuelProvider 
+    <FuelProvider
       fuelConfig={{
-          devMode: true,
-        }}
-      >
+        devMode: true,
+      }}
+    >
       <App />
     </FuelProvider>
   </React.StrictMode>

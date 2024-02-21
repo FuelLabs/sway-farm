@@ -4,7 +4,7 @@ import {
   useIsConnected,
   useWallet,
   useAssets,
-  useAddAssets
+  useAddAssets,
 } from '@fuel-wallet/react';
 import { Analytics } from '@vercel/analytics/react';
 import { Wallet, Provider } from 'fuels';
@@ -13,7 +13,12 @@ import { useState, useEffect, useMemo } from 'react';
 
 import Game from './components/Game';
 import Home from './components/home/Home';
-import { CONTRACT_ID, FARM_COIN_ASSET, FARM_COIN_ASSET_ID, FUEL_PROVIDER_URL } from './constants';
+import {
+  CONTRACT_ID,
+  FARM_COIN_ASSET,
+  FARM_COIN_ASSET_ID,
+  FUEL_PROVIDER_URL,
+} from './constants';
 import './App.css';
 import { ContractAbi__factory } from './sway-api';
 
@@ -52,9 +57,9 @@ function App() {
       }
     }
 
-    async function getWallet(){
-      const key = window.localStorage.getItem("sway-farm-wallet-key");
-      if(key){
+    async function getWallet() {
+      const key = window.localStorage.getItem('sway-farm-wallet-key');
+      if (key) {
         const provider = await Provider.create(FUEL_PROVIDER_URL);
         const walletFromKey = Wallet.fromPrivateKey(key, provider);
         setBurnerWallet(walletFromKey);

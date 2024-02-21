@@ -17,21 +17,19 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
   const [status, setStatus] = useState<'error' | 'loading' | 'none'>('none');
   const [hasFunds, setHasFunds] = useState<boolean>(false);
   const { wallet } = useWallet();
-  
+
   useEffect(() => {
     async function getBalance() {
       const thisWallet = wallet ?? contract?.account;
       const balance = await thisWallet!.getBalance(BASE_ASSET_ID);
       const balanceNum = balance?.toNumber();
-      
-      if(balanceNum){
+
+      if (balanceNum) {
         setHasFunds(balanceNum > 0);
       }
-
     }
     getBalance();
   }, [wallet]);
- 
 
   async function handleNewPlayer() {
     if (contract !== null) {

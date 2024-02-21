@@ -3,7 +3,11 @@ import { useEffect } from 'react';
 
 import { TILES } from '../constants';
 import type { ContractAbi } from '../sway-api';
-import type { GardenVectorOutput, AddressInput, IdentityInput } from '../sway-api/contracts/ContractAbi';
+import type {
+  GardenVectorOutput,
+  AddressInput,
+  IdentityInput,
+} from '../sway-api/contracts/ContractAbi';
 
 import GardenTile from './GardenTile';
 

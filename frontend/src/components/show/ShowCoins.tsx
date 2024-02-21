@@ -15,12 +15,12 @@ interface ShowCoinsProps {
 export default function ShowCoins({ updateNum, contract }: ShowCoinsProps) {
   const { wallet } = useWallet();
   const [balance, setBalance] = useState<BN>();
-  
+
   useEffect(() => {
     async function getBalance() {
-        const thisWallet = wallet ?? contract?.account;
-        const balanceBN = await thisWallet!.getBalance(FARM_COIN_ASSET_ID);
-        setBalance(balanceBN);
+      const thisWallet = wallet ?? contract?.account;
+      const balanceBN = await thisWallet!.getBalance(FARM_COIN_ASSET_ID);
+      setBalance(balanceBN);
     }
     getBalance();
   }, [wallet, updateNum, contract]);
