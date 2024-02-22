@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 
-import type { ContractAbi } from '../../contracts';
+import type { ContractAbi } from '../../sway-api';
 
 import BuySeeds from './BuySeeds';
 import SellItem from './SellItem';

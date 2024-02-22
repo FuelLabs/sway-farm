@@ -4,9 +4,9 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.53.0
-  Forc version: 0.44.0
-  Fuel-Core version: 0.20.4
+  Fuels version: 0.73.0
+  Forc version: 0.49.2
+  Fuel-Core version: 0.22.0
 */
 
 import type {
@@ -23,10 +23,10 @@ import type {
 import type { Option, Enum, Vec } from './common';
 
 export enum FoodTypeInput {
-  tomatoes = 'tomatoes',
+  Tomatoes = 'Tomatoes',
 }
 export enum FoodTypeOutput {
-  tomatoes = 'tomatoes',
+  Tomatoes = 'Tomatoes',
 }
 export type IdentityInput = Enum<{
   Address: AddressInput;
@@ -39,16 +39,18 @@ export type IdentityOutput = Enum<{
 export type InvalidErrorInput = Enum<{
   NotEnoughTokens: BigNumberish;
   NotEnoughSeeds: BigNumberish;
-  IncorrectAssetId: string;
+  IncorrectAssetId: AssetIdInput;
 }>;
 export type InvalidErrorOutput = Enum<{
   NotEnoughTokens: BN;
   NotEnoughSeeds: BN;
-  IncorrectAssetId: string;
+  IncorrectAssetId: AssetIdOutput;
 }>;
 
 export type AddressInput = { value: string };
 export type AddressOutput = AddressInput;
+export type AssetIdInput = { value: string };
+export type AssetIdOutput = AssetIdInput;
 export type ContractIdInput = { value: string };
 export type ContractIdOutput = ContractIdInput;
 export type FoodInput = {

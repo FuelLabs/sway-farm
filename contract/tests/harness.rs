@@ -1,4 +1,4 @@
-use fuels::{prelude::*, types::Identity, types::Bits256};
+use fuels::{prelude::*, types::Bits256, types::Identity};
 
 // Load abi from json
 abigen!(Contract(
@@ -6,7 +6,11 @@ abigen!(Contract(
     abi = "out/debug/contract-abi.json"
 ));
 
-async fn get_contract_instance() -> (MyContract<WalletUnlocked>, Bech32ContractId, Vec<WalletUnlocked>) {
+async fn get_contract_instance() -> (
+    MyContract<WalletUnlocked>,
+    Bech32ContractId,
+    Vec<WalletUnlocked>,
+) {
     // Launch a local network and deploy the contract
     let wallets = launch_custom_provider_and_get_wallets(
         WalletsConfig::new(
@@ -17,23 +21,22 @@ async fn get_contract_instance() -> (MyContract<WalletUnlocked>, Bech32ContractI
         None,
         None,
     )
-    .await;
+    .await
+    .unwrap();
 
     let wallet = wallets.get(0).unwrap().clone();
 
-    let storage_config =
-    StorageConfiguration::load_from("out/debug/contract-storage_slots.json").unwrap();
+    let storage_config = StorageConfiguration::default()
+        .add_slot_overrides_from_file("out/debug/contract-storage_slots.json")
+        .unwrap();
 
     let load_config = LoadConfiguration::default().with_storage_configuration(storage_config);
 
-    let id = Contract::load_from(
-        "./out/debug/contract.bin",
-        load_config,
-    )
-    .unwrap()
-    .deploy(&wallet, TxParameters::default())
-    .await
-    .unwrap();
+    let id = Contract::load_from("./out/debug/contract.bin", load_config)
+        .unwrap()
+        .deploy(&wallet, TxPolicies::default())
+        .await
+        .unwrap();
 
     let instance = MyContract::new(id.clone(), wallet);
 
@@ -45,7 +48,7 @@ async fn can_play_game() {
     let (instance, id, wallets) = get_contract_instance().await;
     let wallet_1 = wallets.get(0).unwrap();
     let wallet_1_id = Identity::Address(wallet_1.address().into());
-    
+
     // create a new player with wallet 1
     let new_player_rep = instance
         .with_account(wallet_1.clone())
@@ -93,14 +96,15 @@ async fn can_play_game() {
 
     let price = 750_000;
     let amount = 5;
-    let call_params = CallParameters::with_asset_id(CallParameters::default(), contract_asset).with_amount(price * amount);
+    let call_params = CallParameters::with_asset_id(CallParameters::default(), contract_asset)
+        .with_amount(price * amount);
 
     // buy 5 tomato seeds from wallet_1
     let buy_seeds_resp = instance
         .with_account(wallet_1.clone())
         .unwrap()
         .methods()
-        .buy_seeds(FoodType::tomatoes, amount)
+        .buy_seeds(FoodType::Tomatoes, amount)
         .call_params(call_params)
         .unwrap()
         .call()
@@ -112,20 +116,20 @@ async fn can_play_game() {
 
     let seed_amount = instance
         .methods()
-        .get_seed_amount(wallet_1_id.clone(), FoodType::tomatoes)
+        .get_seed_amount(wallet_1_id.clone(), FoodType::Tomatoes)
         .simulate()
         .await
         .unwrap();
     assert_eq!(seed_amount.value, amount);
 
-    let index_vec: Vec<u64> = [0,1,2,3,4].into();
+    let index_vec: Vec<u64> = [0, 1, 2, 3, 4].into();
 
     // plant seeds from wallet_1 at the first 5 indexes
     let plant_seeds_resp = instance
         .with_account(wallet_1.clone())
         .unwrap()
         .methods()
-        .plant_seeds(FoodType::tomatoes, amount, index_vec)
+        .plant_seeds(FoodType::Tomatoes, amount, index_vec)
         .call()
         .await;
     assert!(plant_seeds_resp.is_ok());
@@ -158,7 +162,7 @@ async fn can_play_game() {
     // check if the player has a harvested item
     let item_amount = instance
         .methods()
-        .get_item_amount(wallet_1_id.clone(), FoodType::tomatoes)
+        .get_item_amount(wallet_1_id.clone(), FoodType::Tomatoes)
         .simulate()
         .await
         .unwrap();
@@ -203,7 +207,7 @@ async fn can_play_game() {
         .with_account(wallet_1.clone())
         .unwrap()
         .methods()
-        .sell_item(FoodType::tomatoes, 2)
+        .sell_item(FoodType::Tomatoes, 2)
         .append_variable_outputs(1)
         .call()
         .await;
@@ -240,13 +244,14 @@ async fn can_play_game() {
     let final_balance = wallet_1.get_asset_balance(&contract_asset).await.unwrap();
     assert_eq!(final_balance, planted_balance + 15_000_000);
 
-    let new_call_params = CallParameters::with_asset_id(CallParameters::default(), contract_asset).with_amount(price);
+    let new_call_params =
+        CallParameters::with_asset_id(CallParameters::default(), contract_asset).with_amount(price);
 
     let buy_seeds_again_resp = instance
         .with_account(wallet_1.clone())
         .unwrap()
         .methods()
-        .buy_seeds(FoodType::tomatoes, 1)
+        .buy_seeds(FoodType::Tomatoes, 1)
         .call_params(new_call_params)
         .unwrap()
         .call()
@@ -258,7 +263,7 @@ async fn can_play_game() {
         .with_account(wallet_1.clone())
         .unwrap()
         .methods()
-        .plant_seed_at_index(FoodType::tomatoes, 7)
+        .plant_seed_at_index(FoodType::Tomatoes, 7)
         .call()
         .await;
     assert!(plant_seeds_at_index_resp.is_ok());

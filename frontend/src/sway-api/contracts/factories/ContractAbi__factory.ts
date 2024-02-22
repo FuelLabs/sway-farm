@@ -4,9 +4,9 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.53.0
-  Forc version: 0.44.0
-  Fuel-Core version: 0.20.4
+  Fuels version: 0.73.0
+  Forc version: 0.49.2
+  Fuel-Core version: 0.22.0
 */
 
 import { Interface, Contract, ContractFactory } from 'fuels';
@@ -16,6 +16,7 @@ import type {
   AbstractAddress,
   BytesLike,
   DeployContractOptions,
+  StorageSlot,
 } from 'fuels';
 import type { ContractAbi, ContractAbiInterface } from '../ContractAbi';
 
@@ -37,7 +38,7 @@ const _abi = {
           typeArguments: [
             {
               name: '',
-              type: 17,
+              type: 14,
               typeArguments: null,
             },
           ],
@@ -62,7 +63,7 @@ const _abi = {
       type: 'enum FoodType',
       components: [
         {
-          name: 'tomatoes',
+          name: 'Tomatoes',
           type: 0,
           typeArguments: null,
         },
@@ -75,12 +76,12 @@ const _abi = {
       components: [
         {
           name: 'Address',
-          type: 15,
+          type: 11,
           typeArguments: null,
         },
         {
           name: 'ContractId',
-          type: 16,
+          type: 13,
           typeArguments: null,
         },
       ],
@@ -92,17 +93,17 @@ const _abi = {
       components: [
         {
           name: 'NotEnoughTokens',
-          type: 22,
+          type: 19,
           typeArguments: null,
         },
         {
           name: 'NotEnoughSeeds',
-          type: 22,
+          type: 19,
           typeArguments: null,
         },
         {
           name: 'IncorrectAssetId',
-          type: 2,
+          type: 12,
           typeArguments: null,
         },
       ],
@@ -139,36 +140,12 @@ const _abi = {
     },
     {
       typeId: 10,
-      type: 'str[14]',
+      type: 'str',
       components: null,
       typeParameters: null,
     },
     {
       typeId: 11,
-      type: 'str[17]',
-      components: null,
-      typeParameters: null,
-    },
-    {
-      typeId: 12,
-      type: 'str[21]',
-      components: null,
-      typeParameters: null,
-    },
-    {
-      typeId: 13,
-      type: 'str[37]',
-      components: null,
-      typeParameters: null,
-    },
-    {
-      typeId: 14,
-      type: 'str[9]',
-      components: null,
-      typeParameters: null,
-    },
-    {
-      typeId: 15,
       type: 'struct Address',
       components: [
         {
@@ -180,7 +157,19 @@ const _abi = {
       typeParameters: null,
     },
     {
-      typeId: 16,
+      typeId: 12,
+      type: 'struct AssetId',
+      components: [
+        {
+          name: 'value',
+          type: 2,
+          typeArguments: null,
+        },
+      ],
+      typeParameters: null,
+    },
+    {
+      typeId: 13,
       type: 'struct ContractId',
       components: [
         {
@@ -192,7 +181,7 @@ const _abi = {
       typeParameters: null,
     },
     {
-      typeId: 17,
+      typeId: 14,
       type: 'struct Food',
       components: [
         {
@@ -206,7 +195,7 @@ const _abi = {
           typeArguments: [
             {
               name: '',
-              type: 22,
+              type: 19,
               typeArguments: null,
             },
           ],
@@ -215,7 +204,7 @@ const _abi = {
       typeParameters: null,
     },
     {
-      typeId: 18,
+      typeId: 15,
       type: 'struct GardenVector',
       components: [
         {
@@ -227,24 +216,24 @@ const _abi = {
       typeParameters: null,
     },
     {
-      typeId: 19,
+      typeId: 16,
       type: 'struct Player',
       components: [
         {
           name: 'farming_skill',
-          type: 22,
+          type: 19,
           typeArguments: null,
         },
         {
           name: 'total_value_sold',
-          type: 22,
+          type: 19,
           typeArguments: null,
         },
       ],
       typeParameters: null,
     },
     {
-      typeId: 20,
+      typeId: 17,
       type: 'struct RawVec',
       components: [
         {
@@ -254,19 +243,19 @@ const _abi = {
         },
         {
           name: 'cap',
-          type: 22,
+          type: 19,
           typeArguments: null,
         },
       ],
       typeParameters: [8],
     },
     {
-      typeId: 21,
+      typeId: 18,
       type: 'struct Vec',
       components: [
         {
           name: 'buf',
-          type: 20,
+          type: 17,
           typeArguments: [
             {
               name: '',
@@ -277,14 +266,14 @@ const _abi = {
         },
         {
           name: 'len',
-          type: 22,
+          type: 19,
           typeArguments: null,
         },
       ],
       typeParameters: [8],
     },
     {
-      typeId: 22,
+      typeId: 19,
       type: 'u64',
       components: null,
       typeParameters: null,
@@ -300,7 +289,7 @@ const _abi = {
         },
         {
           name: 'amount',
-          type: 22,
+          type: 19,
           typeArguments: null,
         },
       ],
@@ -330,7 +319,7 @@ const _abi = {
         },
         {
           name: 'amount',
-          type: 22,
+          type: 19,
           typeArguments: null,
         },
       ],
@@ -351,7 +340,7 @@ const _abi = {
       inputs: [
         {
           name: 'index',
-          type: 22,
+          type: 19,
           typeArguments: null,
         },
       ],
@@ -400,7 +389,7 @@ const _abi = {
       name: 'get_garden_vec',
       output: {
         name: '',
-        type: 18,
+        type: 15,
         typeArguments: null,
       },
       attributes: [
@@ -426,7 +415,7 @@ const _abi = {
       name: 'get_item_amount',
       output: {
         name: '',
-        type: 22,
+        type: 19,
         typeArguments: null,
       },
       attributes: [
@@ -451,7 +440,7 @@ const _abi = {
         typeArguments: [
           {
             name: '',
-            type: 19,
+            type: 16,
             typeArguments: null,
           },
         ],
@@ -479,7 +468,7 @@ const _abi = {
       name: 'get_seed_amount',
       output: {
         name: '',
-        type: 22,
+        type: 19,
         typeArguments: null,
       },
       attributes: [
@@ -493,7 +482,7 @@ const _abi = {
       inputs: [
         {
           name: 'index',
-          type: 22,
+          type: 19,
           typeArguments: null,
         },
       ],
@@ -549,7 +538,7 @@ const _abi = {
         },
         {
           name: 'index',
-          type: 22,
+          type: 19,
           typeArguments: null,
         },
       ],
@@ -575,16 +564,16 @@ const _abi = {
         },
         {
           name: 'amount',
-          type: 22,
+          type: 19,
           typeArguments: null,
         },
         {
           name: 'indexes',
-          type: 21,
+          type: 18,
           typeArguments: [
             {
               name: '',
-              type: 22,
+              type: 19,
               typeArguments: null,
             },
           ],
@@ -612,7 +601,7 @@ const _abi = {
         },
         {
           name: 'amount',
-          type: 22,
+          type: 19,
           typeArguments: null,
         },
       ],
@@ -651,7 +640,7 @@ const _abi = {
       logId: 2,
       loggedType: {
         name: '',
-        type: 14,
+        type: 10,
         typeArguments: null,
       },
     },
@@ -659,7 +648,7 @@ const _abi = {
       logId: 3,
       loggedType: {
         name: '',
-        type: 11,
+        type: 10,
         typeArguments: null,
       },
     },
@@ -675,7 +664,7 @@ const _abi = {
       logId: 5,
       loggedType: {
         name: '',
-        type: 12,
+        type: 10,
         typeArguments: null,
       },
     },
@@ -691,7 +680,7 @@ const _abi = {
       logId: 7,
       loggedType: {
         name: '',
-        type: 13,
+        type: 10,
         typeArguments: null,
       },
     },
@@ -716,24 +705,38 @@ const _abi = {
   configurables: [],
 };
 
+const _storageSlots: StorageSlot[] = [];
+
 export class ContractAbi__factory {
   static readonly abi = _abi;
+
+  static readonly storageSlots = _storageSlots;
+
   static createInterface(): ContractAbiInterface {
     return new Interface(_abi) as unknown as ContractAbiInterface;
   }
+
   static connect(
     id: string | AbstractAddress,
     accountOrProvider: Account | Provider
   ): ContractAbi {
     return new Contract(id, _abi, accountOrProvider) as unknown as ContractAbi;
   }
+
   static async deployContract(
     bytecode: BytesLike,
     wallet: Account,
     options: DeployContractOptions = {}
   ): Promise<ContractAbi> {
     const factory = new ContractFactory(bytecode, _abi, wallet);
-    const contract = await factory.deployContract(options);
+
+    const { storageSlots } = ContractAbi__factory;
+
+    const contract = await factory.deployContract({
+      storageSlots,
+      ...options,
+    });
+
     return contract as unknown as ContractAbi;
   }
 }

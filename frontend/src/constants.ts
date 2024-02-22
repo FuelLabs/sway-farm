@@ -1,21 +1,38 @@
 import { cssObj } from '@fuel-ui/css';
+import type { Asset } from '@fuel-wallet/sdk';
+import type { Fuel } from '@fuels/assets';
 import type { BN } from 'fuels';
 import { Vector3 } from 'three';
 
-export const FUEL_PROVIDER_URL = 'https://beta-4.fuel.network/graphql';
+export const FUEL_PROVIDER_URL = 'https://beta-5.fuel.network/graphql';
 
 export const CONTRACT_ID =
-  '0x4c6be4ed66b783f55e44a6d36290a73970a616ba33256636cf15ad5cded228d9';
+  '0xd2a93abef5c3f45f48bb9f0736ccfda4c3f32c9c57fc307ab9363ef7712f305f';
 
 export const BASE_ASSET_ID =
   '0x0000000000000000000000000000000000000000000000000000000000000000';
 
-export const FARM_COIN_ASSET = {
-  assetId: '0x49d87db9d69218c77efab7dc2a9ff96f818f52f63e66c6f8b9ab4bdf8435e1b1',
-  imageUrl: 'https://sway-farm.vercel.app/images/pixel-bunny.png',
-  isCustom: true,
+export const FARM_COIN_ASSET_ID =
+  '0x0cfabde7bbe58d253cf3103d8f55d26987b3dc4691205b9299ac6826c613a2e2';
+
+export const FARM_COIN_NETWORK_ASSET = {
+  /** type of network */
+  type: 'fuel',
+  /** chain id of the network */
+  chainId: 0,
+  /** number of decimals of the asset */
+  decimals: 9,
+  /** assetId on the Fuel Network */
+  assetId: FARM_COIN_ASSET_ID,
+  /** the contractId of that generated the Asset on the Fuel Network */
+  contractId: CONTRACT_ID,
+};
+
+export const FARM_COIN_ASSET: Asset = {
+  icon: 'https://sway-farm.vercel.app/images/pixel-bunny.png',
   name: 'Sway Farm Coin',
   symbol: 'FARM',
+  networks: [FARM_COIN_NETWORK_ASSET as Fuel],
 };
 
 export enum Controls {
@@ -63,3 +80,7 @@ export const buttonStyle = cssObj({
     boxShadow: 'none !important',
   },
 });
+
+export enum FoodTypeInput {
+  Tomatoes = 'Tomatoes',
+}

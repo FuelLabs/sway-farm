@@ -3,9 +3,8 @@ import { bn } from 'fuels';
 import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 
-import { buttonStyle } from '../../constants';
-import type { ContractAbi } from '../../contracts';
-import type { FoodTypeInput } from '../../contracts/ContractAbi';
+import { buttonStyle, FoodTypeInput } from '../../constants';
+import type { ContractAbi } from '../../sway-api/contracts/ContractAbi';
 import Loading from '../Loading';
 
 interface SellItemProps {
@@ -30,13 +29,10 @@ export default function SellItem({
         setCanMove(false);
         const realAmount = items / 1_000_000_000;
         const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
-        const seedType: FoodTypeInput = {
-          tomatoes: [],
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } as any as FoodTypeInput;
+        const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
         await contract.functions
           .sell_item(seedType, inputAmount)
-          .txParams({ gasPrice: 1 })
+          .txParams({ gasPrice: 1, gasLimit: 800_000 })
           .call();
         updatePageNum();
         setStatus('none');

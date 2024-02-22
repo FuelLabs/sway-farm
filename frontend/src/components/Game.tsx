@@ -7,15 +7,14 @@ import { BN } from 'fuels';
 import { useState, useEffect, useMemo, Suspense } from 'react';
 
 import type { Modals } from '../constants';
-import { Controls, buttonStyle } from '../constants';
-import type { ContractAbi } from '../contracts';
+import { Controls, buttonStyle, FoodTypeInput } from '../constants';
 import type {
   AddressInput,
+  ContractAbi,
   GardenVectorOutput,
   IdentityInput,
   PlayerOutput,
-  FoodTypeInput,
-} from '../contracts/ContractAbi';
+} from '../sway-api/contracts/ContractAbi';
 
 import Background from './Background';
 import Camera from './Camera';
@@ -67,13 +66,14 @@ export default function Game({ contract, isMobile }: GameProps) {
             value: contract.account.address.toB256(),
           };
           const id: IdentityInput = { Address: address };
-          const seedType: FoodTypeInput = {
-            tomatoes: [],
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any as FoodTypeInput;
+          const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
           // get the player first
           const { value: Some } = await contract.functions
             .get_player(id)
+            .txParams({
+              gasPrice: 1,
+              gasLimit: 800_000,
+            })
             .simulate();
           if (Some?.farming_skill.gte(1)) {
             setPlayer(Some);
@@ -83,8 +83,11 @@ export default function Game({ contract, isMobile }: GameProps) {
                 contract.functions.get_seed_amount(id, seedType),
                 contract.functions.get_item_amount(id, seedType),
               ])
+              .txParams({
+                gasPrice: 1,
+                gasLimit: 800_000,
+              })
               .simulate();
-
             const seedAmount = new BN(results[0]).toNumber();
             setSeeds(seedAmount);
             const itemAmount = new BN(results[1]).toNumber();

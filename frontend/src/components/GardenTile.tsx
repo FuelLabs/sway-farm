@@ -5,8 +5,8 @@ import type { Vector3 } from 'three';
 import { TextureLoader, NearestFilter } from 'three';
 
 import { convertTime } from '../constants';
-import type { FoodOutput } from '../contracts/ContractAbi';
-import type { Option } from '../contracts/common';
+import type { FoodOutput } from '../sway-api/contracts/ContractAbi';
+import type { Option } from '../sway-api/contracts/common';
 
 import Loading from './Loading';
 

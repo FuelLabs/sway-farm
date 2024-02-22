@@ -1,10 +1,11 @@
 import { cssObj } from '@fuel-ui/css';
-import { Button, Box, Link } from '@fuel-ui/react';
-import { Wallet } from 'fuels';
+import { Button, Box } from '@fuel-ui/react';
+import { useConnectUI } from '@fuel-wallet/react';
+import { Wallet, Provider } from 'fuels';
 import type { Dispatch, SetStateAction } from 'react';
+import { useEffect, useState } from 'react';
 
 import { FUEL_PROVIDER_URL } from '../../constants';
-import { useFuel } from '../../hooks/useFuel';
 
 import Instructions from './Instructions';
 
@@ -14,11 +15,23 @@ interface HomeProps {
 }
 
 export default function Home({ setBurnerWallet, isMobile }: HomeProps) {
-  const [fuel] = useFuel();
+  const [provider, setProvider] = useState<Provider | null>(null);
+  const { connect, isConnecting } = useConnectUI();
+
+  useEffect(() => {
+    async function setupProvider() {
+      const newProvider = await Provider.create(FUEL_PROVIDER_URL);
+      setProvider(newProvider);
+    }
+
+    setupProvider();
+  }, []);
 
   function create() {
+    if (!provider) return; // Ensure the provider is set
+
     const newWallet = Wallet.generate({
-      provider: FUEL_PROVIDER_URL,
+      provider,
     });
     setBurnerWallet(newWallet);
     window.localStorage.setItem('sway-farm-wallet-key', newWallet.privateKey);
@@ -27,27 +40,23 @@ export default function Home({ setBurnerWallet, isMobile }: HomeProps) {
   return (
     <div>
       <Instructions isMobile={isMobile} />
-      {fuel ? (
-        <Button css={styles.button} onPress={() => fuel.connect()}>
-          Connect Wallet
-        </Button>
-      ) : (
-        <Box>
-          <Button css={styles.button} onPress={create}>
-            Play with In-Browser Wallet
+      <Box>
+        <Box css={styles.download}>
+          <p>Connect with the Fuel Wallet</p>
+          <Button
+            css={styles.button}
+            onPress={() => {
+              connect();
+            }}
+          >
+            {isConnecting ? 'Connecting' : 'Connect'}
           </Button>
-          <Box css={styles.download}>
-            or download the{' '}
-            <Link
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://wallet.fuel.network/"
-            >
-              Fuel Wallet
-            </Link>
-          </Box>
+          <p>or use a burner wallet</p>
         </Box>
-      )}
+        <Button css={styles.button} onPress={() => create()}>
+          Play with In-Browser Wallet
+        </Button>
+      </Box>
     </div>
   );
 }

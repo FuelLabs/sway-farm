@@ -1,25 +1,35 @@
 import { cssObj } from '@fuel-ui/css';
 import { Box, BoxCentered, Heading } from '@fuel-ui/react';
+import {
+  useIsConnected,
+  useWallet,
+  useAssets,
+  useAddAssets,
+} from '@fuel-wallet/react';
 import { Analytics } from '@vercel/analytics/react';
 import { Wallet, Provider } from 'fuels';
-import type { WalletLocked, Account } from 'fuels';
+import type { Account } from 'fuels';
 import { useState, useEffect, useMemo } from 'react';
 
 import Game from './components/Game';
 import Home from './components/home/Home';
-import { CONTRACT_ID, FARM_COIN_ASSET, FUEL_PROVIDER_URL } from './constants';
-import { ContractAbi__factory } from './contracts';
-import { useFuel } from './hooks/useFuel';
-import { useIsConnected } from './hooks/useIsConnected';
+import {
+  CONTRACT_ID,
+  FARM_COIN_ASSET,
+  FARM_COIN_ASSET_ID,
+  FUEL_PROVIDER_URL,
+} from './constants';
 import './App.css';
+import { ContractAbi__factory } from './sway-api';
 
 function App() {
-  const [wallet, setWallet] = useState<WalletLocked>();
   const [burnerWallet, setBurnerWallet] = useState<Wallet>();
   const [mounted, setMounted] = useState<boolean>(false);
-  const [isConnected] = useIsConnected();
-  const [fuel] = useFuel();
   const [isMobile, setIsMobile] = useState(false);
+  const { isConnected } = useIsConnected();
+  const { wallet } = useWallet();
+  const { assets } = useAssets();
+  const { addAssets } = useAddAssets();
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -29,20 +39,18 @@ function App() {
 
   useEffect(() => {
     async function getAccounts() {
-      const currentAccount = await fuel.currentAccount();
-      const tempWallet = await fuel.getWallet(currentAccount);
-      setWallet(tempWallet);
       if (mounted) {
-        const assets = await fuel.assets();
         let hasAsset = false;
         for (let i = 0; i < assets.length; i++) {
-          if (FARM_COIN_ASSET.assetId === assets[i].assetId) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const thisAsset = assets[i] as any;
+          if (thisAsset.assetId && thisAsset.assetId === FARM_COIN_ASSET_ID) {
             hasAsset = true;
             break;
           }
         }
         if (!hasAsset) {
-          await fuel.addAssets([FARM_COIN_ASSET]);
+          addAssets([FARM_COIN_ASSET]);
         }
       } else {
         setMounted(true);
@@ -52,21 +60,21 @@ function App() {
     async function getWallet() {
       const key = window.localStorage.getItem('sway-farm-wallet-key');
       if (key) {
-        const provider = new Provider(FUEL_PROVIDER_URL);
+        const provider = await Provider.create(FUEL_PROVIDER_URL);
         const walletFromKey = Wallet.fromPrivateKey(key, provider);
         setBurnerWallet(walletFromKey);
       }
     }
 
     // if wallet is installed & connected, fetch account info
-    if (fuel && isConnected) getAccounts();
+    if (isConnected) getAccounts();
 
     // if not connected, check if has burner wallet stored
     if (!isConnected) getWallet();
-  }, [fuel, isConnected, mounted]);
+  }, [isConnected, mounted]);
 
   const contract = useMemo(() => {
-    if (fuel && wallet) {
+    if (wallet) {
       const contract = ContractAbi__factory.connect(CONTRACT_ID, wallet);
       return contract;
     } else if (burnerWallet) {
@@ -77,7 +85,7 @@ function App() {
       return contract;
     }
     return null;
-  }, [fuel, wallet, burnerWallet]);
+  }, [wallet, burnerWallet]);
 
   return (
     <Box css={styles.root}>
@@ -111,7 +119,7 @@ const styles = {
     },
   }),
   box: cssObj({
-    marginTop: '20%',
+    marginTop: '10%',
   }),
   innerBox: cssObj({
     display: 'block',

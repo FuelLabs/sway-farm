@@ -3,7 +3,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 
 import { buttonStyle } from '../../constants';
-import type { ContractAbi } from '../../contracts';
+import type { ContractAbi } from '../../sway-api';
 
 interface HarvestProps {
   contract: ContractAbi | null;
@@ -27,7 +27,7 @@ export default function HarvestModal({
         setCanMove(false);
         await contract.functions
           .harvest(tileArray[0])
-          .txParams({ gasPrice: 1 })
+          .txParams({ gasPrice: 1, gasLimit: 800_000 })
           .call();
         updatePageNum();
         setStatus('none');
