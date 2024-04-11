@@ -4,7 +4,7 @@ A simple farming game written in Sway.
 
 ## Running Locally
 
-Make sure you have `fuelup` installed and are using the `beta-5` toolchain. 
+Make sure you have [`fuelup`](https://docs.fuel.network/guides/installation/) installed and are using the `latest` toolchain.
 
 Install the Fuel Wallet extension and copy your wallet address. In the frontend folder, open the `src/App.tsx` file and add the following lines using your Fuel wallet address:
 

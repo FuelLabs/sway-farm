@@ -1,6 +1,6 @@
 import { cssObj } from '@fuel-ui/css';
 import { Button, BoxCentered, Link } from '@fuel-ui/react';
-import { useWallet } from '@fuel-wallet/react';
+import { useWallet } from '@fuels/react';
 import { useState, useEffect } from 'react';
 
 import { BASE_ASSET_ID, buttonStyle } from '../constants';

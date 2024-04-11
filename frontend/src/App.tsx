@@ -5,7 +5,7 @@ import {
   useWallet,
   useAssets,
   useAddAssets,
-} from '@fuel-wallet/react';
+} from '@fuels/react';
 import { Analytics } from '@vercel/analytics/react';
 import { Wallet, Provider } from 'fuels';
 import type { Account } from 'fuels';

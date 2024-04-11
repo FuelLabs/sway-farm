@@ -1,6 +1,6 @@
 import { cssObj } from '@fuel-ui/css';
 import { Box } from '@fuel-ui/react';
-import { useWallet } from '@fuel-wallet/react';
+import { useWallet } from '@fuels/react';
 import type { BN } from 'fuels';
 import { useState, useEffect } from 'react';
 

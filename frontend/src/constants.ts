@@ -1,6 +1,5 @@
 import { cssObj } from '@fuel-ui/css';
-import type { Asset } from '@fuel-wallet/sdk';
-import type { Fuel } from '@fuels/assets';
+import type { Fuel, Asset } from '@fuels/assets';
 import type { BN } from 'fuels';
 import { Vector3 } from 'three';
 

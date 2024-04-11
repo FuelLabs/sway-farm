@@ -1,6 +1,6 @@
 import { cssObj } from '@fuel-ui/css';
 import { Button, Box } from '@fuel-ui/react';
-import { useConnectUI } from '@fuel-wallet/react';
+import { useConnectUI } from '@fuels/react';
 import { Wallet, Provider } from 'fuels';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';

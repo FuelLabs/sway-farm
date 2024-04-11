@@ -38,7 +38,7 @@ export default function Garden({
               gasPrice: 1,
               gasLimit: 800_000,
             })
-            .simulate();
+            .get();
           setTileStates(value);
         } catch (err) {
           console.log('Error:', err);

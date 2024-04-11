@@ -74,7 +74,7 @@ export default function Game({ contract, isMobile }: GameProps) {
               gasPrice: 1,
               gasLimit: 800_000,
             })
-            .simulate();
+            .get();
           if (Some?.farming_skill.gte(1)) {
             setPlayer(Some);
             // if there is a player found, get the rest of the player info
@@ -87,7 +87,7 @@ export default function Game({ contract, isMobile }: GameProps) {
                 gasPrice: 1,
                 gasLimit: 800_000,
               })
-              .simulate();
+              .get();
             const seedAmount = new BN(results[0]).toNumber();
             setSeeds(seedAmount);
             const itemAmount = new BN(results[1]).toNumber();
