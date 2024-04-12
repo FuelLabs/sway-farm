@@ -7,6 +7,9 @@ abi GameContract {
     #[storage(read, write)]
     fn new_player();
 
+    // get asset ID
+    fn get_asset_id() -> AssetId;
+
     // level up farming skill
     #[storage(read, write)]
     fn level_up();

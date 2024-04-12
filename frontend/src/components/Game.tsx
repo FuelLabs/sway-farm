@@ -4,6 +4,7 @@ import type { KeyboardControlsEntry } from '@react-three/drei';
 import { KeyboardControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { BN } from 'fuels';
+import type { BytesLike } from 'fuels';
 import { useState, useEffect, useMemo, Suspense } from 'react';
 
 import type { Modals } from '../constants';
@@ -31,6 +32,7 @@ import Info from './show/Info';
 interface GameProps {
   contract: ContractAbi | null;
   isMobile: boolean;
+  farmCoinAssetID: BytesLike;
 }
 
 export type Position =
@@ -42,7 +44,7 @@ export type Position =
   | 'right-bottom';
 export type MobileControls = 'none' | 'up' | 'down' | 'left' | 'right';
 
-export default function Game({ contract, isMobile }: GameProps) {
+export default function Game({ contract, isMobile, farmCoinAssetID }: GameProps) {
   const [modal, setModal] = useState<Modals>('none');
   const [tileStates, setTileStates] = useState<
     GardenVectorOutput | undefined
@@ -188,6 +190,7 @@ export default function Game({ contract, isMobile }: GameProps) {
             updateNum={updateNum}
             seeds={seeds}
             items={items}
+            farmCoinAssetID={farmCoinAssetID}
           />
 
           {player !== null && (
@@ -217,6 +220,7 @@ export default function Game({ contract, isMobile }: GameProps) {
                   updatePageNum={updatePageNum}
                   items={items}
                   setCanMove={setCanMove}
+                  farmCoinAssetID={farmCoinAssetID}
                 />
               )}
             </>

@@ -388,6 +388,16 @@ const _abi = {
       ]
     },
     {
+      "inputs": [],
+      "name": "get_asset_id",
+      "output": {
+        "name": "",
+        "type": 12,
+        "typeArguments": null
+      },
+      "attributes": null
+    },
+    {
       "inputs": [
         {
           "name": "id",

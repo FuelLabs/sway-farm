@@ -48,6 +48,7 @@ interface ContractAbiInterface extends Interface {
     buy_seeds_free: FunctionFragment;
     can_harvest: FunctionFragment;
     can_level_up: FunctionFragment;
+    get_asset_id: FunctionFragment;
     get_garden_vec: FunctionFragment;
     get_item_amount: FunctionFragment;
     get_player: FunctionFragment;
@@ -64,6 +65,7 @@ interface ContractAbiInterface extends Interface {
   encodeFunctionData(functionFragment: 'buy_seeds_free', values: [FoodTypeInput, BigNumberish]): Uint8Array;
   encodeFunctionData(functionFragment: 'can_harvest', values: [BigNumberish]): Uint8Array;
   encodeFunctionData(functionFragment: 'can_level_up', values: [IdentityInput]): Uint8Array;
+  encodeFunctionData(functionFragment: 'get_asset_id', values: []): Uint8Array;
   encodeFunctionData(functionFragment: 'get_garden_vec', values: [IdentityInput]): Uint8Array;
   encodeFunctionData(functionFragment: 'get_item_amount', values: [IdentityInput, FoodTypeInput]): Uint8Array;
   encodeFunctionData(functionFragment: 'get_player', values: [IdentityInput]): Uint8Array;
@@ -79,6 +81,7 @@ interface ContractAbiInterface extends Interface {
   decodeFunctionData(functionFragment: 'buy_seeds_free', data: BytesLike): DecodedValue;
   decodeFunctionData(functionFragment: 'can_harvest', data: BytesLike): DecodedValue;
   decodeFunctionData(functionFragment: 'can_level_up', data: BytesLike): DecodedValue;
+  decodeFunctionData(functionFragment: 'get_asset_id', data: BytesLike): DecodedValue;
   decodeFunctionData(functionFragment: 'get_garden_vec', data: BytesLike): DecodedValue;
   decodeFunctionData(functionFragment: 'get_item_amount', data: BytesLike): DecodedValue;
   decodeFunctionData(functionFragment: 'get_player', data: BytesLike): DecodedValue;
@@ -98,6 +101,7 @@ export class ContractAbi extends Contract {
     buy_seeds_free: InvokeFunction<[food_type: FoodTypeInput, amount: BigNumberish], void>;
     can_harvest: InvokeFunction<[index: BigNumberish], boolean>;
     can_level_up: InvokeFunction<[id: IdentityInput], boolean>;
+    get_asset_id: InvokeFunction<[], AssetIdOutput>;
     get_garden_vec: InvokeFunction<[id: IdentityInput], GardenVectorOutput>;
     get_item_amount: InvokeFunction<[id: IdentityInput, item: FoodTypeInput], BN>;
     get_player: InvokeFunction<[id: IdentityInput], Option<PlayerOutput>>;

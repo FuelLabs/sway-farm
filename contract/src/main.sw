@@ -64,6 +64,10 @@ impl GameContract for Contract {
         mint_to(sender, DEFAULT_SUB_ID, 1_000_000_000);
     }
 
+     fn get_asset_id() -> AssetId {
+        AssetId::default()
+     }
+
     #[storage(read, write)]
     fn level_up() {
         // get the player with the message sender
