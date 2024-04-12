@@ -8,7 +8,7 @@ import contractIds from './sway-api/contract-ids.json';
 export const FUEL_PROVIDER_URL = 'https://beta-5.fuel.network/graphql';
 
 export const VERCEL_ENV = 
-  process.env.VERCEL_ENV || process.env.NEXT_PUBLIC_VERCEL_ENV || 'development';
+  process.env.NODE_ENV || 'development';
 
 
 export const CONTRACT_ID = VERCEL_ENV === 'development' ? contractIds.contract : 

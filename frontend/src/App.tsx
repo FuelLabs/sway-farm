@@ -87,8 +87,7 @@ function App() {
     return null;
   }, [wallet, burnerWallet]);
 
-  console.log("1", process.env.NEXT_PUBLIC_VERCEL_ENV)
-  console.log("2", process.env.VERCEL_ENV)
+  console.log("2", process.env)
 
   return (
     <Box css={styles.root}>
