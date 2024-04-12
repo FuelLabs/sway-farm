@@ -2,7 +2,7 @@ import {
   FuelWalletConnector,
   FuelWalletDevelopmentConnector,
   FueletWalletConnector,
-  EVMWalletConnector
+  EVMWalletConnector,
 } from '@fuels/connectors';
 import { FuelProvider } from '@fuels/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -11,7 +11,7 @@ import ReactDOM from 'react-dom/client';
 
 import './index.css';
 import App from './App';
- 
+
 const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(
@@ -19,7 +19,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-       <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
       <FuelProvider
         fuelConfig={{
           connectors: [

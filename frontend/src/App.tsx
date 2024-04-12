@@ -87,8 +87,6 @@ function App() {
     return null;
   }, [wallet, burnerWallet]);
 
-  console.log("2", process.env)
-
   return (
     <Box css={styles.root}>
       {isConnected || (contract && burnerWallet) ? (

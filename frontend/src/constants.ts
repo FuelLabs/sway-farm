@@ -7,12 +7,13 @@ import contractIds from './sway-api/contract-ids.json';
 
 export const FUEL_PROVIDER_URL = 'https://beta-5.fuel.network/graphql';
 
-export const VERCEL_ENV = 
-  process.env.NODE_ENV || 'development';
+export const VERCEL_ENV =
+  process.env.REACT_APP_VERCEL_ENV || process.env.NODE_ENV || 'development';
 
-
-export const CONTRACT_ID = VERCEL_ENV === 'development' ? contractIds.contract : 
-'0xd2a93abef5c3f45f48bb9f0736ccfda4c3f32c9c57fc307ab9363ef7712f305f';
+export const CONTRACT_ID =
+  VERCEL_ENV === 'development'
+    ? contractIds.contract
+    : '0xd2a93abef5c3f45f48bb9f0736ccfda4c3f32c9c57fc307ab9363ef7712f305f';
 
 export const BASE_ASSET_ID =
   '0x0000000000000000000000000000000000000000000000000000000000000000';
