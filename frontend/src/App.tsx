@@ -87,6 +87,9 @@ function App() {
     return null;
   }, [wallet, burnerWallet]);
 
+  console.log("1", process.env.NEXT_PUBLIC_VERCEL_ENV)
+  console.log("2", process.env.VERCEL_ENV)
+
   return (
     <Box css={styles.root}>
       {isConnected || (contract && burnerWallet) ? (

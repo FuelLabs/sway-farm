@@ -11,8 +11,8 @@ export const VERCEL_ENV =
   process.env.VERCEL_ENV || process.env.NEXT_PUBLIC_VERCEL_ENV || 'development';
 
 
-export const CONTRACT_ID = VERCEL_ENV === 'production' || VERCEL_ENV === 'preview'
-? '0xd2a93abef5c3f45f48bb9f0736ccfda4c3f32c9c57fc307ab9363ef7712f305f' : contractIds.contract;
+export const CONTRACT_ID = VERCEL_ENV === 'development' ? contractIds.contract : 
+'0xd2a93abef5c3f45f48bb9f0736ccfda4c3f32c9c57fc307ab9363ef7712f305f';
 
 export const BASE_ASSET_ID =
   '0x0000000000000000000000000000000000000000000000000000000000000000';
