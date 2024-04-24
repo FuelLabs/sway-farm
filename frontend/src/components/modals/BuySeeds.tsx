@@ -24,18 +24,18 @@ export default function BuySeeds({
   const [status, setStatus] = useState<'error' | 'none' | `loading`>('none');
   const [numberOfSeeds, setNumberOfSeeds] = useState<number>(10);
 
-  const seedCost = 0.00075; // Cost of 1 seed in FARM COINS
+  const seedCost = 0.00075;
 
   async function buySeeds() {
     if (contract !== null) {
       try {
         setStatus('loading');
         setCanMove(false);
-        const amount = numberOfSeeds; // Use the state value
+        const amount = numberOfSeeds;
         const realAmount = amount / 1_000_000_000;
         const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
         const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
-        const price = seedCost * amount;
+        const price = 750_000 * amount;
         await contract.functions
           .buy_seeds(seedType, inputAmount)
           .callParams({
