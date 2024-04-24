@@ -1,6 +1,5 @@
-import { Button, Spinner, BoxCentered } from '@fuel-ui/react';
+import { Button, Spinner, BoxCentered, Input, Icon } from '@fuel-ui/react';
 import { bn } from 'fuels';
-import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 
 import {
@@ -8,6 +7,7 @@ import {
   buttonStyle,
   FoodTypeInput,
 } from '../../constants';
+import type { Dispatch, SetStateAction } from 'react';
 import type { ContractAbi } from '../../sway-api/contracts/ContractAbi';
 
 interface BuySeedsProps {
@@ -22,13 +22,14 @@ export default function BuySeeds({
   setCanMove,
 }: BuySeedsProps) {
   const [status, setStatus] = useState<'error' | 'none' | `loading`>('none');
+  const [numberOfSeeds, setNumberOfSeeds] = useState<number>(10);
 
   async function buySeeds() {
     if (contract !== null) {
       try {
         setStatus('loading');
         setCanMove(false);
-        const amount = 10;
+        const amount = numberOfSeeds; // Use the state value
         const realAmount = amount / 1_000_000_000;
         const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
         const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
@@ -77,8 +78,20 @@ export default function BuySeeds({
       {status === 'none' && (
         <>
           <div className="market-header">Buy Seeds</div>
+          <Input>
+            <Input.Field
+              value={numberOfSeeds.toString()}
+              onChange={(e) => setNumberOfSeeds(parseInt(e.target.value) || 0)}
+              placeholder="Enter number of seeds"
+              type="number"
+              min="1"
+            />
+            <Input.ElementRight>
+              <Icon icon="ChevronRight" />
+            </Input.ElementRight>
+          </Input>
           <Button css={buttonStyle} variant="outlined" onPress={buySeeds}>
-            Buy 10 seeds
+            Buy Seeds
           </Button>
         </>
       )}
