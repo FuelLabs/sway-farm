@@ -77,19 +77,20 @@ export default function BuySeeds({
       )}
       {status === 'none' && (
         <>
-          <div className="market-header">Buy Seeds</div>
-          <Input>
-            <Input.Field
-              value={numberOfSeeds.toString()}
-              onChange={(e) => setNumberOfSeeds(parseInt(e.target.value) || 0)}
-              placeholder="Enter number of seeds"
-              type="number"
-              min="1"
-            />
-            <Input.ElementRight>
-              <Icon icon="ChevronRight" />
-            </Input.ElementRight>
-          </Input>
+          <div className="market-header">Enter the number of seeds to Buy</div>
+          <Input css={{ marginBottom: '20px' }}>
+  <Input.Field
+    value={numberOfSeeds.toString()}
+    onChange={(e) => setNumberOfSeeds(parseInt(e.target.value) || 0)}
+    placeholder="Enter number of seeds"
+    type="number"
+    min="1"
+  />
+  <Input.ElementRight>
+    <Icon icon="ChevronRight" />
+  </Input.ElementRight>
+</Input>
+
           <Button css={buttonStyle} variant="outlined" onPress={buySeeds}>
             Buy Seeds
           </Button>
