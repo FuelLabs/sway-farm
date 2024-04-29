@@ -50,7 +50,8 @@ async fn can_play_game() {
     let wallet_1_id = Identity::Address(wallet_1.address().into());
 
     // create a new player with wallet 1
-    let new_player_rep = instance.clone()
+    let new_player_rep = instance
+        .clone()
         .with_account(wallet_1.clone())
         .methods()
         .new_player()
@@ -60,7 +61,8 @@ async fn can_play_game() {
     assert!(new_player_rep.is_ok());
 
     // make sure wallet_1 can't make a new player again
-    let new_player_err = instance.clone()
+    let new_player_err = instance
+        .clone()
         .with_account(wallet_1.clone())
         .methods()
         .new_player()
@@ -75,7 +77,8 @@ async fn can_play_game() {
     let initial_balance = wallet_1.get_asset_balance(&contract_asset).await.unwrap();
     assert_eq!(initial_balance, 1_000_000_000);
 
-    let player = instance.clone()
+    let player = instance
+        .clone()
         .methods()
         .get_player(wallet_1_id.clone())
         .simulate()
@@ -88,7 +91,7 @@ async fn can_play_game() {
     let call_params = CallParameters::with_asset_id(CallParameters::default(), contract_asset)
         .with_amount(price * amount);
 
-        let tx_policies = TxPolicies::default()
+    let tx_policies = TxPolicies::default()
         .with_tip(1)
         .with_script_gas_limit(1_000_000)
         .with_maturity(0);
@@ -145,7 +148,7 @@ async fn can_play_game() {
     let mut harvest_resp = instance.clone()
         .with_account(wallet_1.clone())
         .methods()
-        .harvest(0)
+        .harvest(vec![0])
         .append_variable_outputs(1)
         .call()
         .await;
@@ -176,7 +179,7 @@ async fn can_play_game() {
     harvest_resp = instance.clone()
         .with_account(wallet_1.clone())
         .methods()
-        .harvest(3)
+        .harvest(vec![3])
         .append_variable_outputs(1)
         .call()
         .await;
@@ -246,21 +249,4 @@ async fn can_play_game() {
         .call()
         .await;
     assert!(buy_seeds_again_resp.is_ok());
-
-    // test plant seeds at index
-    let plant_seeds_at_index_resp = instance.clone()
-        .with_account(wallet_1.clone())
-        .methods()
-        .plant_seed_at_index(FoodType::Tomatoes, 7)
-        .call()
-        .await;
-    assert!(plant_seeds_at_index_resp.is_ok());
-
-    new_garden_vec = instance.clone()
-        .methods()
-        .get_garden_vec(wallet_1_id.clone())
-        .simulate()
-        .await
-        .unwrap();
-    assert!(new_garden_vec.value.inner[7].is_some());
 }

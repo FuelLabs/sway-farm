@@ -1,6 +1,6 @@
 library;
 
-use std::{bytes::Bytes, hash::{Hash, Hasher},};
+use std::{bytes::Bytes, hash::{Hash, Hasher}};
 
 abi GameContract {
     // initialize player, mint some coins
@@ -18,16 +18,13 @@ abi GameContract {
     #[storage(read, write), payable]
     fn buy_seeds(food_type: FoodType, amount: u64);
 
-    #[storage(read, write)]
-    fn plant_seed_at_index(food_type: FoodType, index: u64);
-
     // plant any amount of 1 type of seed
     #[storage(read, write)]
     fn plant_seeds(food_type: FoodType, amount: u64, indexes: Vec<u64>);
 
-    // harvest all grown seeds
+    // harvest grown seeds at certain indexes
     #[storage(read, write)]
-    fn harvest(index: u64);
+    fn harvest(indexes: Vec<u64>);
 
     // sell a harvested item
     #[storage(read, write)]
@@ -50,10 +47,6 @@ abi GameContract {
 
     #[storage(read)]
     fn can_harvest(index: u64) -> bool;
-
-    //////// TEMP
-    #[storage(read, write)]
-    fn buy_seeds_free(food_type: FoodType, amount: u64);
 }
 
 pub struct Player {
@@ -85,8 +78,7 @@ impl Hash for FoodType {
     fn hash(self, ref mut state: Hasher) {
         let mut bytes = Bytes::with_capacity(1);
         match self {
-            FoodType::Tomatoes => bytes
-                .push(0u8),
+            FoodType::Tomatoes => bytes.push(0u8),
         }
         state.write(bytes);
     }
@@ -369,4 +361,47 @@ impl GardenVector {
             _ => revert(11),
         };
     }
+}
+
+////////////////////////////////////////
+// EVENT LOG STRUCTS
+////////////////////////////////////////
+
+pub struct NewPlayer {
+    pub address: Identity,
+}
+
+pub struct LevelUp {
+    pub address: Identity,
+    pub player_info: Player,
+}
+
+pub struct BuySeeds {
+    pub address: Identity,
+    pub food_type: FoodType,
+    pub amount_bought: u64,
+    pub cost: u64,
+    pub total_current_amount: u64,
+}
+
+pub struct PlantSeeds {
+    pub address: Identity,
+    pub food_type: FoodType,
+    pub indexes: Vec<u64>,
+    pub timestamp: u64,
+}
+
+pub struct Harvest {
+    pub address: Identity,
+    pub food_type: FoodType,
+    pub index: u64,
+    pub timestamp: u64,
+}
+
+pub struct SellItem {
+    pub address: Identity,
+    pub food_type: FoodType,
+    pub amount_sold: u64,
+    pub value_sold: u64,
+    pub player_info: Player
 }
