@@ -57,8 +57,8 @@ abi GameContract {
 }
 
 pub struct Player {
-    farming_skill: u64,
-    total_value_sold: u64,
+    pub farming_skill: u64,
+    pub total_value_sold: u64,
 }
 
 impl Player {
@@ -93,8 +93,8 @@ impl Hash for FoodType {
 }
 
 pub struct Food {
-    name: FoodType,
-    time_planted: Option<u64>,
+    pub name: FoodType,
+    pub time_planted: Option<u64>,
 }
 
 impl Food {
@@ -107,7 +107,7 @@ impl Food {
 }
 
 pub struct GardenVector {
-    inner: [Option<Food>; 10],
+    pub inner: [Option<Food>; 10],
 }
 
 impl GardenVector {

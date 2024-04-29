@@ -8,7 +8,6 @@ use {
         auth::msg_sender,
         block::timestamp,
         call_frames::{
-            contract_id,
             msg_asset_id,
         },
         constants::DEFAULT_SUB_ID,
@@ -97,9 +96,6 @@ impl GameContract for Contract {
             InvalidError::IncorrectAssetId(asset_id),
         );
 
-        // get the amount of coins sent
-        let message_amount = msg_amount();
-
         // set the price for each seed type 
         let mut price = match food_type {
             FoodType::Tomatoes => 750_000,
@@ -111,7 +107,7 @@ impl GameContract for Contract {
 
         // require that the amount is at least the price of the item
         require(
-            message_amount >= cost,
+            msg_amount() >= cost,
             InvalidError::NotEnoughTokens(amount),
         );
 
@@ -195,9 +191,9 @@ impl GameContract for Contract {
         let current_time = timestamp();
         let planted_time = food.time_planted.unwrap();
 
-        // let one_min = 120;
         // use this for testing
         let time = 0;
+        // let one_min = 120;
         // let time = one_min * 5;
         let finish_time = planted_time + time;
         // require X days to pass

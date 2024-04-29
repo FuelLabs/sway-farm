@@ -16,7 +16,7 @@ async fn get_contract_instance() -> (
         WalletsConfig::new(
             Some(4),             /* Four wallets */
             Some(1),             /* Single coin (UTXO) */
-            Some(1_000_000_000), /* Amount per coin */
+            Some(2_000_000_000), /* Amount per coin */
         ),
         None,
         None,
@@ -50,9 +50,8 @@ async fn can_play_game() {
     let wallet_1_id = Identity::Address(wallet_1.address().into());
 
     // create a new player with wallet 1
-    let new_player_rep = instance
+    let new_player_rep = instance.clone()
         .with_account(wallet_1.clone())
-        .unwrap()
         .methods()
         .new_player()
         .append_variable_outputs(1)
@@ -61,9 +60,8 @@ async fn can_play_game() {
     assert!(new_player_rep.is_ok());
 
     // make sure wallet_1 can't make a new player again
-    let new_player_err = instance
+    let new_player_err = instance.clone()
         .with_account(wallet_1.clone())
-        .unwrap()
         .methods()
         .new_player()
         .append_variable_outputs(1)
@@ -71,22 +69,13 @@ async fn can_play_game() {
         .await;
     assert!(new_player_err.is_err());
 
-    // error handling example
-    // let err = new_player_err.unwrap_err();
-    // let err_msg = match err {
-    //     Error::RevertTransactionError(string, _receipts) => string,
-    //     _ => String::from("not found")
-    // };
-    // println!("ERROR: {:?}", err_msg.contains("player already exists"));
-    // println!("ERROR 2: {}", err_msg);
-
     let contract_asset: AssetId = Bech32ContractId::asset_id(&id, &Bits256::zeroed());
 
     // check that tokens were minted to wallet_1
     let initial_balance = wallet_1.get_asset_balance(&contract_asset).await.unwrap();
     assert_eq!(initial_balance, 1_000_000_000);
 
-    let player = instance
+    let player = instance.clone()
         .methods()
         .get_player(wallet_1_id.clone())
         .simulate()
@@ -99,14 +88,19 @@ async fn can_play_game() {
     let call_params = CallParameters::with_asset_id(CallParameters::default(), contract_asset)
         .with_amount(price * amount);
 
+        let tx_policies = TxPolicies::default()
+        .with_tip(1)
+        .with_script_gas_limit(1_000_000)
+        .with_maturity(0);
+
     // buy 5 tomato seeds from wallet_1
-    let buy_seeds_resp = instance
+    let buy_seeds_resp = instance.clone()
         .with_account(wallet_1.clone())
-        .unwrap()
         .methods()
         .buy_seeds(FoodType::Tomatoes, amount)
         .call_params(call_params)
         .unwrap()
+        .with_tx_policies(tx_policies)
         .call()
         .await;
     assert!(buy_seeds_resp.is_ok());
@@ -114,7 +108,7 @@ async fn can_play_game() {
     let planted_balance = wallet_1.get_asset_balance(&contract_asset).await.unwrap();
     assert_eq!(planted_balance, initial_balance - (amount * price));
 
-    let seed_amount = instance
+    let seed_amount = instance.clone()
         .methods()
         .get_seed_amount(wallet_1_id.clone(), FoodType::Tomatoes)
         .simulate()
@@ -125,9 +119,8 @@ async fn can_play_game() {
     let index_vec: Vec<u64> = [0, 1, 2, 3, 4].into();
 
     // plant seeds from wallet_1 at the first 5 indexes
-    let plant_seeds_resp = instance
+    let plant_seeds_resp = instance.clone()
         .with_account(wallet_1.clone())
-        .unwrap()
         .methods()
         .plant_seeds(FoodType::Tomatoes, amount, index_vec)
         .call()
@@ -135,7 +128,7 @@ async fn can_play_game() {
     assert!(plant_seeds_resp.is_ok());
 
     // check how many seeds are planted
-    let garden_vec = instance
+    let garden_vec = instance.clone()
         .methods()
         .get_garden_vec(wallet_1_id.clone())
         .simulate()
@@ -149,9 +142,8 @@ async fn can_play_game() {
     assert!(garden_vec.value.inner[5].is_none());
 
     // harvest the first planted seed
-    let mut harvest_resp = instance
+    let mut harvest_resp = instance.clone()
         .with_account(wallet_1.clone())
-        .unwrap()
         .methods()
         .harvest(0)
         .append_variable_outputs(1)
@@ -160,7 +152,7 @@ async fn can_play_game() {
     assert!(harvest_resp.is_ok());
 
     // check if the player has a harvested item
-    let item_amount = instance
+    let item_amount = instance.clone()
         .methods()
         .get_item_amount(wallet_1_id.clone(), FoodType::Tomatoes)
         .simulate()
@@ -169,7 +161,7 @@ async fn can_play_game() {
     assert_eq!(item_amount.value, 1);
 
     // make sure the number of planted seeds decreased
-    let mut new_garden_vec = instance
+    let mut new_garden_vec = instance.clone()
         .methods()
         .get_garden_vec(wallet_1_id.clone())
         .simulate()
@@ -181,9 +173,8 @@ async fn can_play_game() {
     assert!(new_garden_vec.value.inner[3].is_some());
 
     // harvest another one at index 3
-    harvest_resp = instance
+    harvest_resp = instance.clone()
         .with_account(wallet_1.clone())
-        .unwrap()
         .methods()
         .harvest(3)
         .append_variable_outputs(1)
@@ -191,7 +182,7 @@ async fn can_play_game() {
         .await;
     assert!(harvest_resp.is_ok());
 
-    new_garden_vec = instance
+    new_garden_vec = instance.clone()
         .methods()
         .get_garden_vec(wallet_1_id.clone())
         .simulate()
@@ -203,9 +194,8 @@ async fn can_play_game() {
     assert!(new_garden_vec.value.inner[3].is_none());
 
     // sell 2 harvested
-    let sell_resp = instance
+    let sell_resp = instance.clone()
         .with_account(wallet_1.clone())
-        .unwrap()
         .methods()
         .sell_item(FoodType::Tomatoes, 2)
         .append_variable_outputs(1)
@@ -213,7 +203,7 @@ async fn can_play_game() {
         .await;
     assert!(sell_resp.is_ok());
 
-    let can_level_up = instance
+    let can_level_up = instance.clone()
         .methods()
         .can_level_up(wallet_1_id.clone())
         .simulate()
@@ -221,16 +211,15 @@ async fn can_play_game() {
         .unwrap();
     assert_eq!(can_level_up.value, true);
 
-    let level_up_rep = instance
+    let level_up_rep = instance.clone()
         .with_account(wallet_1.clone())
-        .unwrap()
         .methods()
         .level_up()
         .call()
         .await;
     assert!(level_up_rep.is_ok());
 
-    let player_resp = instance
+    let player_resp = instance.clone()
         .methods()
         .get_player(wallet_1_id.clone())
         .simulate()
@@ -247,28 +236,27 @@ async fn can_play_game() {
     let new_call_params =
         CallParameters::with_asset_id(CallParameters::default(), contract_asset).with_amount(price);
 
-    let buy_seeds_again_resp = instance
+    let buy_seeds_again_resp = instance.clone()
         .with_account(wallet_1.clone())
-        .unwrap()
         .methods()
         .buy_seeds(FoodType::Tomatoes, 1)
         .call_params(new_call_params)
         .unwrap()
+        .with_tx_policies(tx_policies)
         .call()
         .await;
     assert!(buy_seeds_again_resp.is_ok());
 
     // test plant seeds at index
-    let plant_seeds_at_index_resp = instance
+    let plant_seeds_at_index_resp = instance.clone()
         .with_account(wallet_1.clone())
-        .unwrap()
         .methods()
         .plant_seed_at_index(FoodType::Tomatoes, 7)
         .call()
         .await;
     assert!(plant_seeds_at_index_resp.is_ok());
 
-    new_garden_vec = instance
+    new_garden_vec = instance.clone()
         .methods()
         .get_garden_vec(wallet_1_id.clone())
         .simulate()
