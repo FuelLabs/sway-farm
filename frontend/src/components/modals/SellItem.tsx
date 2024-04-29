@@ -32,7 +32,6 @@ export default function SellItem({
         const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
         await contract.functions
           .sell_item(seedType, inputAmount)
-          .txParams({ gasPrice: 1, gasLimit: 800_000 })
           .call();
         updatePageNum();
         setStatus('none');

@@ -1,6 +1,5 @@
 import { cssObj } from '@fuel-ui/css';
-import type { Fuel, Asset } from '@fuels/assets';
-import type { BN } from 'fuels';
+import type { Asset, BN, NetworkFuel } from 'fuels';
 import { Vector3 } from 'three';
 
 import contractIds from './sway-api/contract-ids.json';
@@ -39,7 +38,7 @@ export const FARM_COIN_ASSET: Asset = {
   icon: 'https://sway-farm.vercel.app/images/pixel-bunny.png',
   name: 'Sway Farm Coin',
   symbol: 'FARM',
-  networks: [FARM_COIN_NETWORK_ASSET as Fuel],
+  networks: [FARM_COIN_NETWORK_ASSET as NetworkFuel],
 };
 
 export enum Controls {

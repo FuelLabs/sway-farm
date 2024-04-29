@@ -4,9 +4,9 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.79.0
-  Forc version: 0.49.3
-  Fuel-Core version: 0.22.1
+  Fuels version: 0.83.0
+  Forc version: 0.56.0
+  Fuel-Core version: 0.24.3
 */
 
 import { Interface, Contract, ContractFactory } from "fuels";
@@ -14,6 +14,7 @@ import type { Provider, Account, AbstractAddress, BytesLike, DeployContractOptio
 import type { ContractAbi, ContractAbiInterface } from "../ContractAbi";
 
 const _abi = {
+  "encoding": "1",
   "types": [
     {
       "typeId": 0,
@@ -31,7 +32,7 @@ const _abi = {
           "typeArguments": [
             {
               "name": "",
-              "type": 14,
+              "type": 15,
               "typeArguments": null
             }
           ]
@@ -74,7 +75,7 @@ const _abi = {
         },
         {
           "name": "ContractId",
-          "type": 13,
+          "type": 14,
           "typeArguments": null
         }
       ],
@@ -86,12 +87,12 @@ const _abi = {
       "components": [
         {
           "name": "NotEnoughTokens",
-          "type": 19,
+          "type": 25,
           "typeArguments": null
         },
         {
           "name": "NotEnoughSeeds",
-          "type": 19,
+          "type": 25,
           "typeArguments": null
         },
         {
@@ -144,7 +145,7 @@ const _abi = {
       "type": "struct Address",
       "components": [
         {
-          "name": "value",
+          "name": "bits",
           "type": 2,
           "typeArguments": null
         }
@@ -156,7 +157,7 @@ const _abi = {
       "type": "struct AssetId",
       "components": [
         {
-          "name": "value",
+          "name": "bits",
           "type": 2,
           "typeArguments": null
         }
@@ -165,11 +166,31 @@ const _abi = {
     },
     {
       "typeId": 13,
-      "type": "struct ContractId",
+      "type": "struct BuySeeds",
       "components": [
         {
-          "name": "value",
-          "type": 2,
+          "name": "address",
+          "type": 5,
+          "typeArguments": null
+        },
+        {
+          "name": "food_type",
+          "type": 4,
+          "typeArguments": null
+        },
+        {
+          "name": "amount_bought",
+          "type": 25,
+          "typeArguments": null
+        },
+        {
+          "name": "cost",
+          "type": 25,
+          "typeArguments": null
+        },
+        {
+          "name": "total_current_amount",
+          "type": 25,
           "typeArguments": null
         }
       ],
@@ -177,6 +198,18 @@ const _abi = {
     },
     {
       "typeId": 14,
+      "type": "struct ContractId",
+      "components": [
+        {
+          "name": "bits",
+          "type": 2,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 15,
       "type": "struct Food",
       "components": [
         {
@@ -190,7 +223,7 @@ const _abi = {
           "typeArguments": [
             {
               "name": "",
-              "type": 19,
+              "type": 25,
               "typeArguments": null
             }
           ]
@@ -199,7 +232,7 @@ const _abi = {
       "typeParameters": null
     },
     {
-      "typeId": 15,
+      "typeId": 16,
       "type": "struct GardenVector",
       "components": [
         {
@@ -211,24 +244,113 @@ const _abi = {
       "typeParameters": null
     },
     {
-      "typeId": 16,
-      "type": "struct Player",
+      "typeId": 17,
+      "type": "struct Harvest",
       "components": [
         {
-          "name": "farming_skill",
-          "type": 19,
+          "name": "address",
+          "type": 5,
           "typeArguments": null
         },
         {
-          "name": "total_value_sold",
-          "type": 19,
+          "name": "food_type",
+          "type": 4,
+          "typeArguments": null
+        },
+        {
+          "name": "index",
+          "type": 25,
+          "typeArguments": null
+        },
+        {
+          "name": "timestamp",
+          "type": 25,
           "typeArguments": null
         }
       ],
       "typeParameters": null
     },
     {
-      "typeId": 17,
+      "typeId": 18,
+      "type": "struct LevelUp",
+      "components": [
+        {
+          "name": "address",
+          "type": 5,
+          "typeArguments": null
+        },
+        {
+          "name": "player_info",
+          "type": 21,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 19,
+      "type": "struct NewPlayer",
+      "components": [
+        {
+          "name": "address",
+          "type": 5,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 20,
+      "type": "struct PlantSeeds",
+      "components": [
+        {
+          "name": "address",
+          "type": 5,
+          "typeArguments": null
+        },
+        {
+          "name": "food_type",
+          "type": 4,
+          "typeArguments": null
+        },
+        {
+          "name": "indexes",
+          "type": 24,
+          "typeArguments": [
+            {
+              "name": "",
+              "type": 25,
+              "typeArguments": null
+            }
+          ]
+        },
+        {
+          "name": "timestamp",
+          "type": 25,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 21,
+      "type": "struct Player",
+      "components": [
+        {
+          "name": "farming_skill",
+          "type": 25,
+          "typeArguments": null
+        },
+        {
+          "name": "total_value_sold",
+          "type": 25,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 22,
       "type": "struct RawVec",
       "components": [
         {
@@ -238,7 +360,7 @@ const _abi = {
         },
         {
           "name": "cap",
-          "type": 19,
+          "type": 25,
           "typeArguments": null
         }
       ],
@@ -247,12 +369,44 @@ const _abi = {
       ]
     },
     {
-      "typeId": 18,
+      "typeId": 23,
+      "type": "struct SellItem",
+      "components": [
+        {
+          "name": "address",
+          "type": 5,
+          "typeArguments": null
+        },
+        {
+          "name": "food_type",
+          "type": 4,
+          "typeArguments": null
+        },
+        {
+          "name": "amount_sold",
+          "type": 25,
+          "typeArguments": null
+        },
+        {
+          "name": "value_sold",
+          "type": 25,
+          "typeArguments": null
+        },
+        {
+          "name": "player_info",
+          "type": 21,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 24,
       "type": "struct Vec",
       "components": [
         {
           "name": "buf",
-          "type": 17,
+          "type": 22,
           "typeArguments": [
             {
               "name": "",
@@ -263,7 +417,7 @@ const _abi = {
         },
         {
           "name": "len",
-          "type": 19,
+          "type": 25,
           "typeArguments": null
         }
       ],
@@ -272,7 +426,7 @@ const _abi = {
       ]
     },
     {
-      "typeId": 19,
+      "typeId": 25,
       "type": "u64",
       "components": null,
       "typeParameters": null
@@ -288,7 +442,7 @@ const _abi = {
         },
         {
           "name": "amount",
-          "type": 19,
+          "type": 25,
           "typeArguments": null
         }
       ],
@@ -315,37 +469,8 @@ const _abi = {
     {
       "inputs": [
         {
-          "name": "food_type",
-          "type": 4,
-          "typeArguments": null
-        },
-        {
-          "name": "amount",
-          "type": 19,
-          "typeArguments": null
-        }
-      ],
-      "name": "buy_seeds_free",
-      "output": {
-        "name": "",
-        "type": 0,
-        "typeArguments": null
-      },
-      "attributes": [
-        {
-          "name": "storage",
-          "arguments": [
-            "read",
-            "write"
-          ]
-        }
-      ]
-    },
-    {
-      "inputs": [
-        {
           "name": "index",
-          "type": 19,
+          "type": 25,
           "typeArguments": null
         }
       ],
@@ -408,7 +533,7 @@ const _abi = {
       "name": "get_garden_vec",
       "output": {
         "name": "",
-        "type": 15,
+        "type": 16,
         "typeArguments": null
       },
       "attributes": [
@@ -436,7 +561,7 @@ const _abi = {
       "name": "get_item_amount",
       "output": {
         "name": "",
-        "type": 19,
+        "type": 25,
         "typeArguments": null
       },
       "attributes": [
@@ -463,7 +588,7 @@ const _abi = {
         "typeArguments": [
           {
             "name": "",
-            "type": 16,
+            "type": 21,
             "typeArguments": null
           }
         ]
@@ -493,7 +618,7 @@ const _abi = {
       "name": "get_seed_amount",
       "output": {
         "name": "",
-        "type": 19,
+        "type": 25,
         "typeArguments": null
       },
       "attributes": [
@@ -508,9 +633,15 @@ const _abi = {
     {
       "inputs": [
         {
-          "name": "index",
-          "type": 19,
-          "typeArguments": null
+          "name": "indexes",
+          "type": 24,
+          "typeArguments": [
+            {
+              "name": "",
+              "type": 25,
+              "typeArguments": null
+            }
+          ]
         }
       ],
       "name": "harvest",
@@ -573,46 +704,12 @@ const _abi = {
           "typeArguments": null
         },
         {
-          "name": "index",
-          "type": 19,
-          "typeArguments": null
-        }
-      ],
-      "name": "plant_seed_at_index",
-      "output": {
-        "name": "",
-        "type": 0,
-        "typeArguments": null
-      },
-      "attributes": [
-        {
-          "name": "storage",
-          "arguments": [
-            "read",
-            "write"
-          ]
-        }
-      ]
-    },
-    {
-      "inputs": [
-        {
-          "name": "food_type",
-          "type": 4,
-          "typeArguments": null
-        },
-        {
-          "name": "amount",
-          "type": 19,
-          "typeArguments": null
-        },
-        {
           "name": "indexes",
-          "type": 18,
+          "type": 24,
           "typeArguments": [
             {
               "name": "",
-              "type": 19,
+              "type": 25,
               "typeArguments": null
             }
           ]
@@ -643,7 +740,7 @@ const _abi = {
         },
         {
           "name": "amount",
-          "type": 19,
+          "type": 25,
           "typeArguments": null
         }
       ],
@@ -685,8 +782,8 @@ const _abi = {
       "logId": 2,
       "loggedType": {
         "name": "",
-        "type": 10,
-        "typeArguments": null
+        "type": 13,
+        "typeArguments": []
       }
     },
     {
@@ -701,8 +798,8 @@ const _abi = {
       "logId": 4,
       "loggedType": {
         "name": "",
-        "type": 10,
-        "typeArguments": null
+        "type": 17,
+        "typeArguments": []
       }
     },
     {
@@ -717,12 +814,20 @@ const _abi = {
       "logId": 6,
       "loggedType": {
         "name": "",
-        "type": 6,
-        "typeArguments": []
+        "type": 10,
+        "typeArguments": null
       }
     },
     {
       "logId": 7,
+      "loggedType": {
+        "name": "",
+        "type": 18,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 8,
       "loggedType": {
         "name": "",
         "type": 10,
@@ -730,7 +835,15 @@ const _abi = {
       }
     },
     {
-      "logId": 8,
+      "logId": 9,
+      "loggedType": {
+        "name": "",
+        "type": 19,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 10,
       "loggedType": {
         "name": "",
         "type": 6,
@@ -738,10 +851,138 @@ const _abi = {
       }
     },
     {
-      "logId": 9,
+      "logId": 11,
+      "loggedType": {
+        "name": "",
+        "type": 20,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 12,
       "loggedType": {
         "name": "",
         "type": 6,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 13,
+      "loggedType": {
+        "name": "",
+        "type": 23,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 14,
+      "loggedType": {
+        "name": "",
+        "type": 6,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 15,
+      "loggedType": {
+        "name": "",
+        "type": 6,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 16,
+      "loggedType": {
+        "name": "",
+        "type": 13,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 17,
+      "loggedType": {
+        "name": "",
+        "type": 10,
+        "typeArguments": null
+      }
+    },
+    {
+      "logId": 18,
+      "loggedType": {
+        "name": "",
+        "type": 17,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 19,
+      "loggedType": {
+        "name": "",
+        "type": 10,
+        "typeArguments": null
+      }
+    },
+    {
+      "logId": 20,
+      "loggedType": {
+        "name": "",
+        "type": 10,
+        "typeArguments": null
+      }
+    },
+    {
+      "logId": 21,
+      "loggedType": {
+        "name": "",
+        "type": 18,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 22,
+      "loggedType": {
+        "name": "",
+        "type": 10,
+        "typeArguments": null
+      }
+    },
+    {
+      "logId": 23,
+      "loggedType": {
+        "name": "",
+        "type": 19,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 24,
+      "loggedType": {
+        "name": "",
+        "type": 6,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 25,
+      "loggedType": {
+        "name": "",
+        "type": 20,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 26,
+      "loggedType": {
+        "name": "",
+        "type": 6,
+        "typeArguments": []
+      }
+    },
+    {
+      "logId": 27,
+      "loggedType": {
+        "name": "",
+        "type": 23,
         "typeArguments": []
       }
     }

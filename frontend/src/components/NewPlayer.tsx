@@ -39,8 +39,6 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
           .new_player()
           .txParams({
             variableOutputs: 1,
-            gasPrice: 1,
-            gasLimit: 800_000,
           })
           .call();
         setStatus('none');

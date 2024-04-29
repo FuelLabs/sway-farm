@@ -4,9 +4,9 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.79.0
-  Forc version: 0.49.3
-  Fuel-Core version: 0.22.1
+  Fuels version: 0.83.0
+  Forc version: 0.56.0
+  Fuel-Core version: 0.24.3
 */
 
 import type {
@@ -29,23 +29,34 @@ export type IdentityOutput = Enum<{ Address: AddressOutput, ContractId: Contract
 export type InvalidErrorInput = Enum<{ NotEnoughTokens: BigNumberish, NotEnoughSeeds: BigNumberish, IncorrectAssetId: AssetIdInput }>;
 export type InvalidErrorOutput = Enum<{ NotEnoughTokens: BN, NotEnoughSeeds: BN, IncorrectAssetId: AssetIdOutput }>;
 
-export type AddressInput = { value: string };
+export type AddressInput = { bits: string };
 export type AddressOutput = AddressInput;
-export type AssetIdInput = { value: string };
+export type AssetIdInput = { bits: string };
 export type AssetIdOutput = AssetIdInput;
-export type ContractIdInput = { value: string };
+export type BuySeedsInput = { address: IdentityInput, food_type: FoodTypeInput, amount_bought: BigNumberish, cost: BigNumberish, total_current_amount: BigNumberish };
+export type BuySeedsOutput = { address: IdentityOutput, food_type: FoodTypeOutput, amount_bought: BN, cost: BN, total_current_amount: BN };
+export type ContractIdInput = { bits: string };
 export type ContractIdOutput = ContractIdInput;
 export type FoodInput = { name: FoodTypeInput, time_planted: Option<BigNumberish> };
 export type FoodOutput = { name: FoodTypeOutput, time_planted: Option<BN> };
 export type GardenVectorInput = { inner: [Option<FoodInput>, Option<FoodInput>, Option<FoodInput>, Option<FoodInput>, Option<FoodInput>, Option<FoodInput>, Option<FoodInput>, Option<FoodInput>, Option<FoodInput>, Option<FoodInput>] };
 export type GardenVectorOutput = { inner: [Option<FoodOutput>, Option<FoodOutput>, Option<FoodOutput>, Option<FoodOutput>, Option<FoodOutput>, Option<FoodOutput>, Option<FoodOutput>, Option<FoodOutput>, Option<FoodOutput>, Option<FoodOutput>] };
+export type HarvestInput = { address: IdentityInput, food_type: FoodTypeInput, index: BigNumberish, timestamp: BigNumberish };
+export type HarvestOutput = { address: IdentityOutput, food_type: FoodTypeOutput, index: BN, timestamp: BN };
+export type LevelUpInput = { address: IdentityInput, player_info: PlayerInput };
+export type LevelUpOutput = { address: IdentityOutput, player_info: PlayerOutput };
+export type NewPlayerInput = { address: IdentityInput };
+export type NewPlayerOutput = { address: IdentityOutput };
+export type PlantSeedsInput = { address: IdentityInput, food_type: FoodTypeInput, indexes: Vec<BigNumberish>, timestamp: BigNumberish };
+export type PlantSeedsOutput = { address: IdentityOutput, food_type: FoodTypeOutput, indexes: Vec<BN>, timestamp: BN };
 export type PlayerInput = { farming_skill: BigNumberish, total_value_sold: BigNumberish };
 export type PlayerOutput = { farming_skill: BN, total_value_sold: BN };
+export type SellItemInput = { address: IdentityInput, food_type: FoodTypeInput, amount_sold: BigNumberish, value_sold: BigNumberish, player_info: PlayerInput };
+export type SellItemOutput = { address: IdentityOutput, food_type: FoodTypeOutput, amount_sold: BN, value_sold: BN, player_info: PlayerOutput };
 
 interface ContractAbiInterface extends Interface {
   functions: {
     buy_seeds: FunctionFragment;
-    buy_seeds_free: FunctionFragment;
     can_harvest: FunctionFragment;
     can_level_up: FunctionFragment;
     get_asset_id: FunctionFragment;
@@ -56,13 +67,11 @@ interface ContractAbiInterface extends Interface {
     harvest: FunctionFragment;
     level_up: FunctionFragment;
     new_player: FunctionFragment;
-    plant_seed_at_index: FunctionFragment;
     plant_seeds: FunctionFragment;
     sell_item: FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: 'buy_seeds', values: [FoodTypeInput, BigNumberish]): Uint8Array;
-  encodeFunctionData(functionFragment: 'buy_seeds_free', values: [FoodTypeInput, BigNumberish]): Uint8Array;
   encodeFunctionData(functionFragment: 'can_harvest', values: [BigNumberish]): Uint8Array;
   encodeFunctionData(functionFragment: 'can_level_up', values: [IdentityInput]): Uint8Array;
   encodeFunctionData(functionFragment: 'get_asset_id', values: []): Uint8Array;
@@ -70,15 +79,13 @@ interface ContractAbiInterface extends Interface {
   encodeFunctionData(functionFragment: 'get_item_amount', values: [IdentityInput, FoodTypeInput]): Uint8Array;
   encodeFunctionData(functionFragment: 'get_player', values: [IdentityInput]): Uint8Array;
   encodeFunctionData(functionFragment: 'get_seed_amount', values: [IdentityInput, FoodTypeInput]): Uint8Array;
-  encodeFunctionData(functionFragment: 'harvest', values: [BigNumberish]): Uint8Array;
+  encodeFunctionData(functionFragment: 'harvest', values: [Vec<BigNumberish>]): Uint8Array;
   encodeFunctionData(functionFragment: 'level_up', values: []): Uint8Array;
   encodeFunctionData(functionFragment: 'new_player', values: []): Uint8Array;
-  encodeFunctionData(functionFragment: 'plant_seed_at_index', values: [FoodTypeInput, BigNumberish]): Uint8Array;
-  encodeFunctionData(functionFragment: 'plant_seeds', values: [FoodTypeInput, BigNumberish, Vec<BigNumberish>]): Uint8Array;
+  encodeFunctionData(functionFragment: 'plant_seeds', values: [FoodTypeInput, Vec<BigNumberish>]): Uint8Array;
   encodeFunctionData(functionFragment: 'sell_item', values: [FoodTypeInput, BigNumberish]): Uint8Array;
 
   decodeFunctionData(functionFragment: 'buy_seeds', data: BytesLike): DecodedValue;
-  decodeFunctionData(functionFragment: 'buy_seeds_free', data: BytesLike): DecodedValue;
   decodeFunctionData(functionFragment: 'can_harvest', data: BytesLike): DecodedValue;
   decodeFunctionData(functionFragment: 'can_level_up', data: BytesLike): DecodedValue;
   decodeFunctionData(functionFragment: 'get_asset_id', data: BytesLike): DecodedValue;
@@ -89,7 +96,6 @@ interface ContractAbiInterface extends Interface {
   decodeFunctionData(functionFragment: 'harvest', data: BytesLike): DecodedValue;
   decodeFunctionData(functionFragment: 'level_up', data: BytesLike): DecodedValue;
   decodeFunctionData(functionFragment: 'new_player', data: BytesLike): DecodedValue;
-  decodeFunctionData(functionFragment: 'plant_seed_at_index', data: BytesLike): DecodedValue;
   decodeFunctionData(functionFragment: 'plant_seeds', data: BytesLike): DecodedValue;
   decodeFunctionData(functionFragment: 'sell_item', data: BytesLike): DecodedValue;
 }
@@ -98,7 +104,6 @@ export class ContractAbi extends Contract {
   interface: ContractAbiInterface;
   functions: {
     buy_seeds: InvokeFunction<[food_type: FoodTypeInput, amount: BigNumberish], void>;
-    buy_seeds_free: InvokeFunction<[food_type: FoodTypeInput, amount: BigNumberish], void>;
     can_harvest: InvokeFunction<[index: BigNumberish], boolean>;
     can_level_up: InvokeFunction<[id: IdentityInput], boolean>;
     get_asset_id: InvokeFunction<[], AssetIdOutput>;
@@ -106,11 +111,10 @@ export class ContractAbi extends Contract {
     get_item_amount: InvokeFunction<[id: IdentityInput, item: FoodTypeInput], BN>;
     get_player: InvokeFunction<[id: IdentityInput], Option<PlayerOutput>>;
     get_seed_amount: InvokeFunction<[id: IdentityInput, item: FoodTypeInput], BN>;
-    harvest: InvokeFunction<[index: BigNumberish], void>;
+    harvest: InvokeFunction<[indexes: Vec<BigNumberish>], void>;
     level_up: InvokeFunction<[], void>;
     new_player: InvokeFunction<[], void>;
-    plant_seed_at_index: InvokeFunction<[food_type: FoodTypeInput, index: BigNumberish], void>;
-    plant_seeds: InvokeFunction<[food_type: FoodTypeInput, amount: BigNumberish, indexes: Vec<BigNumberish>], void>;
+    plant_seeds: InvokeFunction<[food_type: FoodTypeInput, indexes: Vec<BigNumberish>], void>;
     sell_item: InvokeFunction<[food_type: FoodTypeInput, amount: BigNumberish], void>;
   };
 }

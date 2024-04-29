@@ -4,23 +4,23 @@
 /* eslint-disable */
 
 /*
-  Fuels version: 0.79.0
-  Forc version: 0.49.3
-  Fuel-Core version: 0.22.1
+  Fuels version: 0.83.0
+  Forc version: 0.56.0
+  Fuel-Core version: 0.24.3
 */
 
-/*
-  Mimics Sway Enum, requires at least one Key-Value but
-  does not raise error on multiple pairs.
-  This is done in the abi-coder
-*/
-export type Enum<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> &
-  U[keyof U];
+/**
+ * Mimics Sway Enum.
+ * Requires one and only one Key-Value pair and raises error if more are provided.
+ */
+export type Enum<T> = {
+  [K in keyof T]: Pick<T, K> & { [P in Exclude<keyof T, K>]?: never };
+}[keyof T];
 
-/*
-  Mimics Sway Option and Vectors.
-  Vectors are treated like arrays in Typescript.
-*/
+/**
+ * Mimics Sway Option and Vectors.
+ * Vectors are treated like arrays in Typescript.
+ */
 export type Option<T> = T | undefined;
 
 export type Vec<T> = T[];

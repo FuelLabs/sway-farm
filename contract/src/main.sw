@@ -144,14 +144,8 @@ impl GameContract for Contract {
     }
 
     #[storage(read, write)]
-    fn plant_seeds(food_type: FoodType, amount: u64, indexes: Vec<u64>) {
-        // make sure the indexes length is equal to the amount
-        require(
-            indexes
-                .len() == amount,
-            "amount is not equal to indexes length",
-        );
-
+    fn plant_seeds(food_type: FoodType, indexes: Vec<u64>) {
+        let amount = indexes.len();
         // get the sender
         let sender = msg_sender().unwrap();
         // require player has this many seeds

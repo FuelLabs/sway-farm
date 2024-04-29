@@ -33,8 +33,7 @@ export default function PlantModal({
         setCanMove(false);
         const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
         await contract.functions
-          .plant_seed_at_index(seedType, tileArray[0])
-          .txParams({ gasPrice: 1, gasLimit: 800_000 })
+          .plant_seeds(seedType, tileArray)
           .call();
 
         updatePageNum();

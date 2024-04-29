@@ -20,7 +20,7 @@ abi GameContract {
 
     // plant any amount of 1 type of seed
     #[storage(read, write)]
-    fn plant_seeds(food_type: FoodType, amount: u64, indexes: Vec<u64>);
+    fn plant_seeds(food_type: FoodType, indexes: Vec<u64>);
 
     // harvest grown seeds at certain indexes
     #[storage(read, write)]

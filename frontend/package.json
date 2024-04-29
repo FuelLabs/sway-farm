@@ -20,7 +20,7 @@
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@vercel/analytics": "^1.0.0",
-    "fuels": "^0.79.0",
+    "fuels": "^0.83.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -36,7 +36,8 @@
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "prettier:check": "prettier --check .",
-    "prettier:format": "prettier --write ."
+    "prettier:format": "prettier --write .",
+    "build-types": "fuels build"
   },
   "eslintConfig": {
     "extends": [

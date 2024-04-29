@@ -65,17 +65,13 @@ export default function Game({ contract, isMobile, farmCoinAssetID }: GameProps)
       if (contract && contract.account) {
         try {
           const address: AddressInput = {
-            value: contract.account.address.toB256(),
+            bits: contract.account.address.toB256(),
           };
           const id: IdentityInput = { Address: address };
           const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
           // get the player first
           const { value: Some } = await contract.functions
             .get_player(id)
-            .txParams({
-              gasPrice: 1,
-              gasLimit: 800_000,
-            })
             .get();
           if (Some?.farming_skill.gte(1)) {
             setPlayer(Some);
@@ -85,10 +81,6 @@ export default function Game({ contract, isMobile, farmCoinAssetID }: GameProps)
                 contract.functions.get_seed_amount(id, seedType),
                 contract.functions.get_item_amount(id, seedType),
               ])
-              .txParams({
-                gasPrice: 1,
-                gasLimit: 800_000,
-              })
               .get();
             const seedAmount = new BN(results[0]).toNumber();
             setSeeds(seedAmount);

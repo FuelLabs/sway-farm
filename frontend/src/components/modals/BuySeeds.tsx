@@ -40,7 +40,6 @@ export default function BuySeeds({
           .callParams({
             forward: [price, farmCoinAssetID],
           })
-          .txParams({ gasPrice: 1, gasLimit: 800_000 })
           .call();
         updatePageNum();
         setStatus('none');

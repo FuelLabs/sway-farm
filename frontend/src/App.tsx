@@ -96,7 +96,7 @@ function App() {
     if(contract){
       const { value } = await contract.functions.get_asset_id().get();
       console.log("VALUE:", value)
-      setFarmCoinAssetId(value.value);
+      setFarmCoinAssetId(value.bits);
     }
   }
     getAssetId();

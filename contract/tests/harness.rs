@@ -125,7 +125,7 @@ async fn can_play_game() {
     let plant_seeds_resp = instance.clone()
         .with_account(wallet_1.clone())
         .methods()
-        .plant_seeds(FoodType::Tomatoes, amount, index_vec)
+        .plant_seeds(FoodType::Tomatoes, index_vec)
         .call()
         .await;
     assert!(plant_seeds_resp.is_ok());
