@@ -763,7 +763,7 @@ const _abi = {
   ],
   "loggedTypes": [
     {
-      "logId": 0,
+      "logId": "9629041069892043071",
       "loggedType": {
         "name": "",
         "type": 6,
@@ -771,15 +771,7 @@ const _abi = {
       }
     },
     {
-      "logId": 1,
-      "loggedType": {
-        "name": "",
-        "type": 6,
-        "typeArguments": []
-      }
-    },
-    {
-      "logId": 2,
+      "logId": "5635241471306563277",
       "loggedType": {
         "name": "",
         "type": 13,
@@ -787,7 +779,7 @@ const _abi = {
       }
     },
     {
-      "logId": 3,
+      "logId": "10098701174489624218",
       "loggedType": {
         "name": "",
         "type": 10,
@@ -795,7 +787,7 @@ const _abi = {
       }
     },
     {
-      "logId": 4,
+      "logId": "9571889411291565070",
       "loggedType": {
         "name": "",
         "type": 17,
@@ -803,23 +795,7 @@ const _abi = {
       }
     },
     {
-      "logId": 5,
-      "loggedType": {
-        "name": "",
-        "type": 10,
-        "typeArguments": null
-      }
-    },
-    {
-      "logId": 6,
-      "loggedType": {
-        "name": "",
-        "type": 10,
-        "typeArguments": null
-      }
-    },
-    {
-      "logId": 7,
+      "logId": "9956391856148830557",
       "loggedType": {
         "name": "",
         "type": 18,
@@ -827,15 +803,7 @@ const _abi = {
       }
     },
     {
-      "logId": 8,
-      "loggedType": {
-        "name": "",
-        "type": 10,
-        "typeArguments": null
-      }
-    },
-    {
-      "logId": 9,
+      "logId": "169340015036328252",
       "loggedType": {
         "name": "",
         "type": 19,
@@ -843,15 +811,7 @@ const _abi = {
       }
     },
     {
-      "logId": 10,
-      "loggedType": {
-        "name": "",
-        "type": 6,
-        "typeArguments": []
-      }
-    },
-    {
-      "logId": 11,
+      "logId": "13879707519245890900",
       "loggedType": {
         "name": "",
         "type": 20,
@@ -859,127 +819,7 @@ const _abi = {
       }
     },
     {
-      "logId": 12,
-      "loggedType": {
-        "name": "",
-        "type": 6,
-        "typeArguments": []
-      }
-    },
-    {
-      "logId": 13,
-      "loggedType": {
-        "name": "",
-        "type": 23,
-        "typeArguments": []
-      }
-    },
-    {
-      "logId": 14,
-      "loggedType": {
-        "name": "",
-        "type": 6,
-        "typeArguments": []
-      }
-    },
-    {
-      "logId": 15,
-      "loggedType": {
-        "name": "",
-        "type": 6,
-        "typeArguments": []
-      }
-    },
-    {
-      "logId": 16,
-      "loggedType": {
-        "name": "",
-        "type": 13,
-        "typeArguments": []
-      }
-    },
-    {
-      "logId": 17,
-      "loggedType": {
-        "name": "",
-        "type": 10,
-        "typeArguments": null
-      }
-    },
-    {
-      "logId": 18,
-      "loggedType": {
-        "name": "",
-        "type": 17,
-        "typeArguments": []
-      }
-    },
-    {
-      "logId": 19,
-      "loggedType": {
-        "name": "",
-        "type": 10,
-        "typeArguments": null
-      }
-    },
-    {
-      "logId": 20,
-      "loggedType": {
-        "name": "",
-        "type": 10,
-        "typeArguments": null
-      }
-    },
-    {
-      "logId": 21,
-      "loggedType": {
-        "name": "",
-        "type": 18,
-        "typeArguments": []
-      }
-    },
-    {
-      "logId": 22,
-      "loggedType": {
-        "name": "",
-        "type": 10,
-        "typeArguments": null
-      }
-    },
-    {
-      "logId": 23,
-      "loggedType": {
-        "name": "",
-        "type": 19,
-        "typeArguments": []
-      }
-    },
-    {
-      "logId": 24,
-      "loggedType": {
-        "name": "",
-        "type": 6,
-        "typeArguments": []
-      }
-    },
-    {
-      "logId": 25,
-      "loggedType": {
-        "name": "",
-        "type": 20,
-        "typeArguments": []
-      }
-    },
-    {
-      "logId": 26,
-      "loggedType": {
-        "name": "",
-        "type": 6,
-        "typeArguments": []
-      }
-    },
-    {
-      "logId": 27,
+      "logId": "11192939610819626128",
       "loggedType": {
         "name": "",
         "type": 23,

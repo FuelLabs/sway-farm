@@ -15,7 +15,7 @@ export const CONTRACT_ID =
   // VERCEL_ENV === 'development'
     // ? contractIds.contract
     // : 
-    '0x246ed929413907bc7c3078e481f9dd7edcabcd9730b6795f3f9522b85c5bfb39';
+    '0xa53ec4582f372a093dbe529d52aafc236166e90a8484c58b636a91f1dbb2c8cc';
 
 export const FARM_COIN_ASSET_ID =  VERCEL_ENV === 'development'
 ? null :
