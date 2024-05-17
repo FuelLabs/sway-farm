@@ -144,40 +144,26 @@ impl GameContract for Contract {
     }
 
     #[storage(read, write)]
-    fn plant_seeds(food_type: FoodType, indexes: Vec<u64>) {
-        let amount = indexes.len();
+    fn plant_seed_at_index(food_type: FoodType, index: u64) {
         // get the sender
         let sender = msg_sender().unwrap();
         // require player has this many seeds
         let current_amount_option = storage.player_seeds.get((sender, food_type)).try_read();
         let current_amount = current_amount_option.unwrap_or(0);
         require(
-            current_amount >= amount,
-            InvalidError::NotEnoughSeeds(amount),
+            current_amount >= 1,
+            InvalidError::NotEnoughSeeds(current_amount),
         );
-        let new_amount = current_amount - amount;
+
+        let new_amount = current_amount - 1;
         //  update amount from player_seeds
         storage.player_seeds.insert((sender, food_type), new_amount);
 
-        let mut count = 0;
+        let mut vec = storage.planted_seeds.get(sender).try_read().unwrap();
+        let food = Food::new(food_type, Some(timestamp()));
+        vec.plant_at_index(food, index);
 
-        // add the amount of food structs to planted_seeds
-        let mut vec = GardenVector::new();
-        let time = timestamp();
-        while count < amount {
-            let food = Food::new(food_type, Some(time));
-            let index = indexes.get(count).unwrap();
-            vec.plant_at_index(food, index);
-            count += 1;
-        }
         storage.planted_seeds.insert(sender, vec);
-
-        log(PlantSeeds {
-            address: sender,
-            food_type,
-            indexes,
-            timestamp: time,
-        });
     }
 
     #[storage(read, write)]

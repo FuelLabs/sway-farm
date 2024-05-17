@@ -47,8 +47,6 @@ export type LevelUpInput = { address: IdentityInput, player_info: PlayerInput };
 export type LevelUpOutput = { address: IdentityOutput, player_info: PlayerOutput };
 export type NewPlayerInput = { address: IdentityInput };
 export type NewPlayerOutput = { address: IdentityOutput };
-export type PlantSeedsInput = { address: IdentityInput, food_type: FoodTypeInput, indexes: Vec<BigNumberish>, timestamp: BigNumberish };
-export type PlantSeedsOutput = { address: IdentityOutput, food_type: FoodTypeOutput, indexes: Vec<BN>, timestamp: BN };
 export type PlayerInput = { farming_skill: BigNumberish, total_value_sold: BigNumberish };
 export type PlayerOutput = { farming_skill: BN, total_value_sold: BN };
 export type SellItemInput = { address: IdentityInput, food_type: FoodTypeInput, amount_sold: BigNumberish, value_sold: BigNumberish, player_info: PlayerInput };
@@ -67,7 +65,7 @@ interface ContractAbiInterface extends Interface {
     harvest: FunctionFragment;
     level_up: FunctionFragment;
     new_player: FunctionFragment;
-    plant_seeds: FunctionFragment;
+    plant_seed_at_index: FunctionFragment;
     sell_item: FunctionFragment;
   };
 
@@ -82,7 +80,7 @@ interface ContractAbiInterface extends Interface {
   encodeFunctionData(functionFragment: 'harvest', values: [Vec<BigNumberish>]): Uint8Array;
   encodeFunctionData(functionFragment: 'level_up', values: []): Uint8Array;
   encodeFunctionData(functionFragment: 'new_player', values: []): Uint8Array;
-  encodeFunctionData(functionFragment: 'plant_seeds', values: [FoodTypeInput, Vec<BigNumberish>]): Uint8Array;
+  encodeFunctionData(functionFragment: 'plant_seed_at_index', values: [FoodTypeInput, BigNumberish]): Uint8Array;
   encodeFunctionData(functionFragment: 'sell_item', values: [FoodTypeInput, BigNumberish]): Uint8Array;
 
   decodeFunctionData(functionFragment: 'buy_seeds', data: BytesLike): DecodedValue;
@@ -96,7 +94,7 @@ interface ContractAbiInterface extends Interface {
   decodeFunctionData(functionFragment: 'harvest', data: BytesLike): DecodedValue;
   decodeFunctionData(functionFragment: 'level_up', data: BytesLike): DecodedValue;
   decodeFunctionData(functionFragment: 'new_player', data: BytesLike): DecodedValue;
-  decodeFunctionData(functionFragment: 'plant_seeds', data: BytesLike): DecodedValue;
+  decodeFunctionData(functionFragment: 'plant_seed_at_index', data: BytesLike): DecodedValue;
   decodeFunctionData(functionFragment: 'sell_item', data: BytesLike): DecodedValue;
 }
 
@@ -114,7 +112,7 @@ export class ContractAbi extends Contract {
     harvest: InvokeFunction<[indexes: Vec<BigNumberish>], void>;
     level_up: InvokeFunction<[], void>;
     new_player: InvokeFunction<[], void>;
-    plant_seeds: InvokeFunction<[food_type: FoodTypeInput, indexes: Vec<BigNumberish>], void>;
+    plant_seed_at_index: InvokeFunction<[food_type: FoodTypeInput, index: BigNumberish], void>;
     sell_item: InvokeFunction<[food_type: FoodTypeInput, amount: BigNumberish], void>;
   };
 }

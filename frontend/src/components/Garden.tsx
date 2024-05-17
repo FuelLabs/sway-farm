@@ -35,7 +35,7 @@ export default function Garden({
           const { value } = await contract.functions
             .get_garden_vec(id)
             .get();
-          console.log("VALUE:", value)
+          // console.log("VALUE:", value)
           setTileStates(value);
         } catch (err) {
           console.log('Error in Garden:', err);
