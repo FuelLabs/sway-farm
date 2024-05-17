@@ -3,7 +3,7 @@ import { Button, BoxCentered, Link } from '@fuel-ui/react';
 import { useWallet } from '@fuels/react';
 import { useState, useEffect } from 'react';
 
-import { BASE_ASSET_ID, buttonStyle } from '../constants';
+import { TESTNET_FAUCET_URL, buttonStyle } from '../constants';
 import type { ContractAbi } from '../sway-api';
 
 import Loading from './Loading';
@@ -21,8 +21,11 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
   useEffect(() => {
     async function getBalance() {
       const thisWallet = wallet ?? contract?.account;
-      const balance = await thisWallet!.getBalance(BASE_ASSET_ID);
+      const baseAssetId = thisWallet?.provider.getBaseAssetId();
+      const balance = await thisWallet!.getBalance(baseAssetId);
+      // console.log("BALANCE:", balance)
       const balanceNum = balance?.toNumber();
+      // console.log("BALANCENum:", balanceNum)
 
       if (balanceNum) {
         setHasFunds(balanceNum > 0);
@@ -44,7 +47,7 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
         setStatus('none');
         updatePageNum();
       } catch (err) {
-        console.log('Error:', err);
+        console.log('Error in NewPlayer:', err);
         setStatus('error');
       }
     } else {
@@ -66,7 +69,7 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
             You need some ETH to play:
             <Link
               isExternal
-              href={`https://faucet-beta-5.fuel.network/${
+              href={`${TESTNET_FAUCET_URL}${
                 contract && contract.account
                   ? `?address=${contract.account.address.toAddress()}`
                   : ''

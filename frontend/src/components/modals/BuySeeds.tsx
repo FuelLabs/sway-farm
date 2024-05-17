@@ -44,7 +44,7 @@ export default function BuySeeds({
         updatePageNum();
         setStatus('none');
       } catch (err) {
-        console.log('Error:', err);
+        console.log('Error in BuySeeds:', err);
         setStatus('error');
       }
       setCanMove(true);

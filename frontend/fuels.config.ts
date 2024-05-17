@@ -3,8 +3,6 @@ import { createConfig } from 'fuels';
 export default createConfig({
   contracts: ['../contract'],
   output: './src/sway-api',
-  useBuiltinForc: false,
-  chainConfig: './chainConfig.json',
 });
 
 /**

@@ -68,13 +68,13 @@ export default function Game({ contract, isMobile, farmCoinAssetID }: GameProps)
             bits: contract.account.address.toB256(),
           };
           const id: IdentityInput = { Address: address };
-          const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
           // get the player first
           const { value: Some } = await contract.functions
-            .get_player(id)
-            .get();
+          .get_player(id)
+          .get();
           if (Some?.farming_skill.gte(1)) {
             setPlayer(Some);
+            const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
             // if there is a player found, get the rest of the player info
             const { value: results } = await contract
               .multiCall([
@@ -88,7 +88,7 @@ export default function Game({ contract, isMobile, farmCoinAssetID }: GameProps)
             setItems(itemAmount);
           }
         } catch (err) {
-          console.log('Error:', err);
+          console.log('Error in Game:', err);
           setStatus('error');
         }
         setStatus('none');

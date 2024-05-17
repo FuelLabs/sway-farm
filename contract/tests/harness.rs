@@ -144,6 +144,8 @@ async fn can_play_game() {
     assert!(garden_vec.value.inner[4].is_some());
     assert!(garden_vec.value.inner[5].is_none());
 
+    println!("GARDEN VEC:{:?}", garden_vec);
+
     // harvest the first planted seed
     let mut harvest_resp = instance.clone()
         .with_account(wallet_1.clone())

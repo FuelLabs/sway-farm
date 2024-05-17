@@ -36,7 +36,7 @@ export default function SellItem({
         updatePageNum();
         setStatus('none');
       } catch (err) {
-        console.log('Error:', err);
+        console.log('Error in SellItem:', err);
         setStatus('error');
       }
       setCanMove(true);

@@ -39,7 +39,7 @@ export default function PlantModal({
         updatePageNum();
         setStatus('none');
       } catch (err) {
-        console.log('Error!!', err);
+        console.log('Error in PlantModal', err);
         setStatus('error');
       }
       setCanMove(true);
