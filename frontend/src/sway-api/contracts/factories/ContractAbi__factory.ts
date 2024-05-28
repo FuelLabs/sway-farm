@@ -87,12 +87,12 @@ const _abi = {
       "components": [
         {
           "name": "NotEnoughTokens",
-          "type": 24,
+          "type": 25,
           "typeArguments": null
         },
         {
           "name": "NotEnoughSeeds",
-          "type": 24,
+          "type": 25,
           "typeArguments": null
         },
         {
@@ -180,17 +180,17 @@ const _abi = {
         },
         {
           "name": "amount_bought",
-          "type": 24,
+          "type": 25,
           "typeArguments": null
         },
         {
           "name": "cost",
-          "type": 24,
+          "type": 25,
           "typeArguments": null
         },
         {
           "name": "total_current_amount",
-          "type": 24,
+          "type": 25,
           "typeArguments": null
         }
       ],
@@ -223,7 +223,7 @@ const _abi = {
           "typeArguments": [
             {
               "name": "",
-              "type": 24,
+              "type": 25,
               "typeArguments": null
             }
           ]
@@ -259,12 +259,12 @@ const _abi = {
         },
         {
           "name": "index",
-          "type": 24,
+          "type": 25,
           "typeArguments": null
         },
         {
           "name": "timestamp",
-          "type": 24,
+          "type": 25,
           "typeArguments": null
         }
       ],
@@ -281,7 +281,7 @@ const _abi = {
         },
         {
           "name": "player_info",
-          "type": 20,
+          "type": 21,
           "typeArguments": null
         }
       ],
@@ -301,16 +301,26 @@ const _abi = {
     },
     {
       "typeId": 20,
-      "type": "struct Player",
+      "type": "struct PlantSeed",
       "components": [
         {
-          "name": "farming_skill",
-          "type": 24,
+          "name": "address",
+          "type": 5,
           "typeArguments": null
         },
         {
-          "name": "total_value_sold",
-          "type": 24,
+          "name": "food_type",
+          "type": 4,
+          "typeArguments": null
+        },
+        {
+          "name": "index",
+          "type": 25,
+          "typeArguments": null
+        },
+        {
+          "name": "timestamp",
+          "type": 25,
           "typeArguments": null
         }
       ],
@@ -318,6 +328,23 @@ const _abi = {
     },
     {
       "typeId": 21,
+      "type": "struct Player",
+      "components": [
+        {
+          "name": "farming_skill",
+          "type": 25,
+          "typeArguments": null
+        },
+        {
+          "name": "total_value_sold",
+          "type": 25,
+          "typeArguments": null
+        }
+      ],
+      "typeParameters": null
+    },
+    {
+      "typeId": 22,
       "type": "struct RawVec",
       "components": [
         {
@@ -327,7 +354,7 @@ const _abi = {
         },
         {
           "name": "cap",
-          "type": 24,
+          "type": 25,
           "typeArguments": null
         }
       ],
@@ -336,7 +363,7 @@ const _abi = {
       ]
     },
     {
-      "typeId": 22,
+      "typeId": 23,
       "type": "struct SellItem",
       "components": [
         {
@@ -351,29 +378,29 @@ const _abi = {
         },
         {
           "name": "amount_sold",
-          "type": 24,
+          "type": 25,
           "typeArguments": null
         },
         {
           "name": "value_sold",
-          "type": 24,
+          "type": 25,
           "typeArguments": null
         },
         {
           "name": "player_info",
-          "type": 20,
+          "type": 21,
           "typeArguments": null
         }
       ],
       "typeParameters": null
     },
     {
-      "typeId": 23,
+      "typeId": 24,
       "type": "struct Vec",
       "components": [
         {
           "name": "buf",
-          "type": 21,
+          "type": 22,
           "typeArguments": [
             {
               "name": "",
@@ -384,7 +411,7 @@ const _abi = {
         },
         {
           "name": "len",
-          "type": 24,
+          "type": 25,
           "typeArguments": null
         }
       ],
@@ -393,7 +420,7 @@ const _abi = {
       ]
     },
     {
-      "typeId": 24,
+      "typeId": 25,
       "type": "u64",
       "components": null,
       "typeParameters": null
@@ -409,7 +436,7 @@ const _abi = {
         },
         {
           "name": "amount",
-          "type": 24,
+          "type": 25,
           "typeArguments": null
         }
       ],
@@ -437,7 +464,7 @@ const _abi = {
       "inputs": [
         {
           "name": "index",
-          "type": 24,
+          "type": 25,
           "typeArguments": null
         }
       ],
@@ -528,7 +555,7 @@ const _abi = {
       "name": "get_item_amount",
       "output": {
         "name": "",
-        "type": 24,
+        "type": 25,
         "typeArguments": null
       },
       "attributes": [
@@ -555,7 +582,7 @@ const _abi = {
         "typeArguments": [
           {
             "name": "",
-            "type": 20,
+            "type": 21,
             "typeArguments": null
           }
         ]
@@ -585,7 +612,7 @@ const _abi = {
       "name": "get_seed_amount",
       "output": {
         "name": "",
-        "type": 24,
+        "type": 25,
         "typeArguments": null
       },
       "attributes": [
@@ -601,11 +628,11 @@ const _abi = {
       "inputs": [
         {
           "name": "indexes",
-          "type": 23,
+          "type": 24,
           "typeArguments": [
             {
               "name": "",
-              "type": 24,
+              "type": 25,
               "typeArguments": null
             }
           ]
@@ -672,7 +699,7 @@ const _abi = {
         },
         {
           "name": "index",
-          "type": 24,
+          "type": 25,
           "typeArguments": null
         }
       ],
@@ -701,7 +728,7 @@ const _abi = {
         },
         {
           "name": "amount",
-          "type": 24,
+          "type": 25,
           "typeArguments": null
         }
       ],
@@ -772,10 +799,18 @@ const _abi = {
       }
     },
     {
+      "logId": "3925692269668348193",
+      "loggedType": {
+        "name": "",
+        "type": 20,
+        "typeArguments": []
+      }
+    },
+    {
       "logId": "11192939610819626128",
       "loggedType": {
         "name": "",
-        "type": 22,
+        "type": 23,
         "typeArguments": []
       }
     }

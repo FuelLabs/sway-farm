@@ -383,10 +383,10 @@ pub struct BuySeeds {
     pub total_current_amount: u64,
 }
 
-pub struct PlantSeeds {
+pub struct PlantSeed {
     pub address: Identity,
     pub food_type: FoodType,
-    pub indexes: Vec<u64>,
+    pub index: u64,
     pub timestamp: u64,
 }
 

@@ -18,7 +18,7 @@ import {
   FARM_COIN_ASSET,
   FARM_COIN_ASSET_ID,
   FUEL_PROVIDER_URL,
-  VERCEL_ENV,
+  // VERCEL_ENV,
 } from './constants';
 import './App.css';
 import { ContractAbi__factory } from './sway-api';
@@ -42,7 +42,6 @@ function App() {
   useEffect(() => {
     async function getAccounts() {
       if (mounted) {
-        if(VERCEL_ENV === 'development'){
         let hasAsset = false;
         for (let i = 0; i < assets.length; i++) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,7 +50,6 @@ function App() {
             hasAsset = true;
             break;
           }
-        }
         if (!hasAsset) {
           addAssets([FARM_COIN_ASSET]);
         }

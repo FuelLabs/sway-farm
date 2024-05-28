@@ -4,22 +4,23 @@ import { Vector3 } from 'three';
 
 // import contractIds from './sway-api/contract-ids.json';
 
-export const FUEL_PROVIDER_URL = 'https://devnet.fuel.network/v1/graphql';
+export const FUEL_PROVIDER_URL = 'https://testnet.fuel.network/v1/graphql';
 
-export const TESTNET_FAUCET_URL = 'https://faucet-devnet.fuel.network/'
+export const TESTNET_FAUCET_URL = 'https://faucet-testnet.fuel.network/'
 
-export const VERCEL_ENV = FUEL_PROVIDER_URL ? 'preview' : 'development';
-  // process.env.REACT_APP_VERCEL_ENV || process.env.NODE_ENV || 'development';
+// export const VERCEL_ENV = 
+//   // process.env.REACT_APP_VERCEL_ENV || process.env.NODE_ENV || 'development';
 
 export const CONTRACT_ID =
   // VERCEL_ENV === 'development'
     // ? contractIds.contract
     // : 
-    '0x581411452d062c3061e022cc5369a5e2881048bf482c67d151a716818c63a1c6';
+    '0xf5b08689ada97df7fd2fbd67bee7dea6d219f117c1dc9345245da16fe4e99111';
 
-export const FARM_COIN_ASSET_ID =  VERCEL_ENV === 'development'
-? null :
-  "0xa37f6db10859078b39807b2585e83d6e1518a460541af9947f510268ce205286";
+export const FARM_COIN_ASSET_ID =  
+// VERCEL_ENV === 'development'
+// ? null :
+  "0x2a0d0ed9d2217ec7f32dcd9a1902ce2a66d68437aeff84e3a3cc8bebee0d2eea";
 
 export const FARM_COIN_NETWORK_ASSET = {
   /** type of network */

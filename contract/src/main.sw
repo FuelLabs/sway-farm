@@ -164,6 +164,13 @@ impl GameContract for Contract {
         vec.plant_at_index(food, index);
 
         storage.planted_seeds.insert(sender, vec);
+
+        log(PlantSeed {
+            address: sender,
+            food_type,
+            index,
+            timestamp: timestamp(),
+        });
     }
 
     #[storage(read, write)]
