@@ -19,7 +19,7 @@ export default function MarketModal({
   updatePageNum,
   items,
   setCanMove,
-  farmCoinAssetID
+  farmCoinAssetID,
 }: MarketModalProps) {
   return (
     <div className="market-modal">

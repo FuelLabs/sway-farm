@@ -20,7 +20,7 @@ export default function ShowPlayerInfo({
   player,
   contract,
   updateNum,
-  farmCoinAssetID
+  farmCoinAssetID,
 }: PlayerProps) {
   let valSold;
   if (player !== null) {
@@ -31,7 +31,11 @@ export default function ShowPlayerInfo({
     <Box css={styles.playerInfo}>
       <Flex direction={'column'} justify="space-around">
         <Box css={styles.box}>Value Sold: {valSold ?? '0'}</Box>
-        <ShowCoins contract={contract} updateNum={updateNum} farmCoinAssetID={farmCoinAssetID} />
+        <ShowCoins
+          contract={contract}
+          updateNum={updateNum}
+          farmCoinAssetID={farmCoinAssetID}
+        />
       </Flex>
     </Box>
   );

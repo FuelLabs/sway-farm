@@ -25,9 +25,7 @@ export default function HarvestModal({
       try {
         setStatus('loading');
         setCanMove(false);
-        await contract.functions
-          .harvest(tileArray)
-          .call();
+        await contract.functions.harvest(tileArray).call();
         updatePageNum();
         setStatus('none');
       } catch (err) {

@@ -12,7 +12,11 @@ interface ShowCoinsProps {
   farmCoinAssetID: BytesLike;
 }
 
-export default function ShowCoins({ updateNum, contract, farmCoinAssetID }: ShowCoinsProps) {
+export default function ShowCoins({
+  updateNum,
+  contract,
+  farmCoinAssetID,
+}: ShowCoinsProps) {
   const { wallet } = useWallet();
   const [balance, setBalance] = useState<BN>();
 

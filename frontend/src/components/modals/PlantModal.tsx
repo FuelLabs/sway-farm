@@ -37,7 +37,6 @@ export default function PlantModal({
           .plant_seed_at_index(seedType, tileArray[0])
           .call();
 
-
         updatePageNum();
         setStatus('none');
       } catch (err) {

@@ -27,7 +27,9 @@ function App() {
   const [burnerWallet, setBurnerWallet] = useState<Wallet>();
   const [mounted, setMounted] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [farmCoinAssetID, setFarmCoinAssetId] = useState<string | null>(FARM_COIN_ASSET_ID);
+  const [farmCoinAssetID, setFarmCoinAssetId] = useState<string | null>(
+    FARM_COIN_ASSET_ID
+  );
   const { isConnected } = useIsConnected();
   const { wallet } = useWallet();
   const { assets } = useAssets();
@@ -50,10 +52,10 @@ function App() {
             hasAsset = true;
             break;
           }
-        if (!hasAsset) {
-          addAssets([FARM_COIN_ASSET]);
+          if (!hasAsset) {
+            addAssets([FARM_COIN_ASSET]);
+          }
         }
-      }
       } else {
         setMounted(true);
       }
@@ -91,19 +93,23 @@ function App() {
 
   useEffect(() => {
     async function getAssetId() {
-    if(contract){
-      const { value } = await contract.functions.get_asset_id().get();
-      // console.log("VALUE:", value)
-      setFarmCoinAssetId(value.bits);
+      if (contract) {
+        const { value } = await contract.functions.get_asset_id().get();
+        // console.log("VALUE:", value)
+        setFarmCoinAssetId(value.bits);
+      }
     }
-  }
     getAssetId();
   }, [contract]);
 
   return (
     <Box css={styles.root}>
       {(isConnected || (contract && burnerWallet)) && farmCoinAssetID ? (
-        <Game contract={contract} isMobile={isMobile} farmCoinAssetID={farmCoinAssetID} />
+        <Game
+          contract={contract}
+          isMobile={isMobile}
+          farmCoinAssetID={farmCoinAssetID}
+        />
       ) : (
         <BoxCentered css={styles.box}>
           <BoxCentered css={styles.innerBox}>

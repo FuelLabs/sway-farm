@@ -32,9 +32,7 @@ export default function Garden({
             bits: contract.account.address.toB256(),
           };
           const id: IdentityInput = { Address: address };
-          const { value } = await contract.functions
-            .get_garden_vec(id)
-            .get();
+          const { value } = await contract.functions.get_garden_vec(id).get();
           // console.log("VALUE:", value)
           setTileStates(value);
         } catch (err) {

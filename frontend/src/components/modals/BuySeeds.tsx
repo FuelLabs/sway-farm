@@ -4,10 +4,7 @@ import type { BytesLike } from 'fuels';
 import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 
-import {
-  buttonStyle,
-  FoodTypeInput,
-} from '../../constants';
+import { buttonStyle, FoodTypeInput } from '../../constants';
 import type { ContractAbi } from '../../sway-api/contracts/ContractAbi';
 
 interface BuySeedsProps {

@@ -44,7 +44,11 @@ export type Position =
   | 'right-bottom';
 export type MobileControls = 'none' | 'up' | 'down' | 'left' | 'right';
 
-export default function Game({ contract, isMobile, farmCoinAssetID }: GameProps) {
+export default function Game({
+  contract,
+  isMobile,
+  farmCoinAssetID,
+}: GameProps) {
   const [modal, setModal] = useState<Modals>('none');
   const [tileStates, setTileStates] = useState<
     GardenVectorOutput | undefined
@@ -69,9 +73,7 @@ export default function Game({ contract, isMobile, farmCoinAssetID }: GameProps)
           };
           const id: IdentityInput = { Address: address };
           // get the player first
-          const { value: Some } = await contract.functions
-          .get_player(id)
-          .get();
+          const { value: Some } = await contract.functions.get_player(id).get();
           if (Some?.farming_skill.gte(1)) {
             setPlayer(Some);
             const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;

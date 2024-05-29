@@ -26,7 +26,7 @@ export default function Info({
   updateNum,
   seeds,
   items,
-  farmCoinAssetID
+  farmCoinAssetID,
 }: InfoProps) {
   return (
     <Box css={styles.container}>
