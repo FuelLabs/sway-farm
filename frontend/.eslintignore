@@ -1,3 +1,4 @@
 node_modules
 *.html
-src/sway-api
+**/src/sway-api/**
+**/src/sway-api/**/**

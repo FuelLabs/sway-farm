@@ -5,12 +5,13 @@
   "dependencies": {
     "@fuel-ui/css": "^0.12.4",
     "@fuel-ui/react": "^0.12.4",
-    "@fuel-wallet/react": "^0.15.2",
-    "@fuel-wallet/sdk": "^0.15.2",
+    "@fuels/connectors": "^0.2.2",
     "@fuels/eslint-plugin": "^0.1.4",
     "@fuels/prettier-config": "^0.1.4",
+    "@fuels/react": "^0.18.1",
     "@react-three/drei": "^9.97.0",
     "@react-three/fiber": "^8.15.16",
+    "@tanstack/react-query": "^5.36.2",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -19,7 +20,7 @@
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@vercel/analytics": "^1.0.0",
-    "fuels": "^0.73.0",
+    "fuels": "^0.88.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -35,7 +36,8 @@
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "prettier:check": "prettier --check .",
-    "prettier:format": "prettier --write ."
+    "prettier:format": "prettier --write .",
+    "build-types": "fuels build"
   },
   "eslintConfig": {
     "extends": [

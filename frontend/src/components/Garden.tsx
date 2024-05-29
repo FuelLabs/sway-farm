@@ -29,19 +29,14 @@ export default function Garden({
       if (contract && contract.account) {
         try {
           const address: AddressInput = {
-            value: contract.account.address.toB256(),
+            bits: contract.account.address.toB256(),
           };
           const id: IdentityInput = { Address: address };
-          const { value } = await contract.functions
-            .get_garden_vec(id)
-            .txParams({
-              gasPrice: 1,
-              gasLimit: 800_000,
-            })
-            .simulate();
+          const { value } = await contract.functions.get_garden_vec(id).get();
+          // console.log("VALUE:", value)
           setTileStates(value);
         } catch (err) {
-          console.log('Error:', err);
+          console.log('Error in Garden:', err);
         }
       }
     }

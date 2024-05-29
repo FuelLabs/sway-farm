@@ -30,14 +30,11 @@ export default function SellItem({
         const realAmount = items / 1_000_000_000;
         const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
         const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
-        await contract.functions
-          .sell_item(seedType, inputAmount)
-          .txParams({ gasPrice: 1, gasLimit: 800_000 })
-          .call();
+        await contract.functions.sell_item(seedType, inputAmount).call();
         updatePageNum();
         setStatus('none');
       } catch (err) {
-        console.log('Error:', err);
+        console.log('Error in SellItem:', err);
         setStatus('error');
       }
       setCanMove(true);

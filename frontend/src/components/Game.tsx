@@ -4,6 +4,7 @@ import type { KeyboardControlsEntry } from '@react-three/drei';
 import { KeyboardControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { BN } from 'fuels';
+import type { BytesLike } from 'fuels';
 import { useState, useEffect, useMemo, Suspense } from 'react';
 
 import type { Modals } from '../constants';
@@ -31,6 +32,7 @@ import Info from './show/Info';
 interface GameProps {
   contract: ContractAbi | null;
   isMobile: boolean;
+  farmCoinAssetID: BytesLike;
 }
 
 export type Position =
@@ -42,7 +44,11 @@ export type Position =
   | 'right-bottom';
 export type MobileControls = 'none' | 'up' | 'down' | 'left' | 'right';
 
-export default function Game({ contract, isMobile }: GameProps) {
+export default function Game({
+  contract,
+  isMobile,
+  farmCoinAssetID,
+}: GameProps) {
   const [modal, setModal] = useState<Modals>('none');
   const [tileStates, setTileStates] = useState<
     GardenVectorOutput | undefined
@@ -63,38 +69,28 @@ export default function Game({ contract, isMobile }: GameProps) {
       if (contract && contract.account) {
         try {
           const address: AddressInput = {
-            value: contract.account.address.toB256(),
+            bits: contract.account.address.toB256(),
           };
           const id: IdentityInput = { Address: address };
-          const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
           // get the player first
-          const { value: Some } = await contract.functions
-            .get_player(id)
-            .txParams({
-              gasPrice: 1,
-              gasLimit: 800_000,
-            })
-            .simulate();
+          const { value: Some } = await contract.functions.get_player(id).get();
           if (Some?.farming_skill.gte(1)) {
             setPlayer(Some);
+            const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
             // if there is a player found, get the rest of the player info
             const { value: results } = await contract
               .multiCall([
                 contract.functions.get_seed_amount(id, seedType),
                 contract.functions.get_item_amount(id, seedType),
               ])
-              .txParams({
-                gasPrice: 1,
-                gasLimit: 800_000,
-              })
-              .simulate();
+              .get();
             const seedAmount = new BN(results[0]).toNumber();
             setSeeds(seedAmount);
             const itemAmount = new BN(results[1]).toNumber();
             setItems(itemAmount);
           }
         } catch (err) {
-          console.log('Error:', err);
+          console.log('Error in Game:', err);
           setStatus('error');
         }
         setStatus('none');
@@ -188,6 +184,7 @@ export default function Game({ contract, isMobile }: GameProps) {
             updateNum={updateNum}
             seeds={seeds}
             items={items}
+            farmCoinAssetID={farmCoinAssetID}
           />
 
           {player !== null && (
@@ -217,6 +214,7 @@ export default function Game({ contract, isMobile }: GameProps) {
                   updatePageNum={updatePageNum}
                   items={items}
                   setCanMove={setCanMove}
+                  farmCoinAssetID={farmCoinAssetID}
                 />
               )}
             </>

@@ -1,5 +1,6 @@
 import { cssObj } from '@fuel-ui/css';
 import { Box } from '@fuel-ui/react';
+import type { BytesLike } from 'fuels';
 
 import type {
   ContractAbi,
@@ -16,6 +17,7 @@ interface InfoProps {
   updateNum: number;
   seeds: number;
   items: number;
+  farmCoinAssetID: BytesLike;
 }
 
 export default function Info({
@@ -24,6 +26,7 @@ export default function Info({
   updateNum,
   seeds,
   items,
+  farmCoinAssetID,
 }: InfoProps) {
   return (
     <Box css={styles.container}>
@@ -33,6 +36,7 @@ export default function Info({
           player={player}
           contract={contract}
           updateNum={updateNum}
+          farmCoinAssetID={farmCoinAssetID}
         />
       </Box>
       <Inventory seeds={seeds} items={items} />

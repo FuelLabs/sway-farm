@@ -1,5 +1,6 @@
 import { cssObj } from '@fuel-ui/css';
 import { Flex, Box } from '@fuel-ui/react';
+import type { BytesLike } from 'fuels';
 
 import type {
   ContractAbi,
@@ -12,12 +13,14 @@ interface PlayerProps {
   player: PlayerOutput | null;
   contract: ContractAbi | null;
   updateNum: number;
+  farmCoinAssetID: BytesLike;
 }
 
 export default function ShowPlayerInfo({
   player,
   contract,
   updateNum,
+  farmCoinAssetID,
 }: PlayerProps) {
   let valSold;
   if (player !== null) {
@@ -28,7 +31,11 @@ export default function ShowPlayerInfo({
     <Box css={styles.playerInfo}>
       <Flex direction={'column'} justify="space-around">
         <Box css={styles.box}>Value Sold: {valSold ?? '0'}</Box>
-        <ShowCoins contract={contract} updateNum={updateNum} />
+        <ShowCoins
+          contract={contract}
+          updateNum={updateNum}
+          farmCoinAssetID={farmCoinAssetID}
+        />
       </Flex>
     </Box>
   );

@@ -25,14 +25,11 @@ export default function HarvestModal({
       try {
         setStatus('loading');
         setCanMove(false);
-        await contract.functions
-          .harvest(tileArray[0])
-          .txParams({ gasPrice: 1, gasLimit: 800_000 })
-          .call();
+        await contract.functions.harvest(tileArray).call();
         updatePageNum();
         setStatus('none');
       } catch (err) {
-        console.log('Error:', err);
+        console.log('Error in HarvestModal:', err);
         setStatus('error');
       }
       setCanMove(true);

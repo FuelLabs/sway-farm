@@ -1,25 +1,24 @@
 import { Button, Spinner, BoxCentered } from '@fuel-ui/react';
 import { bn } from 'fuels';
+import type { BytesLike } from 'fuels';
 import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 
-import {
-  FARM_COIN_ASSET_ID,
-  buttonStyle,
-  FoodTypeInput,
-} from '../../constants';
+import { buttonStyle, FoodTypeInput } from '../../constants';
 import type { ContractAbi } from '../../sway-api/contracts/ContractAbi';
 
 interface BuySeedsProps {
   contract: ContractAbi | null;
   updatePageNum: () => void;
   setCanMove: Dispatch<SetStateAction<boolean>>;
+  farmCoinAssetID: BytesLike;
 }
 
 export default function BuySeeds({
   contract,
   updatePageNum,
   setCanMove,
+  farmCoinAssetID,
 }: BuySeedsProps) {
   const [status, setStatus] = useState<'error' | 'none' | `loading`>('none');
 
@@ -36,14 +35,13 @@ export default function BuySeeds({
         await contract.functions
           .buy_seeds(seedType, inputAmount)
           .callParams({
-            forward: [price, FARM_COIN_ASSET_ID],
+            forward: [price, farmCoinAssetID],
           })
-          .txParams({ gasPrice: 1, gasLimit: 800_000 })
           .call();
         updatePageNum();
         setStatus('none');
       } catch (err) {
-        console.log('Error:', err);
+        console.log('Error in BuySeeds:', err);
         setStatus('error');
       }
       setCanMove(true);
