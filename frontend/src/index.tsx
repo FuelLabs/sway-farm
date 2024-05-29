@@ -1,6 +1,4 @@
-import {
-  defaultConnectors,
-} from '@fuels/connectors';
+import { defaultConnectors } from '@fuels/connectors';
 import { FuelProvider } from '@fuels/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
