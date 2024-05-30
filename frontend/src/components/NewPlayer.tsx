@@ -19,20 +19,19 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
   const { wallet } = useWallet();
 
   useEffect(() => {
-    async function getBalance() {
-      const thisWallet = wallet ?? contract?.account;
-      const baseAssetId = thisWallet?.provider.getBaseAssetId();
-      const balance = await thisWallet!.getBalance(baseAssetId);
-      // console.log("BALANCE:", balance)
-      const balanceNum = balance?.toNumber();
-      // console.log("BALANCENum:", balanceNum)
-
-      if (balanceNum) {
-        setHasFunds(balanceNum > 0);
-      }
-    }
     getBalance();
   }, [wallet]);
+
+  async function getBalance() {
+    const thisWallet = wallet ?? contract?.account;
+    const baseAssetId = thisWallet?.provider.getBaseAssetId();
+    const balance = await thisWallet!.getBalance(baseAssetId);
+    const balanceNum = balance?.toNumber();
+
+    if (balanceNum) {
+      setHasFunds(balanceNum > 0);
+    }
+  }
 
   async function handleNewPlayer() {
     if (contract !== null) {
@@ -79,6 +78,9 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
                 Go to Faucet
               </Button>
             </Link>
+            <Button css={buttonStyle} onPress={getBalance}>
+              Recheck balance
+            </Button>
           </BoxCentered>
         )}
         {status === 'error' && (
