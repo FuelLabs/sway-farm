@@ -78,8 +78,9 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
                 Go to Faucet
               </Button>
             </Link>
-
-            <Button css={buttonStyle} onPress={getBalance}>Recheck balance</Button>
+            <Button css={buttonStyle} onPress={getBalance}>
+              Recheck balance
+            </Button>
           </BoxCentered>
         )}
         {status === 'error' && (
