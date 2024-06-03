@@ -3,47 +3,54 @@ library;
 use std::{bytes::Bytes, hash::{Hash, Hasher}};
 
 abi GameContract {
-    // initialize player, mint some coins
+    /// initialize player, mint some coins
     #[storage(read, write)]
     fn new_player();
 
-    // get asset ID
+    /// get asset ID
     fn get_asset_id() -> AssetId;
 
-    // level up farming skill
+    /// level up farming skill
     #[storage(read, write)]
     fn level_up();
 
-    // buy any amount of a certain seed
+    /// buy any amount of a certain seed
     #[storage(read, write), payable]
     fn buy_seeds(food_type: FoodType, amount: u64);
 
+    /// plant a seed at a certain garden index
     #[storage(read, write)]
     fn plant_seed_at_index(food_type: FoodType, index: u64);
 
-    // harvest grown seeds at certain indexes
+    /// harvest grown seeds at certain indexes
     #[storage(read, write)]
     fn harvest(indexes: Vec<u64>);
 
-    // sell a harvested item
+    /// sell a harvested item
     #[storage(read, write)]
     fn sell_item(food_type: FoodType, amount: u64);
 
+    /// get player info for a given address
     #[storage(read)]
     fn get_player(id: Identity) -> Option<Player>;
 
+    /// get the number of seeds a given player owns
     #[storage(read)]
     fn get_seed_amount(id: Identity, item: FoodType) -> u64;
 
+    /// get the garden vector for a given player
     #[storage(read)]
     fn get_garden_vec(id: Identity) -> GardenVector;
 
+    /// get the amount of a certain item a player has
     #[storage(read)]
     fn get_item_amount(id: Identity, item: FoodType) -> u64;
 
+    /// check if a player can level up
     #[storage(read)]
     fn can_level_up(id: Identity) -> bool;
 
+    /// check if a player can harvest at a certain index
     #[storage(read)]
     fn can_harvest(index: u64) -> bool;
 }
@@ -54,6 +61,7 @@ pub struct Player {
 }
 
 impl Player {
+    /// create a new player
     pub fn new(farming_skill: u64, total_value_sold: u64) -> Self {
         Self {
             farming_skill,
@@ -61,9 +69,11 @@ impl Player {
         }
     }
 
+    /// level up the player's farming skill by 1
     pub fn level_up_skill(ref mut self) {
         self.farming_skill += 1
     }
+    /// increase the total value told by a given amount
     pub fn increase_tvs(ref mut self, amount: u64) {
         self.total_value_sold += amount;
     }
@@ -73,6 +83,7 @@ pub enum FoodType {
     Tomatoes: (),
 }
 
+/// implement ability to store FoodType in storage block
 impl Hash for FoodType {
     fn hash(self, ref mut state: Hasher) {
         let mut bytes = Bytes::with_capacity(1);
@@ -97,6 +108,7 @@ impl Food {
     }
 }
 
+/// This represents a garden with 10 plots that either have None or Some(Food)
 pub struct GardenVector {
     pub inner: [Option<Food>; 10],
 }

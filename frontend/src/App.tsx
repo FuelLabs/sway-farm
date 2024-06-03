@@ -35,6 +35,7 @@ function App() {
   const { assets } = useAssets();
   const { addAssets } = useAddAssets();
 
+  // check if user is on mobile
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
     const mobile = /(iphone|android|windows phone)/.test(userAgent);
@@ -63,6 +64,7 @@ function App() {
       }
     }
 
+    // checks to see if there is a burner wallet private key stored in local storage
     async function getWallet() {
       const key = window.localStorage.getItem('sway-farm-wallet-key');
       if (key) {
@@ -80,7 +82,6 @@ function App() {
   }, [isConnected, mounted, farmCoinAssetID]);
 
   const contract = useMemo(() => {
-    console.log("WALLET:", wallet)
     if (wallet) {
       const contract = ContractAbi__factory.connect(CONTRACT_ID, wallet);
       return contract;
@@ -94,17 +95,16 @@ function App() {
     return null;
   }, [wallet, burnerWallet]);
 
+  // gets the asset id of the farm coin directly from the contract for local development
   useEffect(() => {
     async function getAssetId() {
-    if(contract){
+    if(contract && VERCEL_ENV === 'development'){
       const { value } = await contract.functions.get_asset_id().get();
-      console.log("VALUE:", value)
       setFarmCoinAssetId(value.bits);
     }
   }
-  console.log("CONTRACT:", contract)
     getAssetId();
-  }, [contract]);
+  }, [contract, VERCEL_ENV]);
 
   return (
     <Box css={styles.root}>

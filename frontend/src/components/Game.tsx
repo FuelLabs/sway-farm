@@ -35,6 +35,7 @@ interface GameProps {
   farmCoinAssetID: BytesLike;
 }
 
+// on mobile, the canvas gets broken into these 6 sections
 export type Position =
   | 'left-top'
   | 'center-top'
@@ -42,6 +43,7 @@ export type Position =
   | 'left-bottom'
   | 'center-bottom'
   | 'right-bottom';
+
 export type MobileControls = 'none' | 'up' | 'down' | 'left' | 'right';
 
 export default function Game({
@@ -99,7 +101,7 @@ export default function Game({
 
     getPlayerInfo();
 
-    // fetches player info 30 seconds
+    // fetches player info every 30 seconds
     const interval = setInterval(() => {
       setUpdateNum(updateNum + 1);
     }, 30000);
@@ -107,6 +109,7 @@ export default function Game({
     return () => clearInterval(interval);
   }, [contract, updateNum]);
 
+// updateNum is used to force a re-render of the game when something updates
   function updatePageNum() {
     setUpdateNum(updateNum + 1);
   }
