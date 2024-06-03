@@ -1,6 +1,6 @@
 import { cssObj } from '@fuel-ui/css';
 import { Box } from '@fuel-ui/react';
-import { useWallet } from '@fuels/react';
+import { useAccount, useWallet } from '@fuels/react';
 import type { BN, BytesLike } from 'fuels';
 import { useState, useEffect } from 'react';
 
@@ -17,7 +17,8 @@ export default function ShowCoins({
   contract,
   farmCoinAssetID,
 }: ShowCoinsProps) {
-  const { wallet } = useWallet();
+  const { account } = useAccount();
+  const { wallet } = useWallet(account);
   const [balance, setBalance] = useState<BN>();
 
   useEffect(() => {

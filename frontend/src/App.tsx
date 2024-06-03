@@ -5,6 +5,7 @@ import {
   useWallet,
   useAssets,
   useAddAssets,
+  useAccount,
 } from '@fuels/react';
 import { Analytics } from '@vercel/analytics/react';
 import { Wallet, Provider } from 'fuels';
@@ -18,7 +19,7 @@ import {
   FARM_COIN_ASSET,
   FARM_COIN_ASSET_ID,
   FUEL_PROVIDER_URL,
-  // VERCEL_ENV,
+  VERCEL_ENV,
 } from './constants';
 import './App.css';
 import { ContractAbi__factory } from './sway-api';
@@ -27,11 +28,10 @@ function App() {
   const [burnerWallet, setBurnerWallet] = useState<Wallet>();
   const [mounted, setMounted] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [farmCoinAssetID, setFarmCoinAssetId] = useState<string | null>(
-    FARM_COIN_ASSET_ID
-  );
+  const [farmCoinAssetID, setFarmCoinAssetId] = useState<string | null>(FARM_COIN_ASSET_ID);
   const { isConnected } = useIsConnected();
-  const { wallet } = useWallet();
+  const { account } = useAccount();
+  const { wallet } = useWallet(account);
   const { assets } = useAssets();
   const { addAssets } = useAddAssets();
 
@@ -44,6 +44,7 @@ function App() {
   useEffect(() => {
     async function getAccounts() {
       if (mounted) {
+        if(VERCEL_ENV !== 'development'){
         let hasAsset = false;
         for (let i = 0; i < assets.length; i++) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,10 +53,11 @@ function App() {
             hasAsset = true;
             break;
           }
-          if (!hasAsset) {
-            addAssets([FARM_COIN_ASSET]);
-          }
         }
+        if (!hasAsset) {
+          addAssets([FARM_COIN_ASSET]);
+        }
+      }
       } else {
         setMounted(true);
       }
@@ -75,9 +77,10 @@ function App() {
 
     // if not connected, check if has burner wallet stored
     if (!isConnected) getWallet();
-  }, [isConnected, mounted]);
+  }, [isConnected, mounted, farmCoinAssetID]);
 
   const contract = useMemo(() => {
+    console.log("WALLET:", wallet)
     if (wallet) {
       const contract = ContractAbi__factory.connect(CONTRACT_ID, wallet);
       return contract;
@@ -93,23 +96,20 @@ function App() {
 
   useEffect(() => {
     async function getAssetId() {
-      if (contract) {
-        const { value } = await contract.functions.get_asset_id().get();
-        // console.log("VALUE:", value)
-        setFarmCoinAssetId(value.bits);
-      }
+    if(contract){
+      const { value } = await contract.functions.get_asset_id().get();
+      console.log("VALUE:", value)
+      setFarmCoinAssetId(value.bits);
     }
+  }
+  console.log("CONTRACT:", contract)
     getAssetId();
   }, [contract]);
 
   return (
     <Box css={styles.root}>
       {(isConnected || (contract && burnerWallet)) && farmCoinAssetID ? (
-        <Game
-          contract={contract}
-          isMobile={isMobile}
-          farmCoinAssetID={farmCoinAssetID}
-        />
+        <Game contract={contract} isMobile={isMobile} farmCoinAssetID={farmCoinAssetID} />
       ) : (
         <BoxCentered css={styles.box}>
           <BoxCentered css={styles.innerBox}>
