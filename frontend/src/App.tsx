@@ -5,6 +5,7 @@ import {
   useWallet,
   useAssets,
   useAddAssets,
+  useAccount,
 } from '@fuels/react';
 import { Analytics } from '@vercel/analytics/react';
 import { Wallet, Provider } from 'fuels';
@@ -18,7 +19,7 @@ import {
   FARM_COIN_ASSET,
   FARM_COIN_ASSET_ID,
   FUEL_PROVIDER_URL,
-  // VERCEL_ENV,
+  VERCEL_ENV,
 } from './constants';
 import './App.css';
 import { ContractAbi__factory } from './sway-api';
@@ -31,10 +32,12 @@ function App() {
     FARM_COIN_ASSET_ID
   );
   const { isConnected } = useIsConnected();
-  const { wallet } = useWallet();
+  const { account } = useAccount();
+  const { wallet } = useWallet(account);
   const { assets } = useAssets();
   const { addAssets } = useAddAssets();
 
+  // check if user is on mobile
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
     const mobile = /(iphone|android|windows phone)/.test(userAgent);
@@ -44,13 +47,15 @@ function App() {
   useEffect(() => {
     async function getAccounts() {
       if (mounted) {
-        let hasAsset = false;
-        for (let i = 0; i < assets.length; i++) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const thisAsset = assets[i] as any;
-          if (thisAsset.assetId && thisAsset.assetId === farmCoinAssetID) {
-            hasAsset = true;
-            break;
+        if (VERCEL_ENV !== 'development') {
+          let hasAsset = false;
+          for (let i = 0; i < assets.length; i++) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const thisAsset = assets[i] as any;
+            if (thisAsset.assetId && thisAsset.assetId === farmCoinAssetID) {
+              hasAsset = true;
+              break;
+            }
           }
           if (!hasAsset) {
             addAssets([FARM_COIN_ASSET]);
@@ -61,6 +66,7 @@ function App() {
       }
     }
 
+    // checks to see if there is a burner wallet private key stored in local storage
     async function getWallet() {
       const key = window.localStorage.getItem('sway-farm-wallet-key');
       if (key) {
@@ -75,7 +81,7 @@ function App() {
 
     // if not connected, check if has burner wallet stored
     if (!isConnected) getWallet();
-  }, [isConnected, mounted]);
+  }, [isConnected, mounted, farmCoinAssetID]);
 
   const contract = useMemo(() => {
     if (wallet) {
@@ -91,16 +97,16 @@ function App() {
     return null;
   }, [wallet, burnerWallet]);
 
+  // gets the asset id of the farm coin directly from the contract for local development
   useEffect(() => {
     async function getAssetId() {
-      if (contract) {
+      if (contract && VERCEL_ENV === 'development') {
         const { value } = await contract.functions.get_asset_id().get();
-        // console.log("VALUE:", value)
         setFarmCoinAssetId(value.bits);
       }
     }
     getAssetId();
-  }, [contract]);
+  }, [contract, VERCEL_ENV]);
 
   return (
     <Box css={styles.root}>

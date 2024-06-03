@@ -28,9 +28,13 @@ enum InvalidError {
 }
 
 storage {
+    /// A mapping of player addresses to player structs
     players: StorageMap<Identity, Player> = StorageMap {},
+    /// A mapping of player addresses to the amount of seeds they have for a given food type
     player_seeds: StorageMap<(Identity, FoodType), u64> = StorageMap {},
+    /// A mapping of player addresses to the amount of planted seeds they have for a given food type
     planted_seeds: StorageMap<Identity, GardenVector> = StorageMap {},
+    /// A mapping of player addresses to the amount of items they have for a given food type
     player_items: StorageMap<(Identity, FoodType), u64> = StorageMap {},
 }
 

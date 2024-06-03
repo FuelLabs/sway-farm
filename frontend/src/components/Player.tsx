@@ -22,6 +22,7 @@ interface PlayerProps {
   mobileControlState: MobileControls;
 }
 
+// The bounds the canvas
 const bounds = {
   left: -4,
   right: 4,
@@ -29,6 +30,7 @@ const bounds = {
   bottom: -3.2,
 };
 
+// The bounds of the garden, used to determine if the the game should check if the player can plant or harvest
 const gardenBounds = {
   x1: 3,
   x2: -3,
@@ -36,12 +38,14 @@ const gardenBounds = {
   y2: -2.6,
 };
 
+// The location of the market on the canvas, used to show the market modal
 const marketBounds = {
   x1: 3.8,
   x2: 2,
   y: 1.7,
 };
 
+// The bounds of where the player can go on the canvas
 const playerBounds = {
   left: -2,
   center: 2,
@@ -57,17 +61,23 @@ export default function Player({
   canMove,
   mobileControlState,
 }: PlayerProps) {
+  // The current sprte tile for the bunny used to make the bunny look like it changes direction
   const [currentTile, setCurrentTile] = useState<number>(0);
+  // The sprite map for the bunny
   const [spriteMap, setSpriteMap] = useState<Texture>();
+  // A refrerence to the player sprite
   const ref = useRef<Sprite>(null);
+  // Keyboard controls
   const [, get] = useKeyboardControls<Controls>();
 
+  // Config for the sprite map
   const tilesHoriz = 4;
   const tilesVert = 5;
   const tempSpriteMap = useLoader(TextureLoader, 'images/bunny_animations.png');
   tempSpriteMap.magFilter = NearestFilter;
   tempSpriteMap.repeat.set(1 / tilesHoriz, 1 / tilesVert);
 
+  // Changes the bunny sprite based on the current tile
   useEffect(() => {
     const xOffset = (currentTile % tilesHoriz) / tilesHoriz;
     const yOffset =
@@ -79,14 +89,19 @@ export default function Player({
 
   const velocity = new Vector3();
 
+  // animation frame - everything inside here runs every frame of the game
   useFrame((_s, dl) => {
     const state = get();
+    // checks to see if the player is in the garden or at the market
     checkTiles();
+    // updates the camera position for mobile players
     updateCameraPosition();
 
+    // if the player isn't awaiting a transaction, check the controls to see if the player should move
     if (canMove) movePlayer(dl, state, mobileControlState);
   });
 
+  // updates the camera position for mobile players based on the player's position
   function updateCameraPosition() {
     const position = ref.current?.position;
     if (!position) return;
@@ -99,6 +114,7 @@ export default function Player({
     }
   }
 
+  // updates the player's position based for mobile players - the canvas gets split into 6 sections (left, center, and right on the top and bottom of the canvas)
   function updatePlayerPosition(
     side: 'left' | 'center' | 'right',
     position: Vector3
@@ -116,6 +132,10 @@ export default function Player({
     }
   }
 
+  // checks to see if the player is in the garden or at the market
+  // if the player is in the garden, it finds the closest plot
+  // the plant or harvest modal is triggered unless the plot has a seed planted that is not ready to harvest (takes 20 minutes to grow)
+  // if the player is at the market, the market modal is triggered
   function checkTiles() {
     if (!ref.current) return;
     if (!tileStates) return;
@@ -158,6 +178,7 @@ export default function Player({
     }
   }
 
+  // checks if the player position is inside the garden bounds
   function checkIfInGarden() {
     if (
       ref.current!.position.x < gardenBounds.x1 &&
@@ -171,6 +192,7 @@ export default function Player({
     }
   }
 
+  // checks if the player position is inside the market bounds
   function checkIfAtMarket() {
     if (
       ref.current!.position.x < marketBounds.x1 &&
@@ -183,6 +205,8 @@ export default function Player({
     }
   }
 
+  // moves the player based on the controls
+  // if the player changes directions, the sprite tile is updated
   function movePlayer(
     dl: number,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

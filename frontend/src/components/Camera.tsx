@@ -13,6 +13,8 @@ export default function Camera({ playerPosition, isMobile }: CameraProps) {
   const { camera } = useThree();
   camera.zoom = 100;
 
+  // on mobile the camera repositions based on the player's position in the canvas
+  // the playerPosition gets set in the Player.tsx component
   useEffect(() => {
     if (isMobile) {
       switch (playerPosition) {

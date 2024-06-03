@@ -3,6 +3,7 @@ import { createConfig } from 'fuels';
 export default createConfig({
   contracts: ['../contract'],
   output: './src/sway-api',
+  snapshotDir: '../chain-snapshot',
 });
 
 /**

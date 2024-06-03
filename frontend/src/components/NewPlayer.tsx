@@ -1,6 +1,6 @@
 import { cssObj } from '@fuel-ui/css';
 import { Button, BoxCentered, Link } from '@fuel-ui/react';
-import { useWallet } from '@fuels/react';
+import { useAccount, useWallet } from '@fuels/react';
 import { useState, useEffect } from 'react';
 
 import { TESTNET_FAUCET_URL, buttonStyle } from '../constants';
@@ -16,7 +16,8 @@ interface NewPlayerProps {
 export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
   const [status, setStatus] = useState<'error' | 'loading' | 'none'>('none');
   const [hasFunds, setHasFunds] = useState<boolean>(false);
-  const { wallet } = useWallet();
+  const { account } = useAccount();
+  const { wallet } = useWallet(account);
 
   useEffect(() => {
     getBalance();

@@ -1,0 +1,51 @@
+{
+  "coins": [
+    {
+      "tx_id": "0x0000000000000000000000000000000000000000000000000000000000000001",
+      "output_index": 0,
+      "tx_pointer_block_height": 0,
+      "tx_pointer_tx_idx": 0,
+      "owner": "0x488284d46414347c78221d3bad71dfebcff61ab2ae26d71129701d50796f714d",
+      "amount": 1000000000,
+      "asset_id": "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
+    },
+    {
+      "tx_id": "0x0000000000000000000000000000000000000000000000000000000000000002",
+      "output_index": 0,
+      "tx_pointer_block_height": 0,
+      "tx_pointer_tx_idx": 0,
+      "owner": "0x94ffcc53b892684acefaebc8a3d4a595e528a8cf664eeb3ef36f1020b0809d0d",
+      "amount": 18446744073709551615,
+      "asset_id": "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
+    }
+  ],
+  "messages": [
+    {
+      "sender": "0xc43454aa38dd91f88109a4b7aef5efb96ce34e3f24992fe0f81d233ca686f80f",
+      "recipient": "0x69a2b736b60159b43bb8a4f98c0589f6da5fa3a3d101e8e269c499eb942753ba",
+      "nonce": "0101010101010101010101010101010101010101010101010101010101010101",
+      "amount": 18446744073709551615,
+      "data": "",
+      "da_height": 0
+    },
+    {
+      "sender": "0x69a2b736b60159b43bb8a4f98c0589f6da5fa3a3d101e8e269c499eb942753ba",
+      "recipient": "0xc43454aa38dd91f88109a4b7aef5efb96ce34e3f24992fe0f81d233ca686f80f",
+      "nonce": "0e1ef2963832068b0e1ef2963832068b0e1ef2963832068b0e1ef2963832068b",
+      "amount": 12704439083013451934,
+      "data": "",
+      "da_height": 0
+    },
+    {
+      "sender": "0x22cae5308938e8b4caf217b6464884f6331eff05e81468df8ccd08126effc8d0",
+      "recipient": "0x8d2af98a4198732a46bf65d87a73427dd7608acaad2414585d8ccdd6f59c437b",
+      "nonce": "0x381de90750098776c71544527fd253412908dec3d07ce9a7367bd1ba975908a0",
+      "amount": 18446744073709551615,
+      "data": "",
+      "da_height": 0
+    }
+  ],
+  "contracts": [],
+  "block_height": 0,
+  "da_block_height": 0
+}
