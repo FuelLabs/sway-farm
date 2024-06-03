@@ -109,7 +109,7 @@ export default function Game({
     return () => clearInterval(interval);
   }, [contract, updateNum]);
 
-// updateNum is used to force a re-render of the game when something updates
+  // updateNum is used to force a re-render of the game when something updates
   function updatePageNum() {
     setUpdateNum(updateNum + 1);
   }

@@ -28,7 +28,9 @@ function App() {
   const [burnerWallet, setBurnerWallet] = useState<Wallet>();
   const [mounted, setMounted] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [farmCoinAssetID, setFarmCoinAssetId] = useState<string | null>(FARM_COIN_ASSET_ID);
+  const [farmCoinAssetID, setFarmCoinAssetId] = useState<string | null>(
+    FARM_COIN_ASSET_ID
+  );
   const { isConnected } = useIsConnected();
   const { account } = useAccount();
   const { wallet } = useWallet(account);
@@ -45,20 +47,20 @@ function App() {
   useEffect(() => {
     async function getAccounts() {
       if (mounted) {
-        if(VERCEL_ENV !== 'development'){
-        let hasAsset = false;
-        for (let i = 0; i < assets.length; i++) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const thisAsset = assets[i] as any;
-          if (thisAsset.assetId && thisAsset.assetId === farmCoinAssetID) {
-            hasAsset = true;
-            break;
+        if (VERCEL_ENV !== 'development') {
+          let hasAsset = false;
+          for (let i = 0; i < assets.length; i++) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const thisAsset = assets[i] as any;
+            if (thisAsset.assetId && thisAsset.assetId === farmCoinAssetID) {
+              hasAsset = true;
+              break;
+            }
+          }
+          if (!hasAsset) {
+            addAssets([FARM_COIN_ASSET]);
           }
         }
-        if (!hasAsset) {
-          addAssets([FARM_COIN_ASSET]);
-        }
-      }
       } else {
         setMounted(true);
       }
@@ -98,18 +100,22 @@ function App() {
   // gets the asset id of the farm coin directly from the contract for local development
   useEffect(() => {
     async function getAssetId() {
-    if(contract && VERCEL_ENV === 'development'){
-      const { value } = await contract.functions.get_asset_id().get();
-      setFarmCoinAssetId(value.bits);
+      if (contract && VERCEL_ENV === 'development') {
+        const { value } = await contract.functions.get_asset_id().get();
+        setFarmCoinAssetId(value.bits);
+      }
     }
-  }
     getAssetId();
   }, [contract, VERCEL_ENV]);
 
   return (
     <Box css={styles.root}>
       {(isConnected || (contract && burnerWallet)) && farmCoinAssetID ? (
-        <Game contract={contract} isMobile={isMobile} farmCoinAssetID={farmCoinAssetID} />
+        <Game
+          contract={contract}
+          isMobile={isMobile}
+          farmCoinAssetID={farmCoinAssetID}
+        />
       ) : (
         <BoxCentered css={styles.box}>
           <BoxCentered css={styles.innerBox}>

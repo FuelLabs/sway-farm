@@ -13,14 +13,13 @@ export const VERCEL_ENV =
 
 export const CONTRACT_ID =
   VERCEL_ENV === 'development'
-  ? contractIds.contract
-  :
-  '0xf5b08689ada97df7fd2fbd67bee7dea6d219f117c1dc9345245da16fe4e99111';
+    ? contractIds.contract
+    : '0xf5b08689ada97df7fd2fbd67bee7dea6d219f117c1dc9345245da16fe4e99111';
 
 export const FARM_COIN_ASSET_ID =
   VERCEL_ENV === 'development'
-  ? null :
-  '0x2a0d0ed9d2217ec7f32dcd9a1902ce2a66d68437aeff84e3a3cc8bebee0d2eea';
+    ? null
+    : '0x2a0d0ed9d2217ec7f32dcd9a1902ce2a66d68437aeff84e3a3cc8bebee0d2eea';
 
 export const FARM_COIN_NETWORK_ASSET = {
   /** type of network */
