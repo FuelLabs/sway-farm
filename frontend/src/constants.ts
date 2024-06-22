@@ -2,6 +2,8 @@ import { cssObj } from '@fuel-ui/css';
 import type { Asset, BN, NetworkFuel } from 'fuels';
 import { Vector3 } from 'three';
 
+import type { KeyboardControlsEntry } from './hooks/useKeyboardControls';
+
 // import contractIds from './sway-api/contract-ids.json';
 
 export const FUEL_PROVIDER_URL = 'https://testnet.fuel.network/v1/graphql';
@@ -48,6 +50,13 @@ export enum Controls {
   right = 'right',
   back = 'back',
 }
+
+export const ControlsMap: KeyboardControlsEntry[] = [
+  { name: Controls.forward, keys: ['ArrowUp', 'w', 'W'] },
+  { name: Controls.back, keys: ['ArrowDown', 's', 'S'] },
+  { name: Controls.left, keys: ['ArrowLeft', 'a', 'A'] },
+  { name: Controls.right, keys: ['ArrowRight', 'd', 'D'] },
+];
 
 export const TILES = [
   new Vector3(-2.47, -0.88, 0),

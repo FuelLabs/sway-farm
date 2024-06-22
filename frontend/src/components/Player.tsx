@@ -1,12 +1,13 @@
-import { useKeyboardControls } from '@react-three/drei';
 import { useFrame, useLoader } from '@react-three/fiber';
 import type { Dispatch, SetStateAction } from 'react';
 import { useState, useEffect, useRef } from 'react';
 import type { Texture, Sprite } from 'three';
 import { Vector3, TextureLoader, NearestFilter } from 'three';
 
-import type { Modals, Controls } from '../constants';
+import type { Modals } from '../constants';
 import { convertTime, TILES } from '../constants';
+import type { KeyboardControlsState } from '../hooks/useKeyboardControls';
+import { useKeyboardControls } from '../hooks/useKeyboardControls';
 import type { GardenVectorOutput } from '../sway-api/contracts/ContractAbi';
 
 import type { MobileControls, Position } from './Game';
@@ -60,7 +61,7 @@ export default function Player({
   const [currentTile, setCurrentTile] = useState<number>(0);
   const [spriteMap, setSpriteMap] = useState<Texture>();
   const ref = useRef<Sprite>(null);
-  const [, get] = useKeyboardControls<Controls>();
+  const controls = useKeyboardControls();
 
   const tilesHoriz = 4;
   const tilesVert = 5;
@@ -80,11 +81,10 @@ export default function Player({
   const velocity = new Vector3();
 
   useFrame((_s, dl) => {
-    const state = get();
     checkTiles();
     updateCameraPosition();
 
-    if (canMove) movePlayer(dl, state, mobileControlState);
+    if (canMove) movePlayer(dl, controls, mobileControlState);
   });
 
   function updateCameraPosition() {
@@ -185,8 +185,7 @@ export default function Player({
 
   function movePlayer(
     dl: number,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    state: any,
+    state: KeyboardControlsState,
     mobileControlState: MobileControls
   ) {
     if (!ref.current) return;
