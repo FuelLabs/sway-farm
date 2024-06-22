@@ -1,14 +1,13 @@
 import { cssObj } from '@fuel-ui/css';
 import { Box, Button } from '@fuel-ui/react';
-import type { KeyboardControlsEntry } from '@react-three/drei';
-import { KeyboardControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { BN } from 'fuels';
 import type { BytesLike } from 'fuels';
-import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 
 import type { Modals } from '../constants';
-import { Controls, buttonStyle, FoodTypeInput } from '../constants';
+import { buttonStyle, FoodTypeInput, ControlsMap } from '../constants';
+import { KeyboardControlsProvider } from '../hooks/useKeyboardControls';
 import type {
   AddressInput,
   ContractAbi,
@@ -111,16 +110,6 @@ export default function Game({
     setUpdateNum(updateNum + 1);
   }
 
-  const controlsMap = useMemo<KeyboardControlsEntry[]>(
-    () => [
-      { name: Controls.forward, keys: ['ArrowUp', 'w', 'W'] },
-      { name: Controls.back, keys: ['ArrowDown', 's', 'S'] },
-      { name: Controls.left, keys: ['ArrowLeft', 'a', 'A'] },
-      { name: Controls.right, keys: ['ArrowRight', 'd', 'D'] },
-    ],
-    []
-  );
-
   return (
     <Box css={styles.canvasContainer}>
       {status === 'error' && (
@@ -155,7 +144,7 @@ export default function Game({
 
               {/* PLAYER */}
               {player !== null && (
-                <KeyboardControls map={controlsMap}>
+                <KeyboardControlsProvider map={ControlsMap}>
                   <Player
                     tileStates={tileStates}
                     modal={modal}
@@ -166,7 +155,7 @@ export default function Game({
                     canMove={canMove}
                     mobileControlState={mobileControlState}
                   />
-                </KeyboardControls>
+                </KeyboardControlsProvider>
               )}
             </Suspense>
           </Canvas>
