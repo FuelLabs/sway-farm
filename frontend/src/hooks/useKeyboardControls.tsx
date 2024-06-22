@@ -70,7 +70,21 @@ export const KeyboardControlsProvider: React.FC<
 
   const downHandler = useCallback(
     (event: KeyboardEvent) => {
-      if (event.metaKey) return; // Ignore if cmd/meta key is pressed
+      // Reset the state if the meta key is pressed
+      if (event.metaKey || event.key === 'Meta') {
+        event.preventDefault();
+
+        setState((prevState) =>
+          Object.keys(prevState).reduce(
+            (acc, key) => ({
+              ...acc,
+              [key]: false,
+            }),
+            {} as KeyboardControlsState
+          )
+        );
+        return;
+      }
 
       const controlName = keyMap[event.key];
       if (controlName && !state[controlName]) {
@@ -83,7 +97,22 @@ export const KeyboardControlsProvider: React.FC<
 
   const upHandler = useCallback(
     (event: KeyboardEvent) => {
-      if (event.metaKey) return; // Ignore if cmd/meta key is pressed
+      // Reset the state if the meta key is pressed
+      if (event.key === 'Meta') {
+        event.preventDefault();
+
+        setState((prevState) =>
+          Object.keys(prevState).reduce(
+            (acc, key) => ({
+              ...acc,
+              [key]: false,
+            }),
+            {} as KeyboardControlsState
+          )
+        );
+
+        return;
+      }
 
       const controlName = keyMap[event.key];
       if (controlName && state[controlName]) {
