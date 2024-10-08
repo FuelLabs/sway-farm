@@ -21,9 +21,10 @@ import {
   // VERCEL_ENV,
 } from './constants';
 import './App.css';
-import { ContractAbi__factory } from './sway-api';
+import { Contract, ContractFactory } from './sway-api';
 
 function App() {
+  const [contract1, setContract] = useState<Contract>();
   const [burnerWallet, setBurnerWallet] = useState<Wallet>();
   const [mounted, setMounted] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -79,13 +80,15 @@ function App() {
 
   const contract = useMemo(() => {
     if (wallet) {
-      const contract = ContractAbi__factory.connect(CONTRACT_ID, wallet);
+      const contract = new Contract(CONTRACT_ID, wallet);
+      setContract(contract);
       return contract;
     } else if (burnerWallet) {
-      const contract = ContractAbi__factory.connect(
+      const contract = new Contract(
         CONTRACT_ID,
         burnerWallet as Account
       );
+      setContract(contract);
       return contract;
     }
     return null;
@@ -106,7 +109,7 @@ function App() {
     <Box css={styles.root}>
       {(isConnected || (contract && burnerWallet)) && farmCoinAssetID ? (
         <Game
-          contract={contract}
+        contract={contract1}
           isMobile={isMobile}
           farmCoinAssetID={farmCoinAssetID}
         />

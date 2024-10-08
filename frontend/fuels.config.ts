@@ -1,6 +1,7 @@
 import { createConfig } from 'fuels';
 
 export default createConfig({
+  // workspace: "../",
   contracts: ['../contract'],
   output: './src/sway-api',
 });
