@@ -61,6 +61,7 @@
     "@types/node": "^20",
     "@types/react": "^18.2",
     "@types/react-dom": "^18.2",
+    "@types/three": "^0.169.0",
     "prettier": "3.2.4"
   }
 }
