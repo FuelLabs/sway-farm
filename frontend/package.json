@@ -5,7 +5,7 @@
   "dependencies": {
     "@fuel-ui/css": "^0.12.4",
     "@fuel-ui/react": "^0.12.4",
-    "@fuels/connectors": "^0.31.3",
+    "@fuels/connectors": "^0.5.0",
     "@fuels/eslint-plugin": "^0.1.4",
     "@fuels/prettier-config": "^0.1.4",
     "@fuels/react": "^0.36.0",
