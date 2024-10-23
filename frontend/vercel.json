@@ -2,7 +2,5 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "github": {
     "silent": true
-  },
-  "buildCommand": "pnpm install --legacy-peer-deps && npm run build"
-
+  }
 }
