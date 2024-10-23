@@ -3,10 +3,10 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 
 import { buttonStyle } from '../../constants';
-import type { ContractAbi } from '../../sway-api';
+import type { FarmContract } from '../../sway-api';
 
 interface HarvestProps {
-  contract: ContractAbi | null;
+  contract: FarmContract | null;
   tileArray: number[];
   updatePageNum: () => void;
   setCanMove: Dispatch<SetStateAction<boolean>>;

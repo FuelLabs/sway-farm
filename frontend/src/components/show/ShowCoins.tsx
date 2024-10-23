@@ -4,11 +4,11 @@ import { useWallet } from '@fuels/react';
 import type { BN, BytesLike } from 'fuels';
 import { useState, useEffect } from 'react';
 
-import type { ContractAbi } from '../../sway-api';
+import type { FarmContract } from '../../sway-api';
 
 interface ShowCoinsProps {
   updateNum: number;
-  contract: ContractAbi | null;
+  contract: FarmContract | null;
   farmCoinAssetID: BytesLike;
 }
 

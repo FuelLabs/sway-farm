@@ -4,12 +4,12 @@ import { useWallet } from '@fuels/react';
 import { useState, useEffect } from 'react';
 
 import { TESTNET_FAUCET_URL, buttonStyle } from '../constants';
-import type { ContractAbi } from '../sway-api';
+import type { FarmContract } from '../sway-api';
 
 import Loading from './Loading';
 
 interface NewPlayerProps {
-  contract: ContractAbi | null;
+  contract: FarmContract | null;
   updatePageNum: () => void;
 }
 

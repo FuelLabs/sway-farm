@@ -21,7 +21,7 @@ import {
   // VERCEL_ENV,
 } from './constants';
 import './App.css';
-import { ContractAbi__factory } from './sway-api';
+import { FarmContract } from './sway-api';
 
 function App() {
   const [burnerWallet, setBurnerWallet] = useState<Wallet>();
@@ -79,10 +79,10 @@ function App() {
 
   const contract = useMemo(() => {
     if (wallet) {
-      const contract = ContractAbi__factory.connect(CONTRACT_ID, wallet);
+      const contract = new FarmContract(CONTRACT_ID, wallet);
       return contract;
     } else if (burnerWallet) {
-      const contract = ContractAbi__factory.connect(
+      const contract = new FarmContract(
         CONTRACT_ID,
         burnerWallet as Account
       );
@@ -97,6 +97,8 @@ function App() {
         const { value } = await contract.functions.get_asset_id().get();
         // console.log("VALUE:", value)
         setFarmCoinAssetId(value.bits);
+        console.log('FARM COIN ASSET ID:', value.bits);
+        console.log('FARM COIN ASSET ID:');
       }
     }
     getAssetId();

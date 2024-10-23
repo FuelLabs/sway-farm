@@ -3,15 +3,15 @@ import { Flex, Box } from '@fuel-ui/react';
 import type { BytesLike } from 'fuels';
 
 import type {
-  ContractAbi,
+  FarmContract,
   PlayerOutput,
-} from '../../sway-api/contracts/ContractAbi';
+} from '../../sway-api/contracts/FarmContract';
 
 import ShowCoins from './ShowCoins';
 
 interface PlayerProps {
   player: PlayerOutput | null;
-  contract: ContractAbi | null;
+  contract: FarmContract | null;
   updateNum: number;
   farmCoinAssetID: BytesLike;
 }

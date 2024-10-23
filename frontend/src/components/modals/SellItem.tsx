@@ -4,11 +4,11 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 
 import { buttonStyle, FoodTypeInput } from '../../constants';
-import type { ContractAbi } from '../../sway-api/contracts/ContractAbi';
+import type { FarmContract } from '../../sway-api/contracts';
 import Loading from '../Loading';
 
 interface SellItemProps {
-  contract: ContractAbi | null;
+  contract: FarmContract | null;
   updatePageNum: () => void;
   items: number;
   setCanMove: Dispatch<SetStateAction<boolean>>;

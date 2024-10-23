@@ -11,11 +11,11 @@ import type { Modals } from '../constants';
 import { Controls, buttonStyle, FoodTypeInput } from '../constants';
 import type {
   AddressInput,
-  ContractAbi,
   GardenVectorOutput,
   IdentityInput,
   PlayerOutput,
-} from '../sway-api/contracts/ContractAbi';
+  FarmContract
+} from '../sway-api/contracts/FarmContract';
 
 import Background from './Background';
 import Camera from './Camera';
@@ -30,7 +30,7 @@ import PlantModal from './modals/PlantModal';
 import Info from './show/Info';
 
 interface GameProps {
-  contract: ContractAbi | null;
+  contract: FarmContract | null;
   isMobile: boolean;
   farmCoinAssetID: BytesLike;
 }

@@ -1,13 +1,13 @@
 [[package]]
-name = "contract"
+name = "core"
+source = "path+from-root-7053AAA90CC5E690"
+
+[[package]]
+name = "farm-contract"
 source = "member"
 dependencies = ["std"]
 
 [[package]]
-name = "core"
-source = "path+from-root-148AAAB4460F1A9D"
-
-[[package]]
 name = "std"
-source = "git+https://github.com/fuellabs/sway?tag=v0.59.0#d9985d8111f94235edba9a08fc71a9513ec2a95c"
+source = "git+https://github.com/fuellabs/sway?tag=v0.66.2#31486c0b47669612acb7c64d66ecb50aea281282"
 dependencies = ["core"]

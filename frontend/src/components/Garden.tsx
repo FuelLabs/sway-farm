@@ -2,18 +2,18 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useEffect } from 'react';
 
 import { TILES } from '../constants';
-import type { ContractAbi } from '../sway-api';
+import type { FarmContract } from '../sway-api';
 import type {
   GardenVectorOutput,
   AddressInput,
   IdentityInput,
-} from '../sway-api/contracts/ContractAbi';
+} from '../sway-api/contracts/FarmContract';
 
 import GardenTile from './GardenTile';
 
 interface GardenProps {
   tileStates: GardenVectorOutput | undefined;
-  contract: ContractAbi | null;
+  contract: FarmContract | null;
   setTileStates: Dispatch<SetStateAction<GardenVectorOutput | undefined>>;
   updateNum: number;
 }

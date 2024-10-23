@@ -5,10 +5,10 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 
 import { buttonStyle, FoodTypeInput } from '../../constants';
-import type { ContractAbi } from '../../sway-api/contracts/ContractAbi';
+import type { FarmContract } from '../../sway-api/contracts/FarmContract';
 
 interface BuySeedsProps {
-  contract: ContractAbi | null;
+  contract: FarmContract | null;
   updatePageNum: () => void;
   setCanMove: Dispatch<SetStateAction<boolean>>;
   farmCoinAssetID: BytesLike;
