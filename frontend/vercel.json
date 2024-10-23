@@ -3,6 +3,6 @@
   "github": {
     "silent": true
   },
-  "buildCommand": "npm install --legacy-peer-deps && npm run build"
+  "buildCommand": "pnpm install --legacy-peer-deps && npm run build"
 
 }
