@@ -2,19 +2,17 @@ import { cssObj } from '@fuel-ui/css';
 import { Button, Box } from '@fuel-ui/react';
 import { useConnectUI } from '@fuels/react';
 import { Wallet, Provider } from 'fuels';
-import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 
-import { FUEL_PROVIDER_URL } from '../../constants';
+import { FUEL_PROVIDER_URL } from '../../constants.ts';
 
-import Instructions from './Instructions';
+import Instructions from './Instructions.tsx';
 
 interface HomeProps {
-  setBurnerWallet: Dispatch<SetStateAction<Wallet>>;
   isMobile: boolean;
 }
 
-export default function Home({ setBurnerWallet, isMobile }: HomeProps) {
+export default function Home({ isMobile }: HomeProps) {
   const [provider, setProvider] = useState<Provider | null>(null);
   const { connect, isConnecting } = useConnectUI();
 
@@ -26,16 +24,6 @@ export default function Home({ setBurnerWallet, isMobile }: HomeProps) {
 
     setupProvider();
   }, []);
-
-  function create() {
-    if (!provider) return; // Ensure the provider is set
-
-    const newWallet = Wallet.generate({
-      provider,
-    });
-    setBurnerWallet(newWallet);
-    window.localStorage.setItem('sway-farm-wallet-key', newWallet.privateKey);
-  }
 
   return (
     <div>
@@ -51,11 +39,7 @@ export default function Home({ setBurnerWallet, isMobile }: HomeProps) {
           >
             {isConnecting ? 'Connecting' : 'Connect'}
           </Button>
-          <p>or use a burner wallet</p>
         </Box>
-        <Button css={styles.button} onPress={() => create()}>
-          Play with In-Browser Wallet
-        </Button>
       </Box>
     </div>
   );

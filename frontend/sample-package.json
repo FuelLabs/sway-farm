@@ -1,0 +1,62 @@
+{
+  "name": "game-demo",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@fuel-ui/css": "^0.12.4",
+    "@fuel-ui/react": "^0.12.4",
+    "@fuels/connectors": "^0.36.0",
+    "@fuels/eslint-plugin": "^0.1.4",
+    "@fuels/prettier-config": "^0.1.4",
+    "@fuels/react": "^0.36.0",
+    "@mediapipe/tasks-vision": "^0.10.17",
+    "@react-three/drei": "^9.114.6",
+    "@react-three/fiber": "^8.17.10",
+    "@tanstack/react-query": "^5.59.5",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@vercel/analytics": "^1.0.0",
+    "@wagmi/connectors": "5.0.26",
+    "@wagmi/core": "2.13.4",
+    "fuels": "^0.96.1",
+    "react": "^18.2",
+    "react-dom": "^18.2",
+    "react-scripts": "5.0.1",
+    "three": "^0.169.0",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "craco start",
+    "build": "craco build",
+    "cbuild": "fuels build",
+    "test": "craco test",
+    "eject": "craco eject",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "prettier:check": "prettier --check .",
+    "prettier:format": "prettier --write .",
+    "build-types": "fuels build"
+  },
+  "eslintConfig": {
+    "extends": ["react-app", "react-app/jest"]
+  },
+  "browserslist": {
+    "production": [">0.2%", "not dead", "not op_mini all"],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@craco/craco": "^7.1.0",
+    "@types/jest": "^29.5.13",
+    "@types/node": "^20",
+    "@types/react": "^18.2",
+    "@types/react-dom": "^18.2",
+    "@types/three": "^0.169.0",
+    "prettier": "3.2.4"
+  }
+}

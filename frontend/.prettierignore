@@ -1,5 +1,0 @@
-.github
-node_modules
-package-lock.json
-**/src/sway-api/**
-**/src/sway-api/**/**

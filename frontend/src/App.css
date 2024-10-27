@@ -15,7 +15,7 @@ body {
 
 @font-face {
   font-family: pressStart2P;
-  src: url(../public/PressStart2P-Regular.ttf);
+  src: url(../PressStart2P-Regular.ttf);
 }
 
 .plant-modal,
