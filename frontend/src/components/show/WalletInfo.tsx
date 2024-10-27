@@ -47,7 +47,7 @@ export default function WalletInfo({
     <Box css={styles.container}>
       <Flex direction={"column"} justify="space-around">
         <Box css={styles.box}>
-          Wallet: {getTruncatedAddress(wallet.address.toB256())}
+          Wallet: {wallet && getTruncatedAddress(wallet.address.toB256())}
         </Box>
         <Box css={styles.disconnect}>
           <span
@@ -60,7 +60,7 @@ export default function WalletInfo({
           </span>
         </Box>
         <Box
-          onClick={() => copyToClipboard(wallet?.address?.toB256())}
+          onClick={() => copyToClipboard(wallet? wallet.address.toB256():"")}
           css={styles.box}
         >
           Balance: {balance?.isZero() ? "0" : balance?.format({ precision: 6 })}{" "}
