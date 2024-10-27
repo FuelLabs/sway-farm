@@ -10,6 +10,7 @@ import type {
 import GithubRepo from './GithubRepo';
 import Inventory from './Inventory';
 import ShowPlayerInfo from './ShowPlayerInfo';
+import WalletInfo from './WalletInfo';
 
 interface InfoProps {
   player: PlayerOutput | null;
@@ -39,7 +40,22 @@ export default function Info({
           farmCoinAssetID={farmCoinAssetID}
         />
       </Box>
-      <Inventory seeds={seeds} items={items} />
+      <Box css={styles.playeriInfo}>
+        {/* <GithubRepo />
+        <ShowPlayerInfo
+          player={player}
+          contract={contract}
+          updateNum={updateNum}
+          farmCoinAssetID={farmCoinAssetID}
+        /> */}
+        <Inventory seeds={seeds} items={items} />
+        <WalletInfo
+          player={player}
+          contract={contract}
+          updateNum={updateNum}
+          farmCoinAssetID={farmCoinAssetID}
+        />
+      </Box>
     </Box>
   );
 }
@@ -58,6 +74,19 @@ const styles = {
     flexDirection: 'column-reverse',
     position: 'fixed',
     left: '0',
+    top: '0',
+    width: '270px',
+    '@sm': {
+      position: 'relative',
+      flexDirection: 'column',
+      width: '100%',
+    },
+  }),
+  playeriInfo: cssObj({
+    display: 'flex',
+    flexDirection: 'column-reverse',
+    position: 'fixed',
+    right: '0',
     top: '0',
     width: '270px',
     '@sm': {

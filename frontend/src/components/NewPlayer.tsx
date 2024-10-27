@@ -24,6 +24,7 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
 
   async function getBalance() {
     const thisWallet = wallet ?? contract?.account;
+    console.log(wallet, "wallet");
     const baseAssetId = thisWallet?.provider.getBaseAssetId();
     const balance = await thisWallet!.getBalance(baseAssetId);
     const balanceNum = balance?.toNumber();
@@ -58,24 +59,17 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
   return (
     <>
       <div className="new-player-modal">
-        {status === 'none' && hasFunds && (
+        {status === "none" && hasFunds && (
           <Button css={buttonStyle} onPress={handleNewPlayer}>
             Make A New Player
           </Button>
         )}
-        {status === 'none' && !hasFunds && (
+        {status === "none" && !hasFunds && (
           <BoxCentered css={styles.container}>
             You need some ETH to play:
-            <Link
-              isExternal
-              href={`${TESTNET_FAUCET_URL}${
-                contract && contract.account
-                  ? `?address=${contract.account.address.toAddress()}`
-                  : ''
-              }`}
-            >
+            <Link isExternal href={`https://app.fuel.network/bridge`}>
               <Button css={styles.link} variant="link">
-                Go to Faucet
+                Go to Bridge
               </Button>
             </Link>
             <Button css={buttonStyle} onPress={getBalance}>
@@ -83,13 +77,13 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
             </Button>
           </BoxCentered>
         )}
-        {status === 'error' && (
+        {status === "error" && (
           <div>
             <p>Something went wrong!</p>
             <Button
               css={buttonStyle}
               onPress={() => {
-                setStatus('none');
+                setStatus("none");
                 updatePageNum();
               }}
             >
@@ -97,7 +91,7 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
             </Button>
           </div>
         )}
-        {status === 'loading' && <Loading />}
+        {status === "loading" && <Loading />}
       </div>
     </>
   );

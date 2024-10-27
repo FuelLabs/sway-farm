@@ -15,7 +15,6 @@ import {
   CONTRACT_ID,
   FARM_COIN_ASSET,
   FARM_COIN_ASSET_ID,
-  FUEL_PROVIDER_URL,
   // VERCEL_ENV,
 } from "./constants.ts";
 import "./App.css";
@@ -74,10 +73,8 @@ function App() {
     async function getAssetId() {
       if (contract) {
         const { value } = await contract.functions.get_asset_id().get();
-        // console.log("VALUE:", value)
         setFarmCoinAssetId(value.bits);
         console.log("FARM COIN ASSET ID:", value.bits);
-        console.log("FARM COIN ASSET ID:");
       }
     }
     getAssetId();

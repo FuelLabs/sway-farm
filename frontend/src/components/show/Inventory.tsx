@@ -42,7 +42,7 @@ const styles = {
     left: '0',
     '@sm': {
       position: 'relative',
-      top: '-108px',
+      top: '-214px',
       justifyContent: 'center',
       ml: '82.2%',
       width: '172px',
