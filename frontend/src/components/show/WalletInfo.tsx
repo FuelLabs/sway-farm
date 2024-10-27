@@ -60,7 +60,7 @@ export default function WalletInfo({
           </span>
         </Box>
         <Box
-          onClick={() => copyToClipboard(wallet.address.toB256())}
+          onClick={() => copyToClipboard(wallet?.address?.toB256())}
           css={styles.box}
         >
           Balance: {balance?.isZero() ? "0" : balance?.format({ precision: 6 })}{" "}
