@@ -1,7 +1,7 @@
 import { cssObj } from '@fuel-ui/css';
 import { Button, Box } from '@fuel-ui/react';
 import { useConnectUI } from '@fuels/react';
-import { Wallet, Provider } from 'fuels';
+import { Provider } from 'fuels';
 import { useEffect, useState } from 'react';
 
 import { FUEL_PROVIDER_URL } from '../../constants.ts';

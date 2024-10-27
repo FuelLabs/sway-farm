@@ -10,7 +10,6 @@ export default function Inventory({ seeds, items }: InventoryProps) {
   return (
     <Box css={styles.container}>
       <Box css={styles.box}>
-        {/* eslint-disable-next-line jsx-a11y/alt-text */}
         <Image css={styles.img} src={'images/tomato_seed_bag.png'} />
         <Box css={styles.numContainer}>
           <Box css={styles.num}>
@@ -20,7 +19,6 @@ export default function Inventory({ seeds, items }: InventoryProps) {
       </Box>
 
       <Box css={styles.box}>
-        {/* eslint-disable-next-line jsx-a11y/alt-text */}
         <Image css={styles.img} src={'images/tomato.png'} />
         <Box css={styles.numContainer}>
           <Box css={styles.num}>{items > 99 ? '99+' : items}</Box>

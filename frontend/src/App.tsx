@@ -7,7 +7,6 @@ import {
   useAddAssets,
 } from "@fuels/react";
 //Add Analytics
-import { Wallet, Provider } from "fuels";
 import { useState, useEffect, useMemo } from "react";
 
 import Game from "./components/Game.tsx";
