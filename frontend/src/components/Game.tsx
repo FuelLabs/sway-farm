@@ -107,9 +107,12 @@ export default function Game({
     return () => clearInterval(interval);
   }, [contract, updateNum]);
 
-  function updatePageNum() {
+  const updatePageNum = () => {
     setUpdateNum(updateNum + 1);
-  }
+    setTimeout(() => {
+      setUpdateNum(updateNum + 1);
+    }, 250);
+  };
 
   const controlsMap = useMemo<KeyboardControlsEntry[]>(
     () => [
