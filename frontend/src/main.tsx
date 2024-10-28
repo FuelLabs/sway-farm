@@ -2,13 +2,11 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import {
   BakoSafeConnector,
-  BurnerWalletConnector,
   createConfig as createFuelConfig,
   FueletWalletConnector,
   FuelWalletConnector,
   SolanaConnector,
   WalletConnectConnector,
-  defaultConnectors
 } from "@fuels/connectors";import { FuelProvider } from "@fuels/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider, CHAIN_IDS } from "fuels";

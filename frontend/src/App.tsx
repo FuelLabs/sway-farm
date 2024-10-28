@@ -28,38 +28,12 @@ function App() {
   );
   const { isConnected } = useIsConnected();
   const { wallet } = useWallet();
-  const { assets } = useAssets();
-  const { addAssets } = useAddAssets();
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
     const mobile = /(iphone|android|windows phone)/.test(userAgent);
     setIsMobile(mobile);
   }, []);
-
-  useEffect(() => {
-    async function getAccounts() {
-      if (mounted) {
-        let hasAsset = false;
-        for (let i = 0; i < assets.length; i++) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const thisAsset = assets[i] as any;
-          if (thisAsset.assetId && thisAsset.assetId === farmCoinAssetID) {
-            hasAsset = true;
-            break;
-          }
-          if (!hasAsset) {
-            addAssets([FARM_COIN_ASSET]);
-          }
-        }
-      } else {
-        setMounted(true);
-      }
-    }
-    // if wallet is installed & connected, fetch account info
-    if (isConnected) getAccounts();
-
-  }, [isConnected, mounted]);
 
   const contract = useMemo(() => {
     if (wallet) {
