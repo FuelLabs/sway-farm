@@ -33,12 +33,12 @@ export default function PlantModal({
         setCanMove(false);
         const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
         // console.log("TILE ARRAY:", tileArray)
-        await contract.functions
+        const tx = await contract.functions
           .plant_seed_at_index(seedType, tileArray[0])
           .call();
-
+        console.log("tx",tx);
         updatePageNum();
-        setStatus('none');
+        // setStatus('none');
       } catch (err) {
         console.log('Error in PlantModal', err);
         setStatus('error');

@@ -38,13 +38,14 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
     if (contract !== null) {
       try {
         setStatus('loading');
-        await contract.functions
+        const tx = await contract.functions
           .new_player()
           .txParams({
             variableOutputs: 1,
           })
           .call();
-        setStatus('none');
+          
+        // setStatus('none');
         updatePageNum();
       } catch (err) {
         console.log('Error in NewPlayer:', err);
@@ -58,6 +59,7 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
 
   return (
     <>
+    {console.log('status',status)}
       <div className="new-player-modal">
         {status === "none" && hasFunds && (
           <Button css={buttonStyle} onPress={handleNewPlayer}>

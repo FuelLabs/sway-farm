@@ -32,7 +32,7 @@ export default function SellItem({
         const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
         await contract.functions.sell_item(seedType, inputAmount).call();
         updatePageNum();
-        setStatus('none');
+        // setStatus('none');
       } catch (err) {
         console.log('Error in SellItem:', err);
         setStatus('error');
