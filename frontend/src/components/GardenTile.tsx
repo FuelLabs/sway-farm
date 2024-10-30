@@ -55,6 +55,7 @@ export default function GardenTile({
       let diff = (now - unix) / 1000;
       diff /= 60;
       const minutesAgo = Math.abs(Math.floor(diff));
+      console.log(`Position: ${position.x}, Diff: ${diff}, Minutes Ago: ${minutesAgo}`)
       if (minutesAgo < 20) {
         setTileState(minutesAgo);
       } else {

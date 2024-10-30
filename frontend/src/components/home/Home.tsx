@@ -1,10 +1,6 @@
 import { cssObj } from '@fuel-ui/css';
 import { Button, Box } from '@fuel-ui/react';
 import { useConnectUI } from '@fuels/react';
-import { Provider } from 'fuels';
-import { useEffect, useState } from 'react';
-
-import { FUEL_PROVIDER_URL } from '../../constants.ts';
 
 import Instructions from './Instructions.tsx';
 
@@ -13,17 +9,7 @@ interface HomeProps {
 }
 
 export default function Home({ isMobile }: HomeProps) {
-  const [provider, setProvider] = useState<Provider | null>(null);
   const { connect, isConnecting } = useConnectUI();
-
-  useEffect(() => {
-    async function setupProvider() {
-      const newProvider = await Provider.create(FUEL_PROVIDER_URL);
-      setProvider(newProvider);
-    }
-
-    setupProvider();
-  }, []);
 
   return (
     <div>

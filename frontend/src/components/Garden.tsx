@@ -40,7 +40,7 @@ export default function Garden({
                     console.log(
                       `3rd tx call duration: ${timeDiff.toFixed(2)} seconds`
                     );
-          // console.log("VALUE:", value)
+          console.log("VALUE:", value)
           setTileStates(value);
         } catch (err) {
           console.log('Error in Garden:', err);

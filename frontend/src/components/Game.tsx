@@ -6,6 +6,7 @@ import { Canvas } from "@react-three/fiber";
 import { BN } from "fuels";
 import type { BytesLike } from "fuels";
 import { useState, useEffect, useMemo, Suspense } from "react";
+import type { FoodOutput } from "../sway-api/contracts/FarmContract";
 
 import type { Modals } from "../constants";
 import { Controls, buttonStyle, FoodTypeInput } from "../constants";
@@ -66,7 +67,6 @@ export default function Game({
 
   useEffect(() => {
     async function getPlayerInfo() {
-      const startTime = performance.now();
       if (contract && contract.account) {
         try {
           const address: AddressInput = {
@@ -76,9 +76,7 @@ export default function Game({
           // get the player first
 
           const { value: Some } = await contract.functions.get_player(id).get();
-          const firstTxTime = performance.now();
-          const timeDiff = (firstTxTime - startTime) / 1000; // Difference in seconds
-          console.log(`1st tx call duration: ${timeDiff.toFixed(2)} seconds`);
+          console.log("SOME:", Some);
           if (Some?.farming_skill.gte(1)) {
             setPlayer(Some);
             const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
@@ -89,9 +87,6 @@ export default function Game({
                 contract.functions.get_item_amount(id, seedType),
               ])
               .get();
-            const secondTxTime = performance.now();
-            const timeDiff = (secondTxTime - firstTxTime) / 1000; // Difference in seconds
-            console.log(`2nd tx call duration: ${timeDiff.toFixed(2)} seconds`);
             const seedAmount = new BN(results[0]).toNumber();
             setSeeds(seedAmount);
             const itemAmount = new BN(results[1]).toNumber();
@@ -103,10 +98,6 @@ export default function Game({
         }
         setStatus("none");
       }
-      const endTime = performance.now(); // End time capture
-      const timeDiff = (endTime - startTime) / 1000; // Difference in seconds
-      console.log(`Performance time (end): ${endTime.toFixed(2)}ms`);
-      console.log(`Total tx call duration: ${timeDiff.toFixed(2)} seconds`);
     }
 
     getPlayerInfo();
@@ -114,7 +105,7 @@ export default function Game({
     // fetches player info 30 seconds
     const interval = setInterval(() => {
       setUpdateNum(updateNum + 1);
-    }, 30000);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [contract, updateNum]);
@@ -124,7 +115,37 @@ export default function Game({
       setUpdateNum(updateNum + 1);
     }, 500);
   };
+  const handlePlantSuccess = (position: number) => {
+    setSeeds((prev) => prev - 1);
 
+    setTileStates((prev) => {
+      if (!prev) return prev;
+      const taiOffset = BigInt(2 ** 62) + BigInt(10);
+      const currentTime = BigInt(Math.floor(Date.now() / 1000)) + taiOffset;
+      const newInner = [...prev.inner];
+      newInner[position] = {
+        name: "Tomatoes",
+        time_planted: new BN(currentTime.toString()),
+      } as FoodOutput;
+
+      return {
+        inner: newInner,
+      } as GardenVectorOutput;
+    });
+  };
+  const onHarvestSuccess = (position: number) => {
+    setItems((prev) => prev + 1);
+    setTileStates((prev) => {
+      if (!prev) return prev;
+
+      const newInner = [...prev.inner];
+      newInner[position] = undefined;
+
+      return {
+        inner: newInner,
+      } as GardenVectorOutput;
+    });
+  };
   const controlsMap = useMemo<KeyboardControlsEntry[]>(
     () => [
       { name: Controls.forward, keys: ["ArrowUp", "w", "W"] },
@@ -211,6 +232,8 @@ export default function Game({
                   tileArray={tileArray}
                   seeds={seeds}
                   setCanMove={setCanMove}
+                  setModal={setModal}
+                  onPlantSuccess={handlePlantSuccess}
                 />
               )}
               {modal === "harvest" && (
@@ -219,6 +242,8 @@ export default function Game({
                   contract={contract}
                   updatePageNum={updatePageNum}
                   setCanMove={setCanMove}
+                  setModal={setModal}
+                  onHarvestSuccess={onHarvestSuccess}
                 />
               )}
 
@@ -236,7 +261,12 @@ export default function Game({
 
           {/* NEW PLAYER MODAL */}
           {player === null && (
-            <NewPlayer updatePageNum={updatePageNum} contract={contract} />
+            <NewPlayer
+              updatePageNum={updatePageNum}
+              contract={contract}
+              setPlayer={setPlayer}
+              setModal={setModal}
+            />
           )}
         </>
       )}
