@@ -113,7 +113,7 @@ export default function Game({
   const updatePageNum = () => {
     setTimeout(() => {
       setUpdateNum(updateNum + 1);
-    }, 500);
+    }, 3000);
   };
   const handlePlantSuccess = (position: number) => {
     setSeeds((prev) => prev - 1);
