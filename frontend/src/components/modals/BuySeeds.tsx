@@ -39,7 +39,7 @@ export default function BuySeeds({
           })
           .call();
         updatePageNum();
-        // setStatus('none');
+        setStatus('none');
       } catch (err) {
         console.log('Error in BuySeeds:', err);
         setStatus('error');
