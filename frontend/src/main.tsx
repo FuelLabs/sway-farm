@@ -7,7 +7,6 @@ import {
   FuelWalletConnector,
   SolanaConnector,
   WalletConnectConnector,
-  defaultConnectors,
 } from "@fuels/connectors";
 import { FuelProvider } from "@fuels/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -16,7 +15,7 @@ import { FUEL_PROVIDER_URL } from './constants.ts';
 import { createConfig, http, injected } from "@wagmi/core";
 import { mainnet } from "@wagmi/core/chains";
 import { walletConnect } from "@wagmi/connectors";
-
+import type { Config as WagmiConfig } from "@wagmi/core";
 import './index.css'
 import App from './App.tsx'
 
@@ -27,7 +26,6 @@ const networks = [
     url: FUEL_PROVIDER_URL,
   },
 ];
-// Creates a protection for SRR
 const FUEL_CONFIG = createFuelConfig(() => {
   const WalletConnectProjectId = "35b967d8f17700b2de24f0abee77e579";
   const wagmiConfig = createConfig({
@@ -62,7 +60,7 @@ const FUEL_CONFIG = createFuelConfig(() => {
   const bakoSafeConnector = new BakoSafeConnector();
   const walletConnectConnector = new WalletConnectConnector({
     projectId: WalletConnectProjectId,
-    wagmiConfig: wagmiConfig as any,
+    wagmiConfig: wagmiConfig as WagmiConfig,
     ...externalConnectorConfig,
   });
   const solanaConnector = new SolanaConnector({
