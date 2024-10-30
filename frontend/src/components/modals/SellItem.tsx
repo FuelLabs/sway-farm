@@ -31,8 +31,8 @@ export default function SellItem({
         const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
         const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
         await contract.functions.sell_item(seedType, inputAmount).call();
+        setStatus("none");
         updatePageNum();
-        setStatus('none');
       } catch (err) {
         console.log('Error in SellItem:', err);
         setStatus('error');

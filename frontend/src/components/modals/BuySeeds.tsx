@@ -38,8 +38,8 @@ export default function BuySeeds({
             forward: [price, farmCoinAssetID],
           })
           .call();
+        setStatus("none");
         updatePageNum();
-        setStatus('none');
       } catch (err) {
         console.log('Error in BuySeeds:', err);
         setStatus('error');
