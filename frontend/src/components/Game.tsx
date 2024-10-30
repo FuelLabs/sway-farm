@@ -114,16 +114,15 @@ export default function Game({
     // fetches player info 30 seconds
     const interval = setInterval(() => {
       setUpdateNum(updateNum + 1);
-    }, 10000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, [contract, updateNum]);
 
   const updatePageNum = () => {
-    setUpdateNum(updateNum + 1);
     setTimeout(() => {
       setUpdateNum(updateNum + 1);
-    }, 2000);
+    }, 500);
   };
 
   const controlsMap = useMemo<KeyboardControlsEntry[]>(

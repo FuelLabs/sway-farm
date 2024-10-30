@@ -46,12 +46,15 @@ export default function WalletInfo({
   return (
     <Box css={styles.container}>
       <Flex direction={"column"} justify="space-around">
-        <Box css={styles.box}>
+        <Box
+          onClick={() => copyToClipboard(wallet ? wallet.address.toB256() : "")}
+          css={styles.box}
+        >
           Wallet: {wallet && getTruncatedAddress(wallet.address.toB256())}
         </Box>
         <Box css={styles.disconnect}>
           <span
-            style={{width: "fit-content", cursor: "pointer"}}
+            style={{ width: "fit-content", cursor: "pointer" }}
             onClick={() => {
               disconnect();
             }}
@@ -59,10 +62,7 @@ export default function WalletInfo({
             Disconnect
           </span>
         </Box>
-        <Box
-          onClick={() => copyToClipboard(wallet? wallet.address.toB256():"")}
-          css={styles.box}
-        >
+        <Box css={styles.box}>
           Balance: {balance?.isZero() ? "0" : balance?.format({ precision: 6 })}{" "}
           ETH
         </Box>
