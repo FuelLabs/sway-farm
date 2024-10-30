@@ -2,9 +2,7 @@ import { cssObj } from "@fuel-ui/css";
 import { Box, BoxCentered, Heading } from "@fuel-ui/react";
 import {
   useIsConnected,
-  useWallet,
-  useAssets,
-  useAddAssets,
+  useWallet
 } from "@fuels/react";
 //Add Analytics
 import { useState, useEffect, useMemo } from "react";
@@ -13,7 +11,6 @@ import Game from "./components/Game.tsx";
 import Home from "./components/home/Home.tsx";
 import {
   CONTRACT_ID,
-  FARM_COIN_ASSET,
   FARM_COIN_ASSET_ID,
   // VERCEL_ENV,
 } from "./constants.ts";
@@ -21,7 +18,6 @@ import "./App.css";
 import { FarmContract } from "./sway-api/index.ts";
 
 function App() {
-  const [mounted, setMounted] = useState<boolean>(false);
   const [isMobile, setIsMobile] = useState(false);
   const [farmCoinAssetID, setFarmCoinAssetId] = useState<string | null>(
     FARM_COIN_ASSET_ID

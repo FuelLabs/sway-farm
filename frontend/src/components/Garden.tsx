@@ -26,8 +26,6 @@ export default function Garden({
 }: GardenProps) {
   useEffect(() => {
     async function getPlantedSeeds() {
-            const startTime = performance.now();
-
       if (contract && contract.account) {
         try {
           const address: AddressInput = {
@@ -35,12 +33,6 @@ export default function Garden({
           };
           const id: IdentityInput = { Address: address };
           const { value } = await contract.functions.get_garden_vec(id).get();
-                    const firstTxTime = performance.now();
-                    const timeDiff = (firstTxTime - startTime) / 1000; // Difference in seconds
-                    console.log(
-                      `3rd tx call duration: ${timeDiff.toFixed(2)} seconds`
-                    );
-          console.log("VALUE:", value)
           setTileStates(value);
         } catch (err) {
           console.log('Error in Garden:', err);

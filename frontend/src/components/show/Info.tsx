@@ -41,20 +41,8 @@ export default function Info({
         />
       </Box>
       <Box css={styles.playeriInfo}>
-        {/* <GithubRepo />
-        <ShowPlayerInfo
-          player={player}
-          contract={contract}
-          updateNum={updateNum}
-          farmCoinAssetID={farmCoinAssetID}
-        /> */}
         <Inventory seeds={seeds} items={items} />
-        <WalletInfo
-          player={player}
-          contract={contract}
-          updateNum={updateNum}
-          farmCoinAssetID={farmCoinAssetID}
-        />
+        <WalletInfo/>
       </Box>
     </Box>
   );

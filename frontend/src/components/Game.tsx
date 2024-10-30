@@ -76,7 +76,6 @@ export default function Game({
           // get the player first
 
           const { value: Some } = await contract.functions.get_player(id).get();
-          console.log("SOME:", Some);
           if (Some?.farming_skill.gte(1)) {
             setPlayer(Some);
             const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;

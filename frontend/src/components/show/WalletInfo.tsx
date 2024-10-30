@@ -1,37 +1,13 @@
 import { cssObj } from "@fuel-ui/css";
 import { Flex, Box } from "@fuel-ui/react";
-import type { BytesLike } from "fuels";
 import {
   useWallet,
-  useIsConnected,
-  useNetwork,
   useBalance,
   useDisconnect,
 } from "@fuels/react";
 
-import type {
-  FarmContract,
-  PlayerOutput,
-} from "../../sway-api/contracts/FarmContract";
-
-interface PlayerProps {
-  player: PlayerOutput | null;
-  contract: FarmContract | null;
-  updateNum: number;
-  farmCoinAssetID: BytesLike;
-}
-
-export default function WalletInfo({
-  player,
-  contract,
-  updateNum,
-  farmCoinAssetID,
-}: PlayerProps) {
-  let valSold;
-  if (player !== null) {
-    valSold = parseFloat(player.total_value_sold.format().toLocaleString());
-  }
-  const { wallet, isLoading: isWalletLoading } = useWallet();
+export default function WalletInfo() {
+  const { wallet } = useWallet();
   const getTruncatedAddress = (address: string) => {
     return address.slice(0, 6) + "..." + address.slice(-4);
   };

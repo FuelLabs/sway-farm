@@ -5,7 +5,6 @@ import {
   createConfig as createFuelConfig,
   FueletWalletConnector,
   FuelWalletConnector,
-  BurnerWalletConnector,
   SolanaConnector,
   WalletConnectConnector,
   defaultConnectors,
@@ -61,7 +60,6 @@ const FUEL_CONFIG = createFuelConfig(() => {
   const fueletWalletConnector = new FueletWalletConnector();
   const fuelWalletConnector = new FuelWalletConnector();
   const bakoSafeConnector = new BakoSafeConnector();
-  const burnerWalletConnector = new BurnerWalletConnector();
   const walletConnectConnector = new WalletConnectConnector({
     projectId: WalletConnectProjectId,
     wagmiConfig: wagmiConfig as any,
@@ -78,8 +76,7 @@ const FUEL_CONFIG = createFuelConfig(() => {
       walletConnectConnector,
       solanaConnector,
       fuelWalletConnector, 
-      bakoSafeConnector,
-      burnerWalletConnector
+      bakoSafeConnector
     ],
   };
 });
@@ -87,16 +84,8 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <FuelProvider
-        // networks={networks}
-        // fuelConfig={FUEL_CONFIG}
-        fuelConfig={{
-          connectors: defaultConnectors({
-            devMode: true,
-            wcProjectId: "35b967d8f17700b2de24f0abee77e579",
-            chainId: CHAIN_IDS.fuel.mainnet,
-            fuelProvider: Provider.create(FUEL_PROVIDER_URL),
-          }),
-        }}
+        networks={networks}
+        fuelConfig={FUEL_CONFIG}
         uiConfig={{ suggestBridge: false }}
         theme="dark"
       >

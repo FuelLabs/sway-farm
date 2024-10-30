@@ -38,12 +38,10 @@ export default function PlantModal({
         setCanMove(false);
         const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
 
-        console.log("TILE ARRAY:", tileArray);
         const tx = await contract.functions
           .plant_seed_at_index(seedType, tileArray[0])
           .call();
 
-        console.log("tx", tx);
         if (tx) {
           onPlantSuccess(tileArray[0]);
           setModal("none");
