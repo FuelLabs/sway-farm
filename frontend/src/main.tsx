@@ -1,5 +1,5 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
 import {
   BakoSafeConnector,
   createConfig as createFuelConfig,
@@ -11,15 +11,16 @@ import {
 import { FuelProvider } from "@fuels/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider, CHAIN_IDS } from "fuels";
-import { FUEL_PROVIDER_URL } from './constants.ts';
+import { FUEL_PROVIDER_URL } from "./constants.ts";
 import { createConfig, http, injected } from "@wagmi/core";
 import { mainnet } from "@wagmi/core/chains";
 import { walletConnect } from "@wagmi/connectors";
 import type { Config as WagmiConfig } from "@wagmi/core";
-import './index.css'
-import App from './App.tsx'
+import "./index.css";
+import App from "./App.tsx";
 
 const queryClient = new QueryClient();
+console.log("ids",CHAIN_IDS);
 const networks = [
   {
     chainId: CHAIN_IDS.fuel.mainnet,
@@ -73,8 +74,8 @@ const FUEL_CONFIG = createFuelConfig(() => {
       fueletWalletConnector,
       walletConnectConnector,
       solanaConnector,
-      fuelWalletConnector, 
-      bakoSafeConnector
+      fuelWalletConnector,
+      bakoSafeConnector,
     ],
   };
 });
@@ -90,5 +91,5 @@ createRoot(document.getElementById("root")!).render(
         <App />
       </FuelProvider>
     </QueryClientProvider>{" "}
-  </StrictMode>
+  </StrictMode>,
 );

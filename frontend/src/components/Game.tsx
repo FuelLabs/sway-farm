@@ -152,7 +152,7 @@ export default function Game({
       { name: Controls.left, keys: ["ArrowLeft", "a", "A"] },
       { name: Controls.right, keys: ["ArrowRight", "d", "D"] },
     ],
-    []
+    [],
   );
 
   return (

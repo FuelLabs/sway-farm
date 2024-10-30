@@ -1,10 +1,10 @@
-import { cssObj } from '@fuel-ui/css';
-import { Box } from '@fuel-ui/react';
-import { useWallet } from '@fuels/react';
-import type { BN, BytesLike } from 'fuels';
-import { useState, useEffect } from 'react';
+import { cssObj } from "@fuel-ui/css";
+import { Box } from "@fuel-ui/react";
+import { useWallet } from "@fuels/react";
+import type { BN, BytesLike } from "fuels";
+import { useState, useEffect } from "react";
 
-import type { FarmContract } from '../../sway-api';
+import type { FarmContract } from "../../sway-api";
 
 interface ShowCoinsProps {
   updateNum: number;
@@ -37,12 +37,12 @@ export default function ShowCoins({
 }
 
 const styles = cssObj({
-  lineHeight: '120%',
-  fontFamily: 'pressStart2P',
-  fontSize: '$xs',
-  textAlign: 'left',
-  '@sm': {
-    maxWidth: 'none',
-    fontSize: '$sm',
+  lineHeight: "120%",
+  fontFamily: "pressStart2P",
+  fontSize: "$xs",
+  textAlign: "left",
+  "@sm": {
+    maxWidth: "none",
+    fontSize: "$sm",
   },
 });

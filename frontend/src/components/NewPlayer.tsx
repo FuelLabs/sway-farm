@@ -1,15 +1,15 @@
-import { cssObj } from '@fuel-ui/css';
-import { Button, BoxCentered, Link } from '@fuel-ui/react';
-import { useWallet } from '@fuels/react';
-import { useState, useEffect } from 'react';
+import { cssObj } from "@fuel-ui/css";
+import { Button, BoxCentered, Link } from "@fuel-ui/react";
+import { useWallet } from "@fuels/react";
+import { useState, useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { Modals } from "../constants";
 
-import {buttonStyle } from '../constants';
-import type { FarmContract } from '../sway-api';
+import { buttonStyle } from "../constants";
+import type { FarmContract } from "../sway-api";
 
-import Loading from './Loading';
-import { PlayerOutput } from '../sway-api/contracts/FarmContract';
+import Loading from "./Loading";
+import { PlayerOutput } from "../sway-api/contracts/FarmContract";
 import { BN } from "fuels";
 
 interface NewPlayerProps {
@@ -23,7 +23,7 @@ export default function NewPlayer({
   contract,
   updatePageNum,
   setPlayer,
-  setModal
+  setModal,
 }: NewPlayerProps) {
   const [status, setStatus] = useState<"error" | "loading" | "none">("none");
   const [hasFunds, setHasFunds] = useState<boolean>(false);
@@ -121,13 +121,13 @@ export default function NewPlayer({
 
 const styles = {
   container: cssObj({
-    flexDirection: 'column',
-    fontFamily: 'pressStart2P',
-    fontSize: '14px',
-    gap: '20px',
+    flexDirection: "column",
+    fontFamily: "pressStart2P",
+    fontSize: "14px",
+    gap: "20px",
   }),
   link: cssObj({
-    fontFamily: 'pressStart2P',
-    fontSize: '14px',
+    fontFamily: "pressStart2P",
+    fontSize: "14px",
   }),
 };

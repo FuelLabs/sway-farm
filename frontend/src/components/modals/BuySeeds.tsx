@@ -1,11 +1,11 @@
-import { Button, Spinner, BoxCentered } from '@fuel-ui/react';
-import { bn } from 'fuels';
-import type { BytesLike } from 'fuels';
-import type { Dispatch, SetStateAction } from 'react';
-import { useState } from 'react';
+import { Button, Spinner, BoxCentered } from "@fuel-ui/react";
+import { bn } from "fuels";
+import type { BytesLike } from "fuels";
+import type { Dispatch, SetStateAction } from "react";
+import { useState } from "react";
 
-import { buttonStyle, FoodTypeInput } from '../../constants';
-import type { FarmContract } from '../../sway-api/contracts/FarmContract';
+import { buttonStyle, FoodTypeInput } from "../../constants";
+import type { FarmContract } from "../../sway-api/contracts/FarmContract";
 
 interface BuySeedsProps {
   contract: FarmContract | null;
@@ -20,12 +20,12 @@ export default function BuySeeds({
   setCanMove,
   farmCoinAssetID,
 }: BuySeedsProps) {
-  const [status, setStatus] = useState<'error' | 'none' | `loading`>('none');
+  const [status, setStatus] = useState<"error" | "none" | `loading`>("none");
 
   async function buySeeds() {
     if (contract !== null) {
       try {
-        setStatus('loading');
+        setStatus("loading");
         setCanMove(false);
         const amount = 10;
         const realAmount = amount / 1_000_000_000;
@@ -41,30 +41,30 @@ export default function BuySeeds({
         setStatus("none");
         updatePageNum();
       } catch (err) {
-        console.log('Error in BuySeeds:', err);
-        setStatus('error');
+        console.log("Error in BuySeeds:", err);
+        setStatus("error");
       }
       setCanMove(true);
     } else {
-      console.log('ERROR: contract missing');
-      setStatus('error');
+      console.log("ERROR: contract missing");
+      setStatus("error");
     }
   }
 
   return (
     <>
-      {status === 'loading' && (
+      {status === "loading" && (
         <BoxCentered>
           <Spinner color="#754a1e" />
         </BoxCentered>
       )}
-      {status === 'error' && (
+      {status === "error" && (
         <div>
           <p>Something went wrong!</p>
           <Button
             css={buttonStyle}
             onPress={() => {
-              setStatus('none');
+              setStatus("none");
               updatePageNum();
             }}
           >
@@ -72,7 +72,7 @@ export default function BuySeeds({
           </Button>
         </div>
       )}
-      {status === 'none' && (
+      {status === "none" && (
         <>
           <div className="market-header">Buy Seeds</div>
           <Button css={buttonStyle} variant="outlined" onPress={buySeeds}>

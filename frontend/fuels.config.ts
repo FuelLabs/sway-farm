@@ -1,10 +1,8 @@
-import { createConfig } from 'fuels';
+import { createConfig } from "fuels";
 
 export default createConfig({
-  contracts: [
-        '../contract',
-  ],
-  output: './src/sway-api',
+  contracts: ["../contract"],
+  output: "./src/sway-api",
 });
 
 /**

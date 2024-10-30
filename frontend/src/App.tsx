@@ -1,9 +1,6 @@
 import { cssObj } from "@fuel-ui/css";
 import { Box, BoxCentered, Heading } from "@fuel-ui/react";
-import {
-  useIsConnected,
-  useWallet
-} from "@fuels/react";
+import { useIsConnected, useWallet } from "@fuels/react";
 //Add Analytics
 import { useState, useEffect, useMemo } from "react";
 
@@ -20,7 +17,7 @@ import { FarmContract } from "./sway-api/index.ts";
 function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [farmCoinAssetID, setFarmCoinAssetId] = useState<string | null>(
-    FARM_COIN_ASSET_ID
+    FARM_COIN_ASSET_ID,
   );
   const { isConnected } = useIsConnected();
   const { wallet } = useWallet();

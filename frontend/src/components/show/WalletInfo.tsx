@@ -1,10 +1,6 @@
 import { cssObj } from "@fuel-ui/css";
 import { Flex, Box } from "@fuel-ui/react";
-import {
-  useWallet,
-  useBalance,
-  useDisconnect,
-} from "@fuels/react";
+import { useWallet, useBalance, useDisconnect } from "@fuels/react";
 
 export default function WalletInfo() {
   const { wallet } = useWallet();

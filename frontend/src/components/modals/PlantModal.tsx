@@ -1,11 +1,11 @@
-import { Button } from '@fuel-ui/react';
-import type { Dispatch, SetStateAction } from 'react';
-import { useState } from 'react';
+import { Button } from "@fuel-ui/react";
+import type { Dispatch, SetStateAction } from "react";
+import { useState } from "react";
 
-import { buttonStyle, FoodTypeInput } from '../../constants';
-import type { FarmContract } from '../../sway-api/contracts';
-import type { Modals } from '../../constants';
-import Loading from '../Loading';
+import { buttonStyle, FoodTypeInput } from "../../constants";
+import type { FarmContract } from "../../sway-api/contracts";
+import type { Modals } from "../../constants";
+import Loading from "../Loading";
 
 interface PlantModalProps {
   contract: FarmContract | null;
@@ -96,6 +96,6 @@ export default function PlantModal({
 
 const styles = {
   seeds: {
-    marginBottom: '20px',
+    marginBottom: "20px",
   },
 };

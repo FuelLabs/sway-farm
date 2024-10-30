@@ -1,16 +1,16 @@
-import { cssObj } from '@fuel-ui/css';
-import { Box } from '@fuel-ui/react';
-import type { BytesLike } from 'fuels';
+import { cssObj } from "@fuel-ui/css";
+import { Box } from "@fuel-ui/react";
+import type { BytesLike } from "fuels";
 
 import type {
   FarmContract,
   PlayerOutput,
-} from '../../sway-api/contracts/FarmContract';
+} from "../../sway-api/contracts/FarmContract";
 
-import GithubRepo from './GithubRepo';
-import Inventory from './Inventory';
-import ShowPlayerInfo from './ShowPlayerInfo';
-import WalletInfo from './WalletInfo';
+import GithubRepo from "./GithubRepo";
+import Inventory from "./Inventory";
+import ShowPlayerInfo from "./ShowPlayerInfo";
+import WalletInfo from "./WalletInfo";
 
 interface InfoProps {
   player: PlayerOutput | null;
@@ -42,7 +42,7 @@ export default function Info({
       </Box>
       <Box css={styles.playeriInfo}>
         <Inventory seeds={seeds} items={items} />
-        <WalletInfo/>
+        <WalletInfo />
       </Box>
     </Box>
   );
@@ -50,37 +50,37 @@ export default function Info({
 
 const styles = {
   container: cssObj({
-    '@sm': {
-      position: 'relative',
-      top: '-150px',
-      alignItems: 'flex-end',
-      width: '100%',
+    "@sm": {
+      position: "relative",
+      top: "-150px",
+      alignItems: "flex-end",
+      width: "100%",
     },
   }),
   playerInfo: cssObj({
-    display: 'flex',
-    flexDirection: 'column-reverse',
-    position: 'fixed',
-    left: '0',
-    top: '0',
-    width: '270px',
-    '@sm': {
-      position: 'relative',
-      flexDirection: 'column',
-      width: '100%',
+    display: "flex",
+    flexDirection: "column-reverse",
+    position: "fixed",
+    left: "0",
+    top: "0",
+    width: "270px",
+    "@sm": {
+      position: "relative",
+      flexDirection: "column",
+      width: "100%",
     },
   }),
   playeriInfo: cssObj({
-    display: 'flex',
-    flexDirection: 'column-reverse',
-    position: 'fixed',
-    right: '0',
-    top: '0',
-    width: '270px',
-    '@sm': {
-      position: 'relative',
-      flexDirection: 'column',
-      width: '100%',
+    display: "flex",
+    flexDirection: "column-reverse",
+    position: "fixed",
+    right: "0",
+    top: "0",
+    width: "270px",
+    "@sm": {
+      position: "relative",
+      flexDirection: "column",
+      width: "100%",
     },
   }),
 };

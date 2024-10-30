@@ -1,10 +1,10 @@
-import type { BytesLike } from 'fuels';
-import type { Dispatch, SetStateAction } from 'react';
+import type { BytesLike } from "fuels";
+import type { Dispatch, SetStateAction } from "react";
 
-import type { FarmContract } from '../../sway-api';
+import type { FarmContract } from "../../sway-api";
 
-import BuySeeds from './BuySeeds';
-import SellItem from './SellItem';
+import BuySeeds from "./BuySeeds";
+import SellItem from "./SellItem";
 
 interface MarketModalProps {
   contract: FarmContract | null;
