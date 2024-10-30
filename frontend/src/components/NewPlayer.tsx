@@ -1,20 +1,31 @@
-import { cssObj } from '@fuel-ui/css';
-import { Button, BoxCentered, Link } from '@fuel-ui/react';
-import { useWallet } from '@fuels/react';
-import { useState, useEffect } from 'react';
+import { cssObj } from "@fuel-ui/css";
+import { Button, BoxCentered, Link } from "@fuel-ui/react";
+import { useWallet } from "@fuels/react";
+import { useState, useEffect } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import type { Modals } from "../constants";
 
-import { TESTNET_FAUCET_URL, buttonStyle } from '../constants';
-import type { ContractAbi } from '../sway-api';
+import { buttonStyle } from "../constants";
+import type { FarmContract } from "../sway-api";
 
-import Loading from './Loading';
+import Loading from "./Loading";
+import { PlayerOutput } from "../sway-api/contracts/FarmContract";
+import { BN } from "fuels";
 
 interface NewPlayerProps {
-  contract: ContractAbi | null;
+  contract: FarmContract | null;
   updatePageNum: () => void;
+  setPlayer: Dispatch<SetStateAction<PlayerOutput | null>>;
+  setModal: Dispatch<SetStateAction<Modals>>;
 }
 
-export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
-  const [status, setStatus] = useState<'error' | 'loading' | 'none'>('none');
+export default function NewPlayer({
+  contract,
+  updatePageNum,
+  setPlayer,
+  setModal,
+}: NewPlayerProps) {
+  const [status, setStatus] = useState<"error" | "loading" | "none">("none");
   const [hasFunds, setHasFunds] = useState<boolean>(false);
   const { wallet } = useWallet();
 
@@ -24,6 +35,7 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
 
   async function getBalance() {
     const thisWallet = wallet ?? contract?.account;
+    console.log(wallet, "wallet");
     const baseAssetId = thisWallet?.provider.getBaseAssetId();
     const balance = await thisWallet!.getBalance(baseAssetId);
     const balanceNum = balance?.toNumber();
@@ -36,46 +48,50 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
   async function handleNewPlayer() {
     if (contract !== null) {
       try {
-        setStatus('loading');
-        await contract.functions
+        setStatus("loading");
+        const tx = await contract.functions
           .new_player()
           .txParams({
             variableOutputs: 1,
           })
           .call();
-        setStatus('none');
-        updatePageNum();
+
+        // setStatus('none');
+        if (tx) {
+          // Immediately update player state with initial values
+          setPlayer({
+            farming_skill: new BN(1),
+            total_value_sold: new BN(0),
+          } as PlayerOutput);
+          setModal("none");
+
+          updatePageNum();
+        }
       } catch (err) {
-        console.log('Error in NewPlayer:', err);
-        setStatus('error');
+        console.log("Error in NewPlayer:", err);
+        setStatus("error");
       }
     } else {
-      console.log('ERROR: contract missing');
-      setStatus('error');
+      console.log("ERROR: contract missing");
+      setStatus("error");
     }
   }
 
   return (
     <>
+      {console.log("status", status)}
       <div className="new-player-modal">
-        {status === 'none' && hasFunds && (
+        {status === "none" && hasFunds && (
           <Button css={buttonStyle} onPress={handleNewPlayer}>
             Make A New Player
           </Button>
         )}
-        {status === 'none' && !hasFunds && (
+        {status === "none" && !hasFunds && (
           <BoxCentered css={styles.container}>
             You need some ETH to play:
-            <Link
-              isExternal
-              href={`${TESTNET_FAUCET_URL}${
-                contract && contract.account
-                  ? `?address=${contract.account.address.toAddress()}`
-                  : ''
-              }`}
-            >
+            <Link isExternal href={`https://app.fuel.network/bridge`}>
               <Button css={styles.link} variant="link">
-                Go to Faucet
+                Go to Bridge
               </Button>
             </Link>
             <Button css={buttonStyle} onPress={getBalance}>
@@ -83,13 +99,13 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
             </Button>
           </BoxCentered>
         )}
-        {status === 'error' && (
+        {status === "error" && (
           <div>
             <p>Something went wrong!</p>
             <Button
               css={buttonStyle}
               onPress={() => {
-                setStatus('none');
+                setStatus("none");
                 updatePageNum();
               }}
             >
@@ -97,7 +113,7 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
             </Button>
           </div>
         )}
-        {status === 'loading' && <Loading />}
+        {status === "loading" && <Loading />}
       </div>
     </>
   );
@@ -105,13 +121,13 @@ export default function NewPlayer({ contract, updatePageNum }: NewPlayerProps) {
 
 const styles = {
   container: cssObj({
-    flexDirection: 'column',
-    fontFamily: 'pressStart2P',
-    fontSize: '14px',
-    gap: '20px',
+    flexDirection: "column",
+    fontFamily: "pressStart2P",
+    fontSize: "14px",
+    gap: "20px",
   }),
   link: cssObj({
-    fontFamily: 'pressStart2P',
-    fontSize: '14px',
+    fontFamily: "pressStart2P",
+    fontSize: "14px",
   }),
 };

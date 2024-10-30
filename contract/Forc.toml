@@ -2,6 +2,6 @@
 authors = ["Sarah Schwartz"]
 entry = "main.sw"
 license = "Apache-2.0"
-name = "contract"
+name = "farm-contract"
 
 [dependencies]

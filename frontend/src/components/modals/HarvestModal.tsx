@@ -1,15 +1,18 @@
-import { Spinner, Button, BoxCentered } from '@fuel-ui/react';
-import type { Dispatch, SetStateAction } from 'react';
-import { useState } from 'react';
+import { Spinner, Button, BoxCentered } from "@fuel-ui/react";
+import type { Dispatch, SetStateAction } from "react";
+import { useState } from "react";
 
-import { buttonStyle } from '../../constants';
-import type { ContractAbi } from '../../sway-api';
+import { buttonStyle } from "../../constants";
+import type { FarmContract } from "../../sway-api";
+import type { Modals } from "../../constants";
 
 interface HarvestProps {
-  contract: ContractAbi | null;
+  contract: FarmContract | null;
   tileArray: number[];
   updatePageNum: () => void;
   setCanMove: Dispatch<SetStateAction<boolean>>;
+  setModal: Dispatch<SetStateAction<Modals>>;
+  onHarvestSuccess: (position: number) => void;
 }
 
 export default function HarvestModal({
@@ -17,42 +20,48 @@ export default function HarvestModal({
   tileArray,
   updatePageNum,
   setCanMove,
+  setModal,
+  onHarvestSuccess,
 }: HarvestProps) {
-  const [status, setStatus] = useState<'error' | 'none' | 'loading'>('none');
+  const [status, setStatus] = useState<"error" | "none" | "loading">("none");
 
   async function harvestItem() {
     if (contract !== null) {
       try {
-        setStatus('loading');
+        setStatus("loading");
         setCanMove(false);
-        await contract.functions.harvest(tileArray).call();
-        updatePageNum();
-        setStatus('none');
+        const result = await contract.functions.harvest(tileArray).call();
+        if (result) {
+          onHarvestSuccess(tileArray[0]); // Update tile state
+          setModal("plant"); // Close modal
+          updatePageNum(); // Update other state
+        }
+        // setStatus('none');
       } catch (err) {
-        console.log('Error in HarvestModal:', err);
-        setStatus('error');
+        console.log("Error in HarvestModal:", err);
+        setStatus("error");
       }
       setCanMove(true);
     } else {
-      console.log('ERROR: contract missing');
-      setStatus('error');
+      console.log("ERROR: contract missing");
+      setStatus("error");
     }
   }
 
   return (
     <div className="harvest-modal">
-      {status === 'loading' && (
+      {status === "loading" && (
         <BoxCentered>
           <Spinner color="#754a1e" />
         </BoxCentered>
       )}
-      {status === 'error' && (
+      {status === "error" && (
         <div>
           <p>Something went wrong!</p>
           <Button
             css={buttonStyle}
             onPress={() => {
-              setStatus('none');
+              setStatus("none");
               updatePageNum();
             }}
           >
@@ -60,7 +69,7 @@ export default function HarvestModal({
           </Button>
         </div>
       )}
-      {status === 'none' && (
+      {status === "none" && (
         <>
           <div style={styles.items}>Harvest this item?</div>
           <Button css={buttonStyle} onPress={harvestItem}>
@@ -74,6 +83,6 @@ export default function HarvestModal({
 
 const styles = {
   items: {
-    marginBottom: '20px',
+    marginBottom: "20px",
   },
 };

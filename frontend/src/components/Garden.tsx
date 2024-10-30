@@ -1,19 +1,19 @@
-import type { Dispatch, SetStateAction } from 'react';
-import { useEffect } from 'react';
+import type { Dispatch, SetStateAction } from "react";
+import { useEffect } from "react";
 
-import { TILES } from '../constants';
-import type { ContractAbi } from '../sway-api';
+import { TILES } from "../constants";
+import type { FarmContract } from "../sway-api";
 import type {
   GardenVectorOutput,
   AddressInput,
   IdentityInput,
-} from '../sway-api/contracts/ContractAbi';
+} from "../sway-api/contracts/FarmContract";
 
-import GardenTile from './GardenTile';
+import GardenTile from "./GardenTile";
 
 interface GardenProps {
   tileStates: GardenVectorOutput | undefined;
-  contract: ContractAbi | null;
+  contract: FarmContract | null;
   setTileStates: Dispatch<SetStateAction<GardenVectorOutput | undefined>>;
   updateNum: number;
 }
@@ -33,10 +33,9 @@ export default function Garden({
           };
           const id: IdentityInput = { Address: address };
           const { value } = await contract.functions.get_garden_vec(id).get();
-          // console.log("VALUE:", value)
           setTileStates(value);
         } catch (err) {
-          console.log('Error in Garden:', err);
+          console.log("Error in Garden:", err);
         }
       }
     }

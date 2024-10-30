@@ -1,15 +1,15 @@
-import { useKeyboardControls } from '@react-three/drei';
-import { useFrame, useLoader } from '@react-three/fiber';
-import type { Dispatch, SetStateAction } from 'react';
-import { useState, useEffect, useRef } from 'react';
-import type { Texture, Sprite } from 'three';
-import { Vector3, TextureLoader, NearestFilter } from 'three';
+import { useKeyboardControls } from "@react-three/drei";
+import { useFrame, useLoader } from "@react-three/fiber";
+import type { Dispatch, SetStateAction } from "react";
+import { useState, useEffect, useRef } from "react";
+import type { Texture, Sprite } from "three";
+import { Vector3, TextureLoader, NearestFilter } from "three";
 
-import type { Modals, Controls } from '../constants';
-import { convertTime, TILES } from '../constants';
-import type { GardenVectorOutput } from '../sway-api/contracts/ContractAbi';
+import type { Modals, Controls } from "../constants";
+import { convertTime, TILES } from "../constants";
+import type { GardenVectorOutput } from "../sway-api/contracts/FarmContract";
 
-import type { MobileControls, Position } from './Game';
+import type { MobileControls, Position } from "./Game";
 
 interface PlayerProps {
   tileStates: GardenVectorOutput | undefined;
@@ -64,7 +64,7 @@ export default function Player({
 
   const tilesHoriz = 4;
   const tilesVert = 5;
-  const tempSpriteMap = useLoader(TextureLoader, 'images/bunny_animations.png');
+  const tempSpriteMap = useLoader(TextureLoader, "images/bunny_animations.png");
   tempSpriteMap.magFilter = NearestFilter;
   tempSpriteMap.repeat.set(1 / tilesHoriz, 1 / tilesVert);
 
@@ -91,17 +91,17 @@ export default function Player({
     const position = ref.current?.position;
     if (!position) return;
     if (position.x < playerBounds.left) {
-      updatePlayerPosition('left', position);
+      updatePlayerPosition("left", position);
     } else if (position.x < playerBounds.center) {
-      updatePlayerPosition('center', position);
+      updatePlayerPosition("center", position);
     } else {
-      updatePlayerPosition('right', position);
+      updatePlayerPosition("right", position);
     }
   }
 
   function updatePlayerPosition(
-    side: 'left' | 'center' | 'right',
-    position: Vector3
+    side: "left" | "center" | "right",
+    position: Vector3,
   ) {
     if (
       position.y < playerBounds.bottom &&
@@ -122,7 +122,7 @@ export default function Player({
     const isInGarden = checkIfInGarden();
     const isAtMarket = checkIfAtMarket();
     if (!isInGarden && !isAtMarket) {
-      setModal('none');
+      setModal("none");
       return;
     }
     if (isInGarden) {
@@ -137,7 +137,7 @@ export default function Player({
         return a.distance - b.distance;
       });
       if (tileStates.inner[distances[0].i] === undefined) {
-        setModal('plant');
+        setModal("plant");
         setTileArray([distances[0].i]);
       } else {
         const now = Date.now();
@@ -147,14 +147,14 @@ export default function Player({
         diff /= 60;
         const minutesAgo = Math.abs(Math.floor(diff));
         if (minutesAgo < 20) {
-          setModal('none');
+          setModal("none");
         } else {
-          setModal('harvest');
+          setModal("harvest");
           setTileArray([distances[0].i]);
         }
       }
     } else if (isAtMarket) {
-      setModal('market');
+      setModal("market");
     }
   }
 
@@ -187,46 +187,46 @@ export default function Player({
     dl: number,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     state: any,
-    mobileControlState: MobileControls
+    mobileControlState: MobileControls,
   ) {
     if (!ref.current) return;
-    if ((state.left && !state.right) || mobileControlState === 'left') {
+    if ((state.left && !state.right) || mobileControlState === "left") {
       velocity.x = -1;
       setCurrentTile(12);
     }
-    if ((state.right && !state.left) || mobileControlState === 'right') {
+    if ((state.right && !state.left) || mobileControlState === "right") {
       velocity.x = 1;
       setCurrentTile(8);
     }
     if (
       !state.left &&
       !state.right &&
-      mobileControlState !== 'left' &&
-      mobileControlState !== 'right'
+      mobileControlState !== "left" &&
+      mobileControlState !== "right"
     )
       velocity.x = 0;
 
-    if ((state.forward && !state.back) || mobileControlState === 'up') {
+    if ((state.forward && !state.back) || mobileControlState === "up") {
       velocity.y = 1;
       setCurrentTile(4);
     }
-    if ((state.back && !state.forward) || mobileControlState === 'down') {
+    if ((state.back && !state.forward) || mobileControlState === "down") {
       velocity.y = -1;
       setCurrentTile(0);
     }
     if (
       !state.forward &&
       !state.back &&
-      mobileControlState !== 'up' &&
-      mobileControlState !== 'down'
+      mobileControlState !== "up" &&
+      mobileControlState !== "down"
     )
       velocity.y = 0;
 
     if (
       state.left ||
       state.right ||
-      mobileControlState === 'left' ||
-      mobileControlState === 'right'
+      mobileControlState === "left" ||
+      mobileControlState === "right"
     ) {
       if (
         ref.current.position.x <= bounds.right &&
@@ -243,8 +243,8 @@ export default function Player({
     if (
       state.back ||
       state.forward ||
-      mobileControlState === 'up' ||
-      mobileControlState === 'down'
+      mobileControlState === "up" ||
+      mobileControlState === "down"
     ) {
       if (
         ref.current.position.y <= bounds.top &&

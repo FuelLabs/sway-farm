@@ -1,14 +1,14 @@
-import { Html } from '@react-three/drei';
-import { useLoader } from '@react-three/fiber';
-import { useState, useEffect } from 'react';
-import type { Vector3 } from 'three';
-import { TextureLoader, NearestFilter } from 'three';
+import { Html } from "@react-three/drei";
+import { useLoader } from "@react-three/fiber";
+import { useState, useEffect } from "react";
+import type { Vector3 } from "three";
+import { TextureLoader, NearestFilter } from "three";
 
-import { convertTime } from '../constants';
-import type { FoodOutput } from '../sway-api/contracts/ContractAbi';
-import type { Option } from '../sway-api/contracts/common';
+import { convertTime } from "../constants";
+import type { FoodOutput } from "../sway-api/contracts/FarmContract";
+import type { Option } from "../sway-api/contracts/common";
 
-import Loading from './Loading';
+import Loading from "./Loading";
 
 interface GardenTileProps {
   position: Vector3;
@@ -22,7 +22,7 @@ export default function GardenTile({
   updateNum,
 }: GardenTileProps) {
   const [tileState, setTileState] = useState<number | undefined>(undefined);
-  const [status, setStatus] = useState<'loading' | 'loaded'>('loading');
+  const [status, setStatus] = useState<"loading" | "loaded">("loading");
 
   const [
     seedTexture,
@@ -32,12 +32,12 @@ export default function GardenTile({
     plantTexture4,
     finalTexture,
   ] = useLoader(TextureLoader, [
-    'images/seeds.png',
-    'images/tomato_plant_1.png',
-    'images/tomato_plant_2.png',
-    'images/tomato_plant_3.png',
-    'images/tomato_plant_4.png',
-    'images/tomato_plant_final.png',
+    "images/seeds.png",
+    "images/tomato_plant_1.png",
+    "images/tomato_plant_2.png",
+    "images/tomato_plant_3.png",
+    "images/tomato_plant_4.png",
+    "images/tomato_plant_final.png",
   ]);
   seedTexture.magFilter = NearestFilter;
   plantTexture1.magFilter = NearestFilter;
@@ -47,7 +47,7 @@ export default function GardenTile({
   finalTexture.magFilter = NearestFilter;
 
   useEffect(() => {
-    setStatus('loading');
+    setStatus("loading");
     if (state === undefined) setTileState(undefined);
     if (state !== undefined && state.time_planted) {
       const now = Date.now();
@@ -61,18 +61,18 @@ export default function GardenTile({
         setTileState(20);
       }
     }
-    setStatus('loaded');
+    setStatus("loaded");
   }, [state, updateNum]);
 
   return (
     <>
-      {status === 'loading' && (
+      {status === "loading" && (
         <Html position={[position.x - 0.1, position.y + 0.1, position.z]}>
           <Loading />
         </Html>
       )}
 
-      {tileState !== undefined && status === 'loaded' && (
+      {tileState !== undefined && status === "loaded" && (
         <>
           {tileState < 4 && (
             <sprite

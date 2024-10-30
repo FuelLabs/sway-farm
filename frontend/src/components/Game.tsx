@@ -1,68 +1,69 @@
-import { cssObj } from '@fuel-ui/css';
-import { Box, Button } from '@fuel-ui/react';
-import type { KeyboardControlsEntry } from '@react-three/drei';
-import { KeyboardControls } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
-import { BN } from 'fuels';
-import type { BytesLike } from 'fuels';
-import { useState, useEffect, useMemo, Suspense } from 'react';
+import { cssObj } from "@fuel-ui/css";
+import { Box, Button } from "@fuel-ui/react";
+import type { KeyboardControlsEntry } from "@react-three/drei";
+import { KeyboardControls } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { BN } from "fuels";
+import type { BytesLike } from "fuels";
+import { useState, useEffect, useMemo, Suspense } from "react";
+import type { FoodOutput } from "../sway-api/contracts/FarmContract";
 
-import type { Modals } from '../constants';
-import { Controls, buttonStyle, FoodTypeInput } from '../constants';
+import type { Modals } from "../constants";
+import { Controls, buttonStyle, FoodTypeInput } from "../constants";
 import type {
   AddressInput,
-  ContractAbi,
   GardenVectorOutput,
   IdentityInput,
   PlayerOutput,
-} from '../sway-api/contracts/ContractAbi';
+  FarmContract,
+} from "../sway-api/contracts/FarmContract";
 
-import Background from './Background';
-import Camera from './Camera';
-import Garden from './Garden';
-import Loading from './Loading';
-import MobileControlButtons from './MobileControls';
-import NewPlayer from './NewPlayer';
-import Player from './Player';
-import HarvestModal from './modals/HarvestModal';
-import MarketModal from './modals/MarketModal';
-import PlantModal from './modals/PlantModal';
-import Info from './show/Info';
+import Background from "./Background";
+import Camera from "./Camera";
+import Garden from "./Garden";
+import Loading from "./Loading";
+import MobileControlButtons from "./MobileControls";
+import NewPlayer from "./NewPlayer";
+import Player from "./Player";
+import HarvestModal from "./modals/HarvestModal";
+import MarketModal from "./modals/MarketModal";
+import PlantModal from "./modals/PlantModal";
+import Info from "./show/Info";
 
 interface GameProps {
-  contract: ContractAbi | null;
+  contract: FarmContract | null;
   isMobile: boolean;
   farmCoinAssetID: BytesLike;
 }
 
 export type Position =
-  | 'left-top'
-  | 'center-top'
-  | 'right-top'
-  | 'left-bottom'
-  | 'center-bottom'
-  | 'right-bottom';
-export type MobileControls = 'none' | 'up' | 'down' | 'left' | 'right';
+  | "left-top"
+  | "center-top"
+  | "right-top"
+  | "left-bottom"
+  | "center-bottom"
+  | "right-bottom";
+export type MobileControls = "none" | "up" | "down" | "left" | "right";
 
 export default function Game({
   contract,
   isMobile,
   farmCoinAssetID,
 }: GameProps) {
-  const [modal, setModal] = useState<Modals>('none');
+  const [modal, setModal] = useState<Modals>("none");
   const [tileStates, setTileStates] = useState<
     GardenVectorOutput | undefined
   >();
   const [tileArray, setTileArray] = useState<number[]>([]);
   const [player, setPlayer] = useState<PlayerOutput | null>(null);
-  const [status, setStatus] = useState<'error' | 'none' | 'loading'>('loading');
+  const [status, setStatus] = useState<"error" | "none" | "loading">("loading");
   const [updateNum, setUpdateNum] = useState<number>(0);
   const [seeds, setSeeds] = useState<number>(0);
   const [items, setItems] = useState<number>(0);
   const [canMove, setCanMove] = useState<boolean>(true);
-  const [playerPosition, setPlayerPosition] = useState<Position>('left-top');
+  const [playerPosition, setPlayerPosition] = useState<Position>("left-top");
   const [mobileControlState, setMobileControlState] =
-    useState<MobileControls>('none');
+    useState<MobileControls>("none");
 
   useEffect(() => {
     async function getPlayerInfo() {
@@ -73,6 +74,7 @@ export default function Game({
           };
           const id: IdentityInput = { Address: address };
           // get the player first
+
           const { value: Some } = await contract.functions.get_player(id).get();
           if (Some?.farming_skill.gte(1)) {
             setPlayer(Some);
@@ -90,10 +92,10 @@ export default function Game({
             setItems(itemAmount);
           }
         } catch (err) {
-          console.log('Error in Game:', err);
-          setStatus('error');
+          console.log("Error in Game:", err);
+          setStatus("error");
         }
-        setStatus('none');
+        setStatus("none");
       }
     }
 
@@ -102,34 +104,66 @@ export default function Game({
     // fetches player info 30 seconds
     const interval = setInterval(() => {
       setUpdateNum(updateNum + 1);
-    }, 30000);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [contract, updateNum]);
 
-  function updatePageNum() {
-    setUpdateNum(updateNum + 1);
-  }
+  const updatePageNum = () => {
+    setTimeout(() => {
+      setUpdateNum(updateNum + 1);
+    }, 3000);
+  };
+  const handlePlantSuccess = (position: number) => {
+    setSeeds((prev) => prev - 1);
 
+    setTileStates((prev) => {
+      if (!prev) return prev;
+      const taiOffset = BigInt(2 ** 62) + BigInt(10);
+      const currentTime = BigInt(Math.floor(Date.now() / 1000)) + taiOffset;
+      const newInner = [...prev.inner];
+      newInner[position] = {
+        name: "Tomatoes",
+        time_planted: new BN(currentTime.toString()),
+      } as FoodOutput;
+
+      return {
+        inner: newInner,
+      } as GardenVectorOutput;
+    });
+  };
+  const onHarvestSuccess = (position: number) => {
+    setItems((prev) => prev + 1);
+    setTileStates((prev) => {
+      if (!prev) return prev;
+
+      const newInner = [...prev.inner];
+      newInner[position] = undefined;
+
+      return {
+        inner: newInner,
+      } as GardenVectorOutput;
+    });
+  };
   const controlsMap = useMemo<KeyboardControlsEntry[]>(
     () => [
-      { name: Controls.forward, keys: ['ArrowUp', 'w', 'W'] },
-      { name: Controls.back, keys: ['ArrowDown', 's', 'S'] },
-      { name: Controls.left, keys: ['ArrowLeft', 'a', 'A'] },
-      { name: Controls.right, keys: ['ArrowRight', 'd', 'D'] },
+      { name: Controls.forward, keys: ["ArrowUp", "w", "W"] },
+      { name: Controls.back, keys: ["ArrowDown", "s", "S"] },
+      { name: Controls.left, keys: ["ArrowLeft", "a", "A"] },
+      { name: Controls.right, keys: ["ArrowRight", "d", "D"] },
     ],
-    []
+    [],
   );
 
   return (
     <Box css={styles.canvasContainer}>
-      {status === 'error' && (
+      {status === "error" && (
         <div>
           <p>Something went wrong!</p>
           <Button
             css={buttonStyle}
             onPress={() => {
-              setStatus('none');
+              setStatus("none");
               updatePageNum();
             }}
           >
@@ -137,8 +171,8 @@ export default function Game({
           </Button>
         </div>
       )}
-      {status === 'loading' && <Loading />}
-      {status === 'none' && (
+      {status === "loading" && <Loading />}
+      {status === "none" && (
         <>
           <Canvas orthographic>
             <Camera playerPosition={playerPosition} isMobile={isMobile} />
@@ -190,25 +224,29 @@ export default function Game({
           {player !== null && (
             <>
               {/* GAME MODALS */}
-              {modal === 'plant' && (
+              {modal === "plant" && (
                 <PlantModal
                   updatePageNum={updatePageNum}
                   contract={contract}
                   tileArray={tileArray}
                   seeds={seeds}
                   setCanMove={setCanMove}
+                  setModal={setModal}
+                  onPlantSuccess={handlePlantSuccess}
                 />
               )}
-              {modal === 'harvest' && (
+              {modal === "harvest" && (
                 <HarvestModal
                   tileArray={tileArray}
                   contract={contract}
                   updatePageNum={updatePageNum}
                   setCanMove={setCanMove}
+                  setModal={setModal}
+                  onHarvestSuccess={onHarvestSuccess}
                 />
               )}
 
-              {modal === 'market' && (
+              {modal === "market" && (
                 <MarketModal
                   contract={contract}
                   updatePageNum={updatePageNum}
@@ -222,7 +260,12 @@ export default function Game({
 
           {/* NEW PLAYER MODAL */}
           {player === null && (
-            <NewPlayer updatePageNum={updatePageNum} contract={contract} />
+            <NewPlayer
+              updatePageNum={updatePageNum}
+              contract={contract}
+              setPlayer={setPlayer}
+              setModal={setModal}
+            />
           )}
         </>
       )}
@@ -232,13 +275,13 @@ export default function Game({
 
 const styles = {
   canvasContainer: cssObj({
-    border: '4px solid #754a1e',
-    borderRadius: '8px',
-    height: ' calc(100vh - 8px)',
-    width: '1000px',
-    margin: 'auto',
-    '@sm': {
-      maxHeight: '740px',
+    border: "4px solid #754a1e",
+    borderRadius: "8px",
+    height: " calc(100vh - 8px)",
+    width: "1000px",
+    margin: "auto",
+    "@sm": {
+      maxHeight: "740px",
     },
   }),
 };
