@@ -20,7 +20,6 @@ import "./index.css";
 import App from "./App.tsx";
 
 const queryClient = new QueryClient();
-console.log("ids",CHAIN_IDS);
 const networks = [
   {
     chainId: CHAIN_IDS.fuel.mainnet,
