@@ -23,7 +23,8 @@ export default function WalletInfo() {
           onClick={() => copyToClipboard(wallet ? wallet.address.toB256() : "")}
           css={styles.box}
         >
-          {`${isMobile ? "W:" : "Wallet:"}`} {wallet && getTruncatedAddress(wallet.address.toB256())}
+          {`${isMobile ? "W:" : "Wallet:"}`}{" "}
+          {wallet && getTruncatedAddress(wallet.address.toB256())}
         </Box>
         <Box css={styles.disconnect}>
           <span
@@ -36,8 +37,8 @@ export default function WalletInfo() {
           </span>
         </Box>
         <Box css={styles.box}>
-          {`${isMobile ? "B:" : "Balance:"}`} {balance?.isZero() ? "0" : balance?.format({ precision: 6 })}{" "}
-          ETH
+          {`${isMobile ? "B:" : "Balance:"}`}{" "}
+          {balance?.isZero() ? "0" : balance?.format({ precision: 6 })} ETH
         </Box>
       </Flex>
     </Box>
