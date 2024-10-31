@@ -55,9 +55,5 @@ const styles = {
     color: "#aaa",
     fontFamily: "pressStart2P",
     lineHeight: "24px",
-    display: "none",
-    "@sm": {
-      display: "block",
-    },
   }),
 };

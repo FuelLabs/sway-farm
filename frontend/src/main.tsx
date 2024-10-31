@@ -67,14 +67,15 @@ const FUEL_CONFIG = createFuelConfig(() => {
     projectId: WalletConnectProjectId,
     ...externalConnectorConfig,
   });
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isMobile = /(iphone|android|windows phone)/.test(userAgent);
 
   return {
     connectors: [
       fueletWalletConnector,
       walletConnectConnector,
       solanaConnector,
-      fuelWalletConnector,
-      bakoSafeConnector,
+      ...(isMobile ? [] : [fuelWalletConnector, bakoSafeConnector]),
     ],
   };
 });
