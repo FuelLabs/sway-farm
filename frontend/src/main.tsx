@@ -7,6 +7,7 @@ import {
   FuelWalletConnector,
   SolanaConnector,
   WalletConnectConnector,
+  BurnerWalletConnector,
 } from "@fuels/connectors";
 import { FuelProvider } from "@fuels/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -58,6 +59,7 @@ const FUEL_CONFIG = createFuelConfig(() => {
   const fueletWalletConnector = new FueletWalletConnector();
   const fuelWalletConnector = new FuelWalletConnector();
   const bakoSafeConnector = new BakoSafeConnector();
+  const burnerWalletConnector = new BurnerWalletConnector({ fuelProvider });
   const walletConnectConnector = new WalletConnectConnector({
     projectId: WalletConnectProjectId,
     wagmiConfig: wagmiConfig as WagmiConfig,
@@ -75,6 +77,7 @@ const FUEL_CONFIG = createFuelConfig(() => {
       fueletWalletConnector,
       walletConnectConnector,
       solanaConnector,
+      burnerWalletConnector,
       ...(isMobile ? [] : [fuelWalletConnector, bakoSafeConnector]),
     ],
   };
