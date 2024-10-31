@@ -14,7 +14,8 @@ export default function WalletInfo() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
   };
-
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isMobile = /(iphone|android|windows phone)/.test(userAgent);
   return (
     <Box css={styles.container}>
       <Flex direction={"column"} justify="space-around">
@@ -22,7 +23,8 @@ export default function WalletInfo() {
           onClick={() => copyToClipboard(wallet ? wallet.address.toB256() : "")}
           css={styles.box}
         >
-          Wallet: {wallet && getTruncatedAddress(wallet.address.toB256())}
+          {`${isMobile ? "W:" : "Wallet:"}`}{" "}
+          {wallet && getTruncatedAddress(wallet.address.toB256())}
         </Box>
         <Box css={styles.disconnect}>
           <span
@@ -35,8 +37,8 @@ export default function WalletInfo() {
           </span>
         </Box>
         <Box css={styles.box}>
-          Balance: {balance?.isZero() ? "0" : balance?.format({ precision: 6 })}{" "}
-          ETH
+          {`${isMobile ? "B:" : "Balance:"}`}{" "}
+          {balance?.isZero() ? "0" : balance?.format({ precision: 6 })} ETH
         </Box>
       </Flex>
     </Box>
@@ -56,7 +58,7 @@ const styles = {
   }),
   disconnect: cssObj({
     fontFamily: "pressStart2P",
-    fontSize: "12px",
+    fontSize: "10px",
     textAlign: "right",
     lineHeight: "120%",
     textDecoration: "underline",
@@ -71,19 +73,23 @@ const styles = {
     display: "flex",
     border: "3px solid #754a1e",
     borderRadius: "8px",
-    height: "100px",
-    width: "300px",
+    height: "80px",
+    width: "fit-content",
     alignItems: "center",
     background: "#ac7339",
     position: "fixed",
-    bottom: "0",
+    bottom: "105px",
     left: "0",
+    px: "8px",
     "@sm": {
       position: "relative",
       top: "-214px",
+      bottom: "0",
       justifyContent: "center",
       ml: "68.2%",
       width: "312px",
+      px: "0px",
+      height: "100px",
     },
   }),
   playerInfo: cssObj({
