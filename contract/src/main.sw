@@ -150,9 +150,16 @@ impl GameContract for Contract {
         // require player has this many seeds
         let current_amount_option = storage.player_seeds.get((sender, food_type)).try_read();
         let current_amount = current_amount_option.unwrap_or(0);
+        // require there is no seed planted in that index
+        let mut planted_index = storage.planted_seeds.get(sender).try_read().unwrap();
         require(
             current_amount >= 1,
             InvalidError::NotEnoughSeeds(current_amount),
+        );
+
+        require(
+            planted_index.inner[index].is_none(),
+            "A seed already planted to this index"
         );
 
         let new_amount = current_amount - 1;
