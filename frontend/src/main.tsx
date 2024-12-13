@@ -23,7 +23,7 @@ import App from "./App.tsx";
 const queryClient = new QueryClient();
 const networks = [
   {
-    chainId: CHAIN_IDS.fuel.mainnet,
+    chainId: CHAIN_IDS.fuel.testnet,
     url: FUEL_PROVIDER_URL,
   },
 ];
