@@ -21,6 +21,7 @@ import axios from "axios";
 import { clone } from "ramda";
 import { FUEL_PROVIDER_URL } from "./constants";
 const main = async () => {
+
   const provider = await Provider.create(FUEL_PROVIDER_URL);
   const wallet = await fuel.getWallet(); // Use Fuel Browser Wallet
 
@@ -124,13 +125,10 @@ const main = async () => {
 
   console.log("request:", request.toJSON());
 
-  const response = await axios.post(
-    `${process.env.FUEL_STATION_SERVER_URL}/sign`,
-    {
-      request: request.toJSON(),
-      jobId: data.jobId,
-    }
-  );
+  const response = await axios.post(`${process.env.FUEL_STATION_SERVER_URL}/sign`, {
+    request: request.toJSON(),
+    jobId: data.jobId,
+  });
 
   if (response.status !== 200) {
     throw new Error("Failed to sign transaction");
