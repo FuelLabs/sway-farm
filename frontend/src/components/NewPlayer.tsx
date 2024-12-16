@@ -80,8 +80,8 @@ export default function NewPlayer({
       try {
         setStatus("loading");
 
+        // Try with gas station first
         try {
-          // Try with gas station first
           const addressIdentityInput = {
             Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
           };
