@@ -111,7 +111,9 @@ export default function NewPlayer({
           request.gasLimit = txCost.gasUsed;
           request.maxFee = txCost.maxFee;
   
-          await paymaster.sign(request, gasCoin, jobId);
+          const {signature} = await paymaster.fetchSignature(request, jobId);
+          request.updateWitnessByOwner(gasCoin.owner, signature);
+
           const tx = await (await wallet.provider.sendTransaction(request)).wait();
   
           if (tx) {

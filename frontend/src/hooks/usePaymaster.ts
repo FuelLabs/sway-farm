@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Address, BN, type Coin, Provider, TransactionRequest, bn } from "fuels";
+import { Address, type Coin, TransactionRequest, bn } from "fuels";
 
 type PaymasterMetadata = {
   maxValuePerCoin: string;
@@ -63,7 +63,7 @@ export const usePaymaster = () => {
     return { coin: gasCoin, jobId, utxoId }
   }
 
-  const sign = async (request: TransactionRequest, gasCoin: Coin, jobId: string) => {
+  const fetchSignature = async (request: TransactionRequest, jobId: string) => {
     // return;
     const response = await axios.post(signUrl, {
       request: request.toJSON(),
@@ -84,14 +84,12 @@ export const usePaymaster = () => {
       throw new Error("Gas coin not found");
     }
 
-    request.updateWitnessByOwner(gasCoin.owner, response.data.signature);
-
     return { signature: response.data.signature, gasInput, request }
   }
 
   return {
     allocate,
     metadata,
-    sign,
+    fetchSignature,
   }
 }
