@@ -4,7 +4,7 @@ import { Vector3 } from "three";
 
 // import contractIds from './sway-api/contract-ids.json';
 
-export const FUEL_PROVIDER_URL = "https://testnet.fuel.network/v1/graphql";
+export const FUEL_PROVIDER_URL = "http://localhost:4000/v1/graphql";
 
 export const TESTNET_FAUCET_URL = "https://faucet-testnet.fuel.network/";
 
@@ -15,7 +15,7 @@ export const CONTRACT_ID =
   // VERCEL_ENV === 'development'
   // ? contractIds.contract
   // :
-  "0x8e8a249c7e724019b2c975f245922609af63bbef88803a836cc59459a0542500";
+  "0x41d3e79c373eb01f3c9151e4f7f35bf8d13ed7a468ff3219341b3a0cca04970f";
 
 export const FARM_COIN_ASSET_ID =
   // VERCEL_ENV === 'development'

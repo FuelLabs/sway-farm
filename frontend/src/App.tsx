@@ -32,6 +32,7 @@ function App() {
   const contract = useMemo(() => {
     if (wallet) {
       const contract = new FarmContract(CONTRACT_ID, wallet);
+      console.log('contract', contract, wallet.provider.url);
       return contract;
     }
     return null;

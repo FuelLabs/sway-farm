@@ -97,28 +97,36 @@ export default function NewPlayer({
           Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
         };
 
+        console.log('contractID', contract.id.toB256());
+        console.log('Provider', provider.url);
         const scope = contract.functions
           .new_player(addressIdentityInput)
           .txParams({
             variableOutputs: 1,
           });
         const request = await scope.getTransactionRequest();
-        // const txCost = await wallet.getTransactionCost(request);
-        // console.log("txCost", txCost);
+
+
+        console.log('contractID 2', request.inputs);
         request.addCoinInput(gasCoin);
         request.addCoinOutput(
           gasCoin.owner,
           gasCoin.amount.sub(maxValuePerCoin),
           provider.getBaseAssetId()
         );
+        // request.addContractInputAndOutput(Address.fromAddressOrString('0x41d3e79c373eb01f3c9151e4f7f35bf8d13ed7a468ff3219341b3a0cca04970f'));
 
-        request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
-        const { gasLimit, maxFee } = await provider.estimateTxGasAndFee({
-          transactionRequest: request,
-        });
-        console.log(`New Player Cost gasLimit: ${gasLimit}, Maxfee: ${maxFee}`);
-        request.gasLimit = gasLimit;
+        const txCost = await wallet.getTransactionCost(request);
+        const { gasUsed, maxFee, missingContractIds, outputVariables} = txCost;
+        console.log("missingContractIds", missingContractIds);
+        console.log("outputVariables", outputVariables);
+        console.log(`New Player Cost gasLimit: ${gasUsed}, Maxfee: ${maxFee}`);
+        request.gasLimit = gasUsed;
         request.maxFee = maxFee;
+        request.addVariableOutputs(outputVariables);
+
+
+        // request.addContractInputAndOutput(Address.fromAddressOrString('0x41d3e79c373eb01f3c9151e4f7f35bf8d13ed7a468ff3219341b3a0cca04970f'));
 
         // return;
         const response = await axios.post(`http://167.71.42.88:3000/sign`, {
@@ -140,14 +148,18 @@ export default function NewPlayer({
           throw new Error("Gas coin not found");
         }
 
+        console.log("Dan request first", request.toJSON());
+
         const wi = request.getCoinInputWitnessIndexByOwner(gasCoin.owner);
         console.log("wi", wi);
         request.witnesses[wi as number] = response.data.signature;
 
-        // await wallet.fund(request, txCost);
 
-        const tx = await (await wallet.sendTransaction(request)).wait();
-        console.log("tx", tx);
+        console.log("Dan request", request.toJSON());
+        const tx = await wallet.sendTransaction(request, {
+          estimateTxDependencies: false,
+        });
+        console.log("Dan tx", tx);
         // const tx = await scope.call();
         //   .txParams({
         //     variableOutputs: 1,
