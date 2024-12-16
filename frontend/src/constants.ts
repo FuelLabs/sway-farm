@@ -15,12 +15,12 @@ export const CONTRACT_ID =
   // VERCEL_ENV === 'development'
   // ? contractIds.contract
   // :
-  "0xded6e82c3e59e3a9d230c6b5d4a161b5f60d12087a3b6ea8a1760f82e63be933";
+  "0x8e8a249c7e724019b2c975f245922609af63bbef88803a836cc59459a0542500";
 
 export const FARM_COIN_ASSET_ID =
   // VERCEL_ENV === 'development'
   // ? null :
-  "0x0d49458456105245c3e409720df7e2c066e30632c6fcc7faba8264e3aa7ae160";
+  "0x252d10f228f8fe0e67a9153e8154d4f752ff157d2f2307b151b6bd0957586c7e";
 
 export const FARM_COIN_NETWORK_ASSET = {
   /** type of network */

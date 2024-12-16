@@ -3,27 +3,13 @@ import {
   type BytesLike,
   Address,
   bn,
-  bufferFromString,
-  concat,
-  InputType,
-  OutputType,
   Provider,
-  ScriptTransactionRequest,
-  stringFromBuffer,
-  TransactionCoder,
-  TransactionType,
-  uint64ToBytesBE,
-  Wallet,
-  ZeroBytes32,
   type Coin,
-  type TransactionRequest,
-  type AssetId,
-  ReceiptType,
+  InputType,
 } from "fuels";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
 import axios from "axios";
-import { clone } from "ramda";
 import { FUEL_PROVIDER_URL } from "../../constants";
 import { buttonStyle, FoodTypeInput } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts/FarmContract";
@@ -49,112 +35,12 @@ export default function BuySeeds({
 }: BuySeedsProps) {
   const [status, setStatus] = useState<"error" | "none" | `loading`>("none");
   const { wallet } = useWallet();
-  function getTransactionIdPayload(
-    transactionRequest: TransactionRequest,
-    chainId: number
-  ) {
-    const transaction = transactionRequest.toTransaction();
 
-    if (transaction.type === TransactionType.Script) {
-      transaction.receiptsRoot = ZeroBytes32;
-    }
-
-    transaction.inputs = transaction.inputs.map((input) => {
-      const inputClone = clone(input);
-
-      switch (inputClone.type) {
-        case InputType.Coin: {
-          inputClone.txPointer = {
-            blockHeight: 0,
-            txIndex: 0,
-          };
-          inputClone.predicateGasUsed = bn(0);
-          return inputClone;
-        }
-        case InputType.Message: {
-          inputClone.predicateGasUsed = bn(0);
-          return inputClone;
-        }
-        case InputType.Contract: {
-          inputClone.txPointer = {
-            blockHeight: 0,
-            txIndex: 0,
-          };
-          inputClone.txID = ZeroBytes32;
-          inputClone.outputIndex = 0;
-          inputClone.balanceRoot = ZeroBytes32;
-          inputClone.stateRoot = ZeroBytes32;
-          return inputClone;
-        }
-        default:
-          return inputClone;
-      }
-    });
-
-    transaction.outputs = transaction.outputs.map((output) => {
-      const outputClone = clone(output);
-
-      switch (outputClone.type) {
-        case OutputType.Contract: {
-          outputClone.balanceRoot = ZeroBytes32;
-          outputClone.stateRoot = ZeroBytes32;
-          return outputClone;
-        }
-        case OutputType.Change: {
-          outputClone.amount = bn(0);
-          return outputClone;
-        }
-        case OutputType.Variable: {
-          outputClone.to = ZeroBytes32;
-          outputClone.amount = bn(0);
-          outputClone.assetId = ZeroBytes32;
-          return outputClone;
-        }
-        default:
-          return outputClone;
-      }
-    });
-    transaction.witnessesCount = 0;
-    transaction.witnesses = [];
-
-    const chainIdBytes = uint64ToBytesBE(chainId);
-    const concatenatedData = concat([
-      chainIdBytes,
-      new TransactionCoder().encode(transaction),
-    ]);
-
-    return concatenatedData;
-  }
   async function getCoins() {
     if (!wallet) {
       throw new Error("No wallet found");
     }
     const provider = await Provider.create(FUEL_PROVIDER_URL);
-    wallet.connect(provider);
-    const privateKey = localStorage.getItem("burner-wallet-private-key");
-    console.log("privateKey", privateKey);
-    if (!privateKey) {
-      throw new Error("No private key found");
-    }
-    // const burnerWallet = Wallet.fromPrivateKey(privateKey, provider);
-    const burnerWallet = wallet;
-
-    // const request = new ScriptTransactionRequest();
-    const amount = 10;
-    const realAmount = amount / 1_000_000_000;
-    const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
-    const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
-    const price = 750_000 * amount;
-    if (!contract) return;
-    const scope = contract.functions
-      .buy_seeds(seedType, inputAmount)
-      .callParams({
-        forward: [price, farmCoinAssetID],
-      });
-    const request = await scope.getTransactionRequest();
-    const assetId: AssetId = {
-      bits: "0x0d49458456105245c3e409720df7e2c066e30632c6fcc7faba8264e3aa7ae160",
-    };
     const { data: MetaDataResponse } = await axios.get<{
       maxValuePerCoin: string;
     }>(`http://167.71.42.88:3000/metadata`);
@@ -190,99 +76,134 @@ export default function BuySeeds({
       blockCreated: bn(data.coin.blockCreated),
       txCreatedIdx: bn(data.coin.txCreatedIdx),
     };
-    const recipientAddress = Address.fromString(
-      "0xe1f10f96460b3ABE6312a741339c5cc2B166aF30c17d954dA725180eEf45ce75"
-    );
     console.log("gasCoin", gasCoin);
-    const address = burnerWallet?.address.toB256();
-    console.log("address", address);
-    if (!burnerWallet) {
-      throw new Error("Wallet not connected");
-    }
-    // const { coins } = await burnerWallet.getCoins(assetId.bits);
-    // // console.log("Receipient address coins", await provider.getCoins(recipientAddress,assetId.bits));
-    // // return;
-    // if (!coins.length) {
-    //   throw new Error("No coins found");
-    // }
+    const amount = 10;
+    const realAmount = amount / 1_000_000_000;
+    const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
+    const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
+    const price = 750_000 * amount;
+    if (!contract) return;
+    const addressIdentityInput = {
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
+    };
+    console.log(price);
+    const scope = contract.functions
+      .buy_seeds(seedType, inputAmount, addressIdentityInput)
+      .callParams({
+        forward: [price, farmCoinAssetID],
+      });
+    const { coins } = await wallet.getCoins(farmCoinAssetID);
 
-    // console.log("coins", coins[0]);
-    // request.addCoinInput(coins[0]);
+    const request = await scope.getTransactionRequest();
+    // request.inputs = request.inputs.filter((input) => {
+    //   const typedInput = input as { assetId: string };
+    //   return (
+    //     typedInput.assetId !==
+    //     "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
+    //   );
+    // });
+    // request.outputs = request.outputs.filter(
+    //   (output) =>
+    //     (output as { assetId: string }).assetId !==
+    //     "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
+    // );
+    request.addCoinInput(coins[0]);
+    request.addChangeOutput(wallet.address, farmCoinAssetID);
+    const txCost = await wallet.getTransactionCost(request, {
+      quantities: coins,
+    });
+    console.log("txCost", txCost);
+    console.log("request before filter", request.toJSON());
 
-    // request.outputs = [];
-    // request.addCoinOutput(recipientAddress, 69, assetId.bits);
-    // request.addChangeOutput(wallet.address, assetId.bits);
+    const { gasUsed, missingContractIds, outputVariables, maxFee } = txCost;
+    console.log("outputVariables", outputVariables);
+    // Clean coin inputs before add new coins to the request
+    // request.inputs = request.inputs.filter((i) => i.type !== InputType.Coin);
 
-    // const txCost = await wallet.getTransactionCost(request);
-    // console.log("txCost", txCost);
-    // request.gasLimit = txCost.gasUsed;
-    // request.maxFee = txCost.maxFee;
+    // Adding missing contract ids
+    missingContractIds.forEach((contractId) => {
+      request.addContractInputAndOutput(Address.fromString(contractId));
+    });
+
+    // Adding required number of OutputVariables
+    request.addVariableOutputs(outputVariables);
+    request.gasLimit = gasUsed;
+    request.maxFee = maxFee;
+    console.log(`Buy Seeds Cost gasLimit: ${gasUsed}, Maxfee: ${maxFee}`);
 
     // await wallet.fund(request, txCost);
+    // console.log("request", request);
+    console.log("request manually", request.toJSON());
+    // request.addChangeOutput(wallet.address, farmCoinAssetID);
 
-    // request.addCoinInput(gasCoin);
-    // request.addCoinOutput(
-    //   gasCoin.owner,
-    //   gasCoin.amount.sub(maxValuePerCoin),
-    //   provider.getBaseAssetId()
-    // );
-    // request.addChangeOutput(burnerWallet.address, provider.getBaseAssetId());
-    console.log("wallet balance", await wallet.getBalances());
-    const estimateGas = await provider.estimateTxGasAndFee({
-      transactionRequest: request,
-    });
-    console.log("Estimate Gas", estimateGas);
-    console.log("Max Fee", estimateGas.maxFee.toNumber());
-    const txCost = await provider.getTransactionCost(request);
-
-    request.gasLimit = txCost.gasUsed;
-    request.maxFee = txCost.maxFee;
-    console.log("txCost", txCost);
-    await wallet.fund(request, txCost);
-    // const result = await provider.estimateTxGasAndFee({
-    //   transactionRequest: request,
-    // });
-    // console.log("result of estimate fees", result);
-    // request.maxFee = result.maxFee;
-    // request.gasLimit = result.maxGas;
-    // console.log("wallet", wallet);
-
-    // const response = await axios.post(`http://167.71.42.88:3000/sign`, {
-    //   request: request.toJSON(),
-    //   jobId: data.jobId,
-    // });
-    // if (response.status !== 200) {
-    //   throw new Error("Failed to sign transaction");
-    // }
-    // if (!response.data.signature) {
-    //   throw new Error("No signature found");
-    // }
-    // request.witnesses[1] = response.data.signature;
-    const txResult = await(await wallet.sendTransaction(request)).wait();
-    console.log("txResult", txResult);
-    console.log(
-      "balance of reciever after:",
-      await provider.getBalance(recipientAddress, assetId.bits)
+    request.addCoinInput(gasCoin);
+    request.addCoinOutput(
+      gasCoin.owner,
+      gasCoin.amount.sub(maxValuePerCoin),
+      provider.getBaseAssetId()
     );
+    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+
+    const response = await axios.post(`http://167.71.42.88:3000/sign`, {
+      request: request.toJSON(),
+      jobId: data.jobId,
+    });
+    if (response.status !== 200) {
+      throw new Error("Failed to sign transaction");
+    }
+    if (!response.data.signature) {
+      throw new Error("No signature found");
+    }
+    const gasInput = request.inputs.find((coin) => {
+      return coin.type === 0;
+    });
+    if (!gasInput) {
+      throw new Error("Gas coin not found");
+    }
+    console.log("gasInput", gasInput);
+    // request.witnesses.push(response.data.signature);
+    const wi = request.getCoinInputWitnessIndexByOwner(gasCoin.owner);
+    console.log("wi", wi);
+    request.witnesses[wi as number] = response.data.signature;
+    // request.witnesses = [request.witnesses[0]];
+    console.log("request manually after coin", request.toJSON());
+
+    const tx = await wallet.sendTransaction(request, {
+      estimateTxDependencies: false,
+    });
+    if (tx) {
+      console.log("tx", tx);
+    }
   }
   async function buySeeds() {
+    if (!wallet) {
+      throw new Error("No wallet found");
+    }
     if (contract !== null) {
       try {
         setStatus("loading");
         setCanMove(false);
-        // const amount = 10;
-        // const realAmount = amount / 1_000_000_000;
-        // const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
-        // const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
-        // const price = 750_000 * amount;
+        const amount = 10;
+        const realAmount = amount / 1_000_000_000;
+        const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
+        const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
+        const price = 750_000 * amount;
         await getCoins();
-
+        // const addressIdentityInput = {
+        //   Address: {
+        //     bits: Address.fromAddressOrString(
+        //       wallet.address.toString()
+        //     ).toB256(),
+        //   },
+        // };
         // const txRequest = await contract.functions
-        //   .buy_seeds(seedType, inputAmount)
+        //   .buy_seeds(seedType, inputAmount, addressIdentityInput)
         //   .callParams({
         //     forward: [price, farmCoinAssetID],
         //   })
-        //   .getTransactionRequest();
+        //   .call();
         // if (wallet) {
         //   const txResult = await (
         //     await wallet.sendTransaction(txRequest)
