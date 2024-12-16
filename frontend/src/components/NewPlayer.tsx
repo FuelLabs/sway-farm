@@ -1,5 +1,5 @@
 import { cssObj } from "@fuel-ui/css";
-import { Button } from "@fuel-ui/react";
+import { BoxCentered, Button } from "@fuel-ui/react";
 import { useWallet } from "@fuels/react";
 import { useState, useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
@@ -26,7 +26,7 @@ export default function NewPlayer({
   setPlayer,
   setModal,
 }: NewPlayerProps) {
-  const [status, setStatus] = useState<"error" | "loading" | "none">("none");
+  const [status, setStatus] = useState<"error" | "loading" | "retrying" | "none">("none");
   const [hasFunds, setHasFunds] = useState<boolean>(false);
   const { wallet } = useWallet();
 
@@ -47,124 +47,159 @@ export default function NewPlayer({
     }
   }
 
+  async function createPlayerWithoutGasStation() {
+    if (!wallet || !contract) throw new Error("Wallet or contract not found");
+    
+    const addressIdentityInput = {
+      Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
+    };
+
+    const tx = await contract.functions
+      .new_player(addressIdentityInput)
+      .txParams({
+        variableOutputs: 1,
+      })
+      .call();
+
+    if (tx) {
+      setPlayer({
+        farming_skill: new BN(1),
+        total_value_sold: new BN(0),
+      } as PlayerOutput);
+      setModal("none");
+      updatePageNum();
+    }
+    return tx;
+  }
+
   async function handleNewPlayer() {
-    const provider = await Provider.create(FUEL_PROVIDER_URL);
+    if (!wallet) {
+      throw new Error("No wallet found");
+    }
     if (contract !== null) {
-      if (!wallet) {
-        throw new Error("No wallet found");
-      }
       try {
         setStatus("loading");
-        const { data: MetaDataResponse } = await axios.get<{
-          maxValuePerCoin: string;
-        }>(`http://167.71.42.88:3000/metadata`);
-        const { maxValuePerCoin } = MetaDataResponse;
-        console.log("maxValuePerCoin", maxValuePerCoin);
-        if (!maxValuePerCoin) {
-          throw new Error("No maxValuePerCoin found");
-        }
-        const { data } = await axios.post<{
-          coin: {
-            id: string;
-            amount: string;
-            assetId: string;
-            owner: string;
-            blockCreated: string;
-            txCreatedIdx: string;
+
+        try {
+          // Try with gas station first
+          const provider = await Provider.create(FUEL_PROVIDER_URL);
+          const { data: MetaDataResponse } = await axios.get<{
+            maxValuePerCoin: string;
+          }>(`http://167.71.42.88:3000/metadata`);
+          const { maxValuePerCoin } = MetaDataResponse;
+          console.log("maxValuePerCoin", maxValuePerCoin);
+          if (!maxValuePerCoin) {
+            throw new Error("No maxValuePerCoin found");
+          }
+          const { data } = await axios.post<{
+            coin: {
+              id: string;
+              amount: string;
+              assetId: string;
+              owner: string;
+              blockCreated: string;
+              txCreatedIdx: string;
+            };
+            jobId: string;
+            utxoId: string;
+          }>(`http://167.71.42.88:3000/allocate-coin`);
+          if (!data?.coin) {
+            throw new Error("No coin found");
+          }
+
+          if (!data.jobId) {
+            throw new Error("No jobId found");
+          }
+          const gasCoin: Coin = {
+            id: data.coin.id,
+            amount: bn(data.coin.amount),
+            assetId: data.coin.assetId,
+            owner: Address.fromAddressOrString(data.coin.owner),
+            blockCreated: bn(data.coin.blockCreated),
+            txCreatedIdx: bn(data.coin.txCreatedIdx),
           };
-          jobId: string;
-          utxoId: string;
-        }>(`http://167.71.42.88:3000/allocate-coin`);
-        if (!data?.coin) {
-          throw new Error("No coin found");
-        }
+          console.log("gasCoin", gasCoin);
+          // const address = Address.fromRandom();
 
-        if (!data.jobId) {
-          throw new Error("No jobId found");
-        }
-        const gasCoin: Coin = {
-          id: data.coin.id,
-          amount: bn(data.coin.amount),
-          assetId: data.coin.assetId,
-          owner: Address.fromAddressOrString(data.coin.owner),
-          blockCreated: bn(data.coin.blockCreated),
-          txCreatedIdx: bn(data.coin.txCreatedIdx),
-        };
-        console.log("gasCoin", gasCoin);
-        // const address = Address.fromRandom();
+          const addressIdentityInput = {
+            Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
+          };
 
-        const addressIdentityInput = {
-          Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
-        };
+          const scope = contract.functions
+            .new_player(addressIdentityInput)
+            .txParams({
+              variableOutputs: 1,
+            });
+          const request = await scope.getTransactionRequest();
+          // const txCost = await wallet.getTransactionCost(request);
+          // console.log("txCost", txCost);
+          request.addCoinInput(gasCoin);
+          request.addCoinOutput(
+            gasCoin.owner,
+            gasCoin.amount.sub(maxValuePerCoin),
+            provider.getBaseAssetId()
+          );
 
-        const scope = contract.functions
-          .new_player(addressIdentityInput)
-          .txParams({
-            variableOutputs: 1,
+          request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+          const { gasLimit, maxFee } = await provider.estimateTxGasAndFee({
+            transactionRequest: request,
           });
-        const request = await scope.getTransactionRequest();
-        // const txCost = await wallet.getTransactionCost(request);
-        // console.log("txCost", txCost);
-        request.addCoinInput(gasCoin);
-        request.addCoinOutput(
-          gasCoin.owner,
-          gasCoin.amount.sub(maxValuePerCoin),
-          provider.getBaseAssetId()
-        );
+          console.log(`New Player Cost gasLimit: ${gasLimit}, Maxfee: ${maxFee}`);
+          request.gasLimit = gasLimit;
+          request.maxFee = maxFee;
 
-        request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
-        const { gasLimit, maxFee } = await provider.estimateTxGasAndFee({
-          transactionRequest: request,
-        });
-        console.log(`New Player Cost gasLimit: ${gasLimit}, Maxfee: ${maxFee}`);
-        request.gasLimit = gasLimit;
-        request.maxFee = maxFee;
+          // return;
+          const response = await axios.post(`http://167.71.42.88:3000/sign`, {
+            request: request.toJSON(),
+            jobId: data.jobId,
+          });
+          if (response.status !== 200) {
+            throw new Error("Failed to sign transaction");
+          }
 
-        // return;
-        const response = await axios.post(`http://167.71.42.88:3000/sign`, {
-          request: request.toJSON(),
-          jobId: data.jobId,
-        });
-        if (response.status !== 200) {
-          throw new Error("Failed to sign transaction");
+          if (!response.data.signature) {
+            throw new Error("No signature found");
+          }
+          console.log("response.data", response.data);
+          const gasInput = request.inputs.find((coin) => {
+            return coin.type === 0;
+          });
+          if (!gasInput) {
+            throw new Error("Gas coin not found");
+          }
+
+          const wi = request.getCoinInputWitnessIndexByOwner(gasCoin.owner);
+          console.log("wi", wi);
+          request.witnesses[wi as number] = response.data.signature;
+
+          // await wallet.fund(request, txCost);
+
+          const tx = await (await wallet.sendTransaction(request)).wait();
+          console.log("tx", tx);
+          // const tx = await scope.call();
+          //   .txParams({
+          //     variableOutputs: 1,
+          //   })
+          //   .call();
+
+          // setStatus('none');
+          if (tx) {
+            // Immediately update player state with initial values
+            setPlayer({
+              farming_skill: new BN(1),
+              total_value_sold: new BN(0),
+            } as PlayerOutput);
+            setModal("none");
+
+            updatePageNum();
+          }
+        } catch (error) {
+          console.log("Gas station failed, trying direct transaction...", error);
+          setStatus("retrying");
+          await createPlayerWithoutGasStation();
         }
 
-        if (!response.data.signature) {
-          throw new Error("No signature found");
-        }
-        console.log("response.data", response.data);
-        const gasInput = request.inputs.find((coin) => {
-          return coin.type === 0;
-        });
-        if (!gasInput) {
-          throw new Error("Gas coin not found");
-        }
-
-        const wi = request.getCoinInputWitnessIndexByOwner(gasCoin.owner);
-        console.log("wi", wi);
-        request.witnesses[wi as number] = response.data.signature;
-
-        // await wallet.fund(request, txCost);
-
-        const tx = await (await wallet.sendTransaction(request)).wait();
-        console.log("tx", tx);
-        // const tx = await scope.call();
-        //   .txParams({
-        //     variableOutputs: 1,
-        //   })
-        //   .call();
-
-        // setStatus('none');
-        if (tx) {
-          // Immediately update player state with initial values
-          setPlayer({
-            farming_skill: new BN(1),
-            total_value_sold: new BN(0),
-          } as PlayerOutput);
-          setModal("none");
-
-          updatePageNum();
-        }
+        setStatus("none");
       } catch (err) {
         console.log("Error in NewPlayer:", err);
         setStatus("error");
@@ -177,41 +212,37 @@ export default function NewPlayer({
 
   return (
     <>
-      {console.log("status", status)}
       <div className="new-player-modal">
         {status === "none" && (
           <Button css={buttonStyle} onPress={handleNewPlayer}>
             Make A New Player
           </Button>
         )}
-        {/* {status === "none" && !hasFunds && (
-          <BoxCentered css={styles.container}>
-            You need some ETH to play:
-            <Link isExternal href={`https://app.fuel.network/bridge`}>
-              <Button css={styles.link} variant="link">
-                Go to Bridge
-              </Button>
-            </Link>
-            <Button css={buttonStyle} onPress={getBalance}>
-              Recheck balance
-            </Button>
+        {status === "loading" && (
+          <BoxCentered>
+            <Loading />
+            <p>Creating new player...</p>
           </BoxCentered>
-        )} */}
+        )}
+        {status === "retrying" && (
+          <BoxCentered>
+            <Loading />
+            <p>Retrying with alternate method...</p>
+          </BoxCentered>
+        )}
         {status === "error" && (
           <div>
-            <p>Something went wrong!</p>
+            <p>Failed to create player! Please try again.</p>
             <Button
               css={buttonStyle}
               onPress={() => {
                 setStatus("none");
-                updatePageNum();
               }}
             >
               Try Again
             </Button>
           </div>
         )}
-        {status === "loading" && <Loading />}
       </div>
     </>
   );

@@ -33,7 +33,9 @@ export default function BuySeeds({
   setCanMove,
   farmCoinAssetID,
 }: BuySeedsProps) {
-  const [status, setStatus] = useState<"error" | "none" | `loading`>("none");
+  const [status, setStatus] = useState<"error" | "none" | "loading" | "retrying">("none");
+  const [retryCount, setRetryCount] = useState(0);
+  const MAX_RETRIES = 3;
   const { wallet } = useWallet();
 
   async function getCoins() {
@@ -163,11 +165,8 @@ export default function BuySeeds({
       throw new Error("Gas coin not found");
     }
     console.log("gasInput", gasInput);
-    // request.witnesses.push(response.data.signature);
     const wi = request.getCoinInputWitnessIndexByOwner(gasCoin.owner);
-    console.log("wi", wi);
     request.witnesses[wi as number] = response.data.signature;
-    // request.witnesses = [request.witnesses[0]];
     console.log("request manually after coin", request.toJSON());
 
     const tx = await wallet.sendTransaction(request, {
@@ -177,6 +176,30 @@ export default function BuySeeds({
       console.log("tx", tx);
     }
   }
+
+  async function buyWithoutGasStation() {
+    if (!wallet || !contract) throw new Error("Wallet or contract not found");
+    
+    const amount = 10;
+    const realAmount = amount / 1_000_000_000;
+    const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
+    const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
+    const price = 750_000 * amount;
+    
+    const addressIdentityInput = {
+      Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
+    };
+
+    const tx = await contract.functions
+      .buy_seeds(seedType, inputAmount, addressIdentityInput)
+      .callParams({
+        forward: [price, farmCoinAssetID],
+      })
+      .call();
+
+    return tx;
+  }
+
   async function buySeeds() {
     if (!wallet) {
       throw new Error("No wallet found");
@@ -185,38 +208,23 @@ export default function BuySeeds({
       try {
         setStatus("loading");
         setCanMove(false);
-        const amount = 10;
-        const realAmount = amount / 1_000_000_000;
-        const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
-        const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
-        const price = 750_000 * amount;
-        await getCoins();
-        // const addressIdentityInput = {
-        //   Address: {
-        //     bits: Address.fromAddressOrString(
-        //       wallet.address.toString()
-        //     ).toB256(),
-        //   },
-        // };
-        // const txRequest = await contract.functions
-        //   .buy_seeds(seedType, inputAmount, addressIdentityInput)
-        //   .callParams({
-        //     forward: [price, farmCoinAssetID],
-        //   })
-        //   .call();
-        // if (wallet) {
-        //   const txResult = await (
-        //     await wallet.sendTransaction(txRequest)
-        //   ).wait();
-        //   console.log("txResult", txResult);
-        // }
+
+        try {
+          await getCoins();
+        } catch (error) {
+          console.log("Gas station failed, trying direct transaction...",error);
+          setStatus("retrying");
+          await buyWithoutGasStation();
+        }
+
         setStatus("none");
         updatePageNum();
       } catch (err) {
         console.log("Error", err);
-        setStatus("error");
+        setStatus("none");
+      } finally {
+        setCanMove(true);
       }
-      setCanMove(true);
     } else {
       console.log("ERROR: contract missing");
       setStatus("error");
@@ -228,19 +236,26 @@ export default function BuySeeds({
       {status === "loading" && (
         <BoxCentered>
           <Spinner color="#754a1e" />
+          <p>Processing transaction...</p>
+        </BoxCentered>
+      )}
+      {status === "retrying" && (
+        <BoxCentered>
+          <Spinner color="#754a1e" />
+          <p>Retrying with alternate method...</p>
         </BoxCentered>
       )}
       {status === "error" && (
         <div>
-          <p>Something went wrong!</p>
+          <p>Transaction failed! Please try again.</p>
           <Button
             css={buttonStyle}
             onPress={() => {
               setStatus("none");
-              updatePageNum();
+              setRetryCount(0);
             }}
           >
-            Try Again
+            Buy 10 seeds
           </Button>
         </div>
       )}
