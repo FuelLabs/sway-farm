@@ -141,11 +141,9 @@ export default function NewPlayer({
           );
 
           request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
-          const { gasLimit, maxFee } = await provider.estimateTxGasAndFee({
-            transactionRequest: request,
-          });
-          console.log(`New Player Cost gasLimit: ${gasLimit}, Maxfee: ${maxFee}`);
-          request.gasLimit = gasLimit;
+          const txCost = await wallet.getTransactionCost(request);
+          const { gasUsed, maxFee } = txCost;
+          request.gasLimit = gasUsed;
           request.maxFee = maxFee;
 
           // return;
