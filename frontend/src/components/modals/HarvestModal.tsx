@@ -6,8 +6,8 @@ import { buttonStyle, FUEL_PROVIDER_URL } from "../../constants";
 import type { FarmContract } from "../../sway-api";
 import type { Modals } from "../../constants";
 import { useWallet } from "@fuels/react";
-import { Address, type Coin, Provider, bn } from "fuels";
-import axios from "axios";
+import { Address, Provider } from "fuels";
+import { usePaymaster } from "../../hooks/usePaymaster";
 interface HarvestProps {
   contract: FarmContract | null;
   tileArray: number[];
