@@ -124,12 +124,11 @@ export default function PlantModal({
             provider.getBaseAssetId()
           );
           request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
-          const { gasLimit, maxFee } = await provider.estimateTxGasAndFee({
-            transactionRequest: request,
-          });
-          request.gasLimit = gasLimit;
+          const txCost = await wallet.getTransactionCost(request);
+          const { gasUsed, maxFee } = txCost;
+          request.gasLimit = gasUsed;
           request.maxFee = maxFee;
-          console.log(`Plant Cost gasLimit: ${gasLimit}, Maxfee: ${maxFee}`);
+          console.log(`Plant Cost gasLimit: ${gasUsed}, Maxfee: ${maxFee}`);
           const response = await axios.post(`http://167.71.42.88:3000/sign`, {
             request: request.toJSON(),
             jobId: data.jobId,
