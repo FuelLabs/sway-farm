@@ -10,8 +10,8 @@ import type { FarmContract } from "../sway-api";
 
 import Loading from "./Loading";
 import { PlayerOutput } from "../sway-api/contracts/FarmContract";
-import { Address, BN, type Coin, Provider, bn } from "fuels";
-import axios from "axios";
+import { Address, BN, Provider } from "fuels";
+import { usePaymaster } from "../hooks/usePaymaster";
 
 interface NewPlayerProps {
   contract: FarmContract | null;
@@ -83,43 +83,10 @@ export default function NewPlayer({
         try {
           // Try with gas station first
           const provider = await Provider.create(FUEL_PROVIDER_URL);
-          const { data: MetaDataResponse } = await axios.get<{
-            maxValuePerCoin: string;
-          }>(`http://167.71.42.88:3000/metadata`);
-          const { maxValuePerCoin } = MetaDataResponse;
-          console.log("maxValuePerCoin", maxValuePerCoin);
-          if (!maxValuePerCoin) {
-            throw new Error("No maxValuePerCoin found");
-          }
-          const { data } = await axios.post<{
-            coin: {
-              id: string;
-              amount: string;
-              assetId: string;
-              owner: string;
-              blockCreated: string;
-              txCreatedIdx: string;
-            };
-            jobId: string;
-            utxoId: string;
-          }>(`http://167.71.42.88:3000/allocate-coin`);
-          if (!data?.coin) {
-            throw new Error("No coin found");
-          }
-
-          if (!data.jobId) {
-            throw new Error("No jobId found");
-          }
-          const gasCoin: Coin = {
-            id: data.coin.id,
-            amount: bn(data.coin.amount),
-            assetId: data.coin.assetId,
-            owner: Address.fromAddressOrString(data.coin.owner),
-            blockCreated: bn(data.coin.blockCreated),
-            txCreatedIdx: bn(data.coin.txCreatedIdx),
-          };
-          console.log("gasCoin", gasCoin);
-          // const address = Address.fromRandom();
+          
+          const paymaster = usePaymaster();
+          const { maxValuePerCoin } = await paymaster.metadata();
+          const { coin: gasCoin, jobId } = await paymaster.allocate();
 
           const addressIdentityInput = {
             Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
@@ -146,29 +113,8 @@ export default function NewPlayer({
           request.gasLimit = gasUsed;
           request.maxFee = maxFee;
 
-          // return;
-          const response = await axios.post(`http://167.71.42.88:3000/sign`, {
-            request: request.toJSON(),
-            jobId: data.jobId,
-          });
-          if (response.status !== 200) {
-            throw new Error("Failed to sign transaction");
-          }
-
-          if (!response.data.signature) {
-            throw new Error("No signature found");
-          }
-          console.log("response.data", response.data);
-          const gasInput = request.inputs.find((coin) => {
-            return coin.type === 0;
-          });
-          if (!gasInput) {
-            throw new Error("Gas coin not found");
-          }
-
-          const wi = request.getCoinInputWitnessIndexByOwner(gasCoin.owner);
-          console.log("wi", wi);
-          request.witnesses[wi as number] = response.data.signature;
+          const { signature } = await paymaster.fetchSignature(request, jobId);
+          request.updateWitnessByOwner(gasCoin.owner, signature);
 
           // await wallet.fund(request, txCost);
 
