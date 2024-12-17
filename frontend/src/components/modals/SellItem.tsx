@@ -9,6 +9,7 @@ import Loading from "../Loading";
 import { useWallet } from "@fuels/react";
 import axios from "axios";
 import { usePaymaster } from "../../hooks/usePaymaster";
+import { toast } from "react-hot-toast";
 
 interface SellItemProps {
   contract: FarmContract | null;
@@ -85,14 +86,17 @@ export default function SellItem({
 
         const tx = await wallet.sendTransaction(request);
         console.log("tx", tx);
+        toast.success("Successfully sold the item!");
       } catch (err) {
         console.log("Error in SellItem:", err);
         setStatus("error");
+        toast.error("Failed to sell the item :( Please try again.");
       }
       setCanMove(true);
     } else {
       console.log("ERROR: contract missing");
       setStatus("error");
+      toast.error("Failed to sell the item :( Please try again.");
     }
   }
 

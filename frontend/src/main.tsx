@@ -19,6 +19,7 @@ import { walletConnect } from "@wagmi/connectors";
 import type { Config as WagmiConfig } from "@wagmi/core";
 import "./index.css";
 import App from "./App.tsx";
+import { Toaster } from "react-hot-toast";
 
 const queryClient = new QueryClient();
 const networks = [
@@ -91,8 +92,19 @@ createRoot(document.getElementById("root")!).render(
         uiConfig={{ suggestBridge: false }}
         theme="dark"
       >
+        <Toaster
+          toastOptions={{
+            style: {
+              backgroundColor: "#ac7339",
+              border: "4px solid #754a1e",
+              borderRadius: "8px",
+              color: "black",
+            },
+            position: "bottom-center",
+          }}
+        />
         <App />
       </FuelProvider>
     </QueryClientProvider>{" "}
-  </StrictMode>,
+  </StrictMode>
 );

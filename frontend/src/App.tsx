@@ -18,7 +18,7 @@ import { Analytics } from "@vercel/analytics/react";
 function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [farmCoinAssetID, setFarmCoinAssetId] = useState<string | null>(
-    FARM_COIN_ASSET_ID,
+    FARM_COIN_ASSET_ID
   );
   const { isConnected } = useIsConnected();
   const { wallet } = useWallet();
@@ -62,6 +62,7 @@ function App() {
             <Heading css={styles.heading} as={"h1"}>
               SWAY FARM
             </Heading>
+            <span style={styles.gaslessLine}>Now completely GASLESS! 🎉</span>
             <Home isMobile={isMobile} />
           </BoxCentered>
         </BoxCentered>
@@ -126,5 +127,9 @@ const styles = {
     "@sm": {
       display: "none",
     },
+  }),
+  gaslessLine: cssObj({
+    color: "white",
+    fontSize: "20px",
   }),
 };

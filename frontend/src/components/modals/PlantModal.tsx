@@ -10,6 +10,7 @@ import { Address, type Coin, Provider, bn } from "fuels";
 import { useWallet } from "@fuels/react";
 import axios from "axios";
 import { usePaymaster } from "../../hooks/usePaymaster";
+import { toast } from "react-hot-toast";
 
 interface PlantModalProps {
   contract: FarmContract | null;
@@ -30,15 +31,19 @@ export default function PlantModal({
   onPlantSuccess,
   setModal,
 }: PlantModalProps) {
-  const [status, setStatus] = useState<"error" | "none" | "loading" | "retrying">("none");
+  const [status, setStatus] = useState<
+    "error" | "none" | "loading" | "retrying"
+  >("none");
   const { wallet } = useWallet();
 
   async function plantWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
-    
+
     const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
     const addressIdentityInput = {
-      Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
     };
 
     const tx = await contract.functions
@@ -48,6 +53,7 @@ export default function PlantModal({
     if (tx) {
       onPlantSuccess(tileArray[0]);
       setModal("none");
+      toast.success("Planted the seed!");
       updatePageNum();
     }
     return tx;
@@ -61,7 +67,7 @@ export default function PlantModal({
       try {
         setStatus("loading");
         setCanMove(false);
-    const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
+        const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
 
         try {
           // Try with gas station first
@@ -109,10 +115,17 @@ export default function PlantModal({
             onPlantSuccess(tileArray[0]);
             setModal("none");
             updatePageNum();
+            toast.success("Planted the seed!");
           }
           // setStatus('none');
         } catch (error) {
-          console.log("Gas station failed, trying direct transaction...", error);
+          console.log(
+            "Gas station failed, trying direct transaction...",
+            error
+          );
+          toast.error(
+            "Failed to plant the seed :( Retrying with alternate method..."
+          );
           setStatus("retrying");
           await plantWithoutGasStation();
         }
@@ -121,23 +134,21 @@ export default function PlantModal({
       } catch (err) {
         console.log("Error in PlantModal", err);
         setStatus("error");
+        toast.error("Failed to plant the seed :( Please try again.");
       } finally {
         setCanMove(true);
       }
     } else {
       console.log("ERROR: contract missing");
       setStatus("error");
+      toast.error("Failed to plant the seed :( Please try again.");
     }
   }
 
   return (
     <div className="plant-modal">
-      {status === "loading" && (
-        <Loading />
-      )}
-      {status === "retrying" && (
-        <Loading />
-      )}
+      {status === "loading" && <Loading />}
+      {status === "retrying" && <Loading />}
       {status === "error" && (
         <div>
           <p>Planting failed! Please try again.</p>

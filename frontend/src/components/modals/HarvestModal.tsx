@@ -8,6 +8,8 @@ import type { Modals } from "../../constants";
 import { useWallet } from "@fuels/react";
 import { Address, Provider } from "fuels";
 import { usePaymaster } from "../../hooks/usePaymaster";
+import { toast } from 'react-hot-toast'
+
 interface HarvestProps {
   contract: FarmContract | null;
   tileArray: number[];
@@ -43,6 +45,7 @@ export default function HarvestModal({
       onHarvestSuccess(tileArray[0]);
       setModal("plant");
       updatePageNum();
+      toast.success("Seed harvested!");
     }
     return tx;
   }
@@ -102,11 +105,13 @@ export default function HarvestModal({
             onHarvestSuccess(tileArray[0]); // Update tile state
             setModal("plant"); // Close modal
             updatePageNum(); // Update other state
+            toast.success("Seed harvested!");
           }
           // setStatus('none');
         } catch (error) {
           console.log("Gas station failed, trying direct transaction...", error);
           setStatus("retrying");
+          toast.error("Failed to harvest the seed :( Retrying with alternate method...");
           await harvestWithoutGasStation();
         }
 
@@ -114,12 +119,14 @@ export default function HarvestModal({
       } catch (err) {
         console.log("Error in HarvestModal:", err);
         setStatus("error");
+        toast.error("Failed to harvest the seed :( Please try again.");
       } finally {
         setCanMove(true);
       }
     } else {
       console.log("ERROR: contract missing");
       setStatus("error");
+      toast.error("Failed to harvest the seed :( Please try again.");
     }
   }
 

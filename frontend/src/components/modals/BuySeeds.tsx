@@ -20,6 +20,7 @@ import {
   useBalance,
 } from "@fuels/react";
 import { usePaymaster } from "../../hooks/usePaymaster";
+import { toast } from "react-hot-toast";
 
 interface BuySeedsProps {
   contract: FarmContract | null;
@@ -34,7 +35,9 @@ export default function BuySeeds({
   setCanMove,
   farmCoinAssetID,
 }: BuySeedsProps) {
-  const [status, setStatus] = useState<"error" | "none" | "loading" | "retrying">("none");
+  const [status, setStatus] = useState<
+    "error" | "none" | "loading" | "retrying"
+  >("none");
   const [retryCount, setRetryCount] = useState(0);
   const MAX_RETRIES = 3;
   const { wallet } = useWallet();
@@ -118,7 +121,7 @@ export default function BuySeeds({
     );
     request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
 
-    const {signature} = await paymaster.fetchSignature(request, jobId);
+    const { signature } = await paymaster.fetchSignature(request, jobId);
     request.updateWitnessByOwner(gasCoin.owner, signature);
 
     const tx = await wallet.sendTransaction(request, {
@@ -131,15 +134,17 @@ export default function BuySeeds({
 
   async function buyWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
-    
+
     const amount = 10;
     const realAmount = amount / 1_000_000_000;
     const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
     const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
     const price = 750_000 * amount;
-    
+
     const addressIdentityInput = {
-      Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
     };
 
     const tx = await contract.functions
@@ -164,22 +169,29 @@ export default function BuySeeds({
         try {
           await getCoins();
         } catch (error) {
-          console.log("Gas station failed, trying direct transaction...",error);
+          console.log(
+            "Gas station failed, trying direct transaction...",
+            error
+          );
           setStatus("retrying");
           await buyWithoutGasStation();
         }
 
         setStatus("none");
         updatePageNum();
+
+        toast.success("Successfully bought seeds!");
       } catch (err) {
         console.log("Error", err);
         setStatus("none");
+        toast.error("Failed to buy seeds :( Please try again.");
       } finally {
         setCanMove(true);
       }
     } else {
       console.log("ERROR: contract missing");
       setStatus("error");
+      toast.error("Failed to buy seeds :( Please try again.");
     }
   }
 
