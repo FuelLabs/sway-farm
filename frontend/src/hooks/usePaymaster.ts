@@ -63,7 +63,7 @@ export const usePaymaster = () => {
     return { coin: gasCoin, jobId, utxoId }
   }
 
-  const sign = async (request: TransactionRequest, gasCoin: Coin, jobId: string) => {
+  const sign = async (request: TransactionRequest, jobId: string): Promise<{ signature: string }> => {
     // return;
     const response = await axios.post(signUrl, {
       request: request.toJSON(),
@@ -84,9 +84,7 @@ export const usePaymaster = () => {
       throw new Error("Gas coin not found");
     }
 
-    request.updateWitnessByOwner(gasCoin.owner, response.data.signature);
-
-    return { signature: response.data.signature, gasInput, request }
+    return { signature: response.data.signature }
   }
 
   return {
