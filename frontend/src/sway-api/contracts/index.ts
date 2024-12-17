@@ -10,5 +10,5 @@
   Fuel-Core version: 0.40.0
 */
 
-export { FarmContract } from "./FarmContract";
-export { FarmContractFactory } from "./FarmContractFactory";
+export { FarmContract } from './FarmContract';
+export { FarmContractFactory } from './FarmContractFactory';

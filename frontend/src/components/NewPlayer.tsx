@@ -1,16 +1,17 @@
 import { cssObj } from "@fuel-ui/css";
-import { Button, BoxCentered, Link } from "@fuel-ui/react";
+import { Button } from "@fuel-ui/react";
 import { useWallet } from "@fuels/react";
 import { useState, useEffect } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { Modals } from "../constants";
 
-import { buttonStyle } from "../constants";
+import { buttonStyle, FUEL_PROVIDER_URL } from "../constants";
 import type { FarmContract } from "../sway-api";
 
 import Loading from "./Loading";
 import { PlayerOutput } from "../sway-api/contracts/FarmContract";
-import { BN } from "fuels";
+import { Address, BN, Provider } from "fuels";
+import { usePaymaster } from "../hooks/usePaymaster";
 
 interface NewPlayerProps {
   contract: FarmContract | null;
@@ -31,6 +32,7 @@ export default function NewPlayer({
 
   useEffect(() => {
     getBalance();
+    // setStatus("error");
   }, [wallet]);
 
   async function getBalance() {
@@ -46,17 +48,46 @@ export default function NewPlayer({
   }
 
   async function handleNewPlayer() {
+    const provider = await Provider.create(FUEL_PROVIDER_URL);
     if (contract !== null) {
+      if (!wallet) {
+        throw new Error("No wallet found");
+      }
       try {
         setStatus("loading");
-        const tx = await contract.functions
-          .new_player()
+
+        const addressIdentityInput = {
+          Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
+        };
+
+        const scope = contract.functions
+          .new_player(addressIdentityInput)
           .txParams({
             variableOutputs: 1,
-          })
-          .call();
+          });
 
-        // setStatus('none');
+        const request = await scope.getTransactionRequest();
+
+        const paymaster = usePaymaster();
+        const { maxValuePerCoin } = await paymaster.metadata();
+        const { coin: gasCoin, jobId } = await paymaster.allocate();
+
+        request.addCoinInput(gasCoin);
+        request.addCoinOutput(
+          gasCoin.owner,
+          gasCoin.amount.sub(maxValuePerCoin),
+          provider.getBaseAssetId()
+        );
+
+        request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+        
+        const txCost = await wallet.getTransactionCost(request);
+        request.gasLimit = txCost.gasUsed;
+        request.maxFee = txCost.maxFee;
+
+        await paymaster.sign(request, gasCoin, jobId);
+        const tx = await (await provider.sendTransaction(request)).wait();
+
         if (tx) {
           // Immediately update player state with initial values
           setPlayer({
@@ -81,12 +112,12 @@ export default function NewPlayer({
     <>
       {console.log("status", status)}
       <div className="new-player-modal">
-        {status === "none" && hasFunds && (
+        {status === "none" && (
           <Button css={buttonStyle} onPress={handleNewPlayer}>
             Make A New Player
           </Button>
         )}
-        {status === "none" && !hasFunds && (
+        {/* {status === "none" && !hasFunds && (
           <BoxCentered css={styles.container}>
             You need some ETH to play:
             <Link isExternal href={`https://app.fuel.network/bridge`}>
@@ -98,7 +129,7 @@ export default function NewPlayer({
               Recheck balance
             </Button>
           </BoxCentered>
-        )}
+        )} */}
         {status === "error" && (
           <div>
             <p>Something went wrong!</p>
