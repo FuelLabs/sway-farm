@@ -88,7 +88,6 @@ export default function BuySeeds({
         bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
       },
     };
-    console.log(price);
     const scope = contract.functions
       .buy_seeds(seedType, inputAmount, addressIdentityInput)
       .callParams({
@@ -146,6 +145,7 @@ export default function BuySeeds({
     );
     request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
 
+    console.log("asd request before sign first time", request.toJSON());
     const response = await axios.post(`http://167.71.42.88:3000/sign`, {
       request: request.toJSON(),
       jobId: data.jobId,
@@ -165,13 +165,39 @@ export default function BuySeeds({
     console.log("gasInput", gasInput);
     // request.witnesses.push(response.data.signature);
     const wi = request.getCoinInputWitnessIndexByOwner(gasCoin.owner);
-    console.log("wi", wi);
     request.witnesses[wi as number] = response.data.signature;
-    // request.witnesses = [request.witnesses[0]];
-    console.log("request manually after coin", request.toJSON());
 
+
+    console.log("asd gas witness index", wi);
+    console.log("asd inputs before sending", request.inputs);
+    console.log("asd witnesses before sending", request.witnesses);
     const tx = await wallet.sendTransaction(request, {
       estimateTxDependencies: false,
+      onBeforeSend: async (request) => {
+        // debugger;
+        // (request.inputs[2] as any).witnessIndex = 1;
+        console.log("asd request before sign second time", request.toJSON());
+        const response = await axios.post(`http://167.71.42.88:3000/sign`, {
+          request: request.toJSON(),
+          jobId: data.jobId,
+        });
+        if (response.status !== 200) {
+          throw new Error("Failed to sign transaction");
+        }
+        if (!response.data.signature) {
+          throw new Error("No signature found");
+        }
+        const wi = request.getCoinInputWitnessIndexByOwner(gasCoin.owner);
+
+        console.log("asd request inputs", request.toJSON());
+        console.log("asd request wi", wi);
+        console.log("asd response.data.signature", response.data.signature);
+        
+        request.witnesses[wi as number] = response.data.signature;
+        console.log("asd request witnesses after", request.toJSON());
+        console.log("asd request before send", request.toJSON());
+        return request;
+      },
     });
     if (tx) {
       console.log("tx", tx);
