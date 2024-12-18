@@ -28,9 +28,9 @@ export const UnsupportedWalletsNoticeModal = ({
         onClick={(e) => e.stopPropagation()}
         style={{
           backgroundColor: "rgb(18, 18, 18)",
-          padding: "30px",
+          padding: "50px",
           borderRadius: "8px",
-          maxWidth: "400px",
+          maxWidth: "500px",
           width: "90%",
           position: "relative",
         }}
@@ -38,14 +38,23 @@ export const UnsupportedWalletsNoticeModal = ({
         <div
           style={{
             fontWeight: "bold",
-            marginBottom: "15px",
-            fontSize: "18px",
+            marginBottom: "35px",
+            fontSize: "26px",
             color: "green",
+            lineHeight: "1.5",
           }}
         >
           Wallet Support Notice
         </div>
-        <div style={{ fontSize: "14px", color: "white", marginTop: "10px" }}>
+        <div
+          style={{
+            fontSize: "18px",
+            color: "white",
+            marginTop: "25px",
+            lineHeight: "2",
+            letterSpacing: "0.4px",
+          }}
+        >
           Note: Gasless transactions are currently only supported for the Burner
           wallet & Fuelet Wallet.
           <br />
@@ -56,13 +65,14 @@ export const UnsupportedWalletsNoticeModal = ({
         <button
           onClick={onClose}
           style={{
-            marginTop: "20px",
-            padding: "8px 16px",
+            marginTop: "40px",
+            padding: "14px 28px",
             borderRadius: "4px",
             border: "none",
             backgroundColor: "#102a9e",
             color: "#d0cdcd",
             cursor: "pointer",
+            fontSize: "18px",
           }}
         >
           Continue
