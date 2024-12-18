@@ -1,24 +1,11 @@
 import { Button, Spinner, BoxCentered } from "@fuel-ui/react";
-import {
-  type BytesLike,
-  Address,
-  bn,
-  Provider,
-  type Coin,
-  InputType,
-} from "fuels";
+import { type BytesLike, Address, bn, Provider } from "fuels";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
-import axios from "axios";
-import { FUEL_PROVIDER_URL } from "../../constants";
+import { FUEL_PROVIDER_URL, useGaslessWalletSupported } from "../../constants";
 import { buttonStyle, FoodTypeInput } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts/FarmContract";
-import {
-  useWallet,
-  useIsConnected,
-  useNetwork,
-  useBalance,
-} from "@fuels/react";
+import { useWallet } from "@fuels/react";
 import { usePaymaster } from "../../hooks/usePaymaster";
 import { toast } from "react-hot-toast";
 
@@ -38,17 +25,16 @@ export default function BuySeeds({
   const [status, setStatus] = useState<
     "error" | "none" | "loading" | "retrying"
   >("none");
-  const [retryCount, setRetryCount] = useState(0);
-  const MAX_RETRIES = 3;
   const { wallet } = useWallet();
+  const paymaster = usePaymaster();
+  const isGaslessSupported = useGaslessWalletSupported();
 
-  async function getCoins() {
+  async function buyWithGasStation() {
     if (!wallet) {
       throw new Error("No wallet found");
     }
     const provider = await Provider.create(FUEL_PROVIDER_URL);
 
-    const paymaster = usePaymaster();
     const { maxValuePerCoin } = await paymaster.metadata();
     const { coin: gasCoin, jobId } = await paymaster.allocate();
 
@@ -72,52 +58,26 @@ export default function BuySeeds({
     const { coins } = await wallet.getCoins(farmCoinAssetID);
 
     const request = await scope.getTransactionRequest();
-    // request.inputs = request.inputs.filter((input) => {
-    //   const typedInput = input as { assetId: string };
-    //   return (
-    //     typedInput.assetId !==
-    //     "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
-    //   );
-    // });
-    // request.outputs = request.outputs.filter(
-    //   (output) =>
-    //     (output as { assetId: string }).assetId !==
-    //     "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
-    // );
     request.addCoinInput(coins[0]);
     request.addChangeOutput(wallet.address, farmCoinAssetID);
     const txCost = await wallet.getTransactionCost(request, {
       quantities: coins,
     });
-    console.log("txCost", txCost);
-    console.log("request before filter", request.toJSON());
 
     const { gasUsed, missingContractIds, outputVariables, maxFee } = txCost;
-    console.log("outputVariables", outputVariables);
-    // Clean coin inputs before add new coins to the request
-    // request.inputs = request.inputs.filter((i) => i.type !== InputType.Coin);
-
-    // Adding missing contract ids
     missingContractIds.forEach((contractId) => {
       request.addContractInputAndOutput(Address.fromString(contractId));
     });
 
-    // Adding required number of OutputVariables
     request.addVariableOutputs(outputVariables);
     request.gasLimit = gasUsed;
     request.maxFee = maxFee;
-    console.log(`Buy Seeds Cost gasLimit: ${gasUsed}, Maxfee: ${maxFee}`);
-
-    // await wallet.fund(request, txCost);
-    // console.log("request", request);
-    console.log("request manually", request.toJSON());
-    // request.addChangeOutput(wallet.address, farmCoinAssetID);
 
     request.addCoinInput(gasCoin);
     request.addCoinOutput(
       gasCoin.owner,
       gasCoin.amount.sub(maxValuePerCoin),
-      provider.getBaseAssetId()
+      provider.getBaseAssetId(),
     );
     request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
 
@@ -129,6 +89,7 @@ export default function BuySeeds({
     });
     if (tx) {
       console.log("tx", tx);
+      updatePageNum();
     }
   }
 
@@ -154,6 +115,9 @@ export default function BuySeeds({
       })
       .call();
 
+    if (tx) {
+      updatePageNum();
+    }
     return tx;
   }
 
@@ -166,24 +130,27 @@ export default function BuySeeds({
         setStatus("loading");
         setCanMove(false);
 
-        try {
-          await getCoins();
-        } catch (error) {
-          console.log(
-            "Gas station failed, trying direct transaction...",
-            error
-          );
-          setStatus("retrying");
+        if (isGaslessSupported) {
+          try {
+            await buyWithGasStation();
+          } catch (error) {
+            console.log(
+              "Gas station failed, trying direct transaction...",
+              error,
+            );
+            setStatus("retrying");
+            await buyWithoutGasStation();
+          }
+        } else {
+          console.log("Using direct transaction method...");
           await buyWithoutGasStation();
         }
 
         setStatus("none");
-        updatePageNum();
-
         toast.success("Successfully bought seeds!");
       } catch (err) {
-        console.log("Error", err);
-        setStatus("none");
+        console.log("Error in BuySeeds:", err);
+        setStatus("error");
         toast.error("Failed to buy seeds :( Please try again.");
       } finally {
         setCanMove(true);
@@ -216,7 +183,6 @@ export default function BuySeeds({
             css={buttonStyle}
             onPress={() => {
               setStatus("none");
-              setRetryCount(0);
             }}
           >
             Buy 10 seeds

@@ -3,7 +3,7 @@ import { Address, type Coin, TransactionRequest, bn } from "fuels";
 
 type PaymasterMetadata = {
   maxValuePerCoin: string;
-}
+};
 
 type PaymasterAllocateResponse = {
   coin: {
@@ -16,30 +16,29 @@ type PaymasterAllocateResponse = {
   };
   jobId: string;
   utxoId: string;
-}
+};
 
 type PaymasterAllocate = {
   coin: Coin;
   jobId: string;
   utxoId: string;
-}
+};
 
 export const usePaymaster = () => {
-  const baseUrl = 'http://167.71.42.88:3000';
+  const baseUrl = "http://167.71.42.88:3000";
   const metadataUrl = `${baseUrl}/metadata`;
   const allocateUrl = `${baseUrl}/allocate-coin`;
   const signUrl = `${baseUrl}/sign`;
 
-
   const metadata = async (): Promise<PaymasterMetadata> => {
-    const { data: MetaDataResponse } = await axios.get<PaymasterMetadata>(metadataUrl);
+    const { data: MetaDataResponse } =
+      await axios.get<PaymasterMetadata>(metadataUrl);
     const { maxValuePerCoin } = MetaDataResponse;
     if (!maxValuePerCoin) {
       throw new Error("No maxValuePerCoin found");
     }
-    return { maxValuePerCoin};
-  }
-
+    return { maxValuePerCoin };
+  };
 
   const allocate = async (): Promise<PaymasterAllocate> => {
     const { data } = await axios.post<PaymasterAllocateResponse>(allocateUrl);
@@ -60,8 +59,8 @@ export const usePaymaster = () => {
       txCreatedIdx: bn(data.coin.txCreatedIdx),
     };
 
-    return { coin: gasCoin, jobId, utxoId }
-  }
+    return { coin: gasCoin, jobId, utxoId };
+  };
 
   const fetchSignature = async (request: TransactionRequest, jobId: string) => {
     // return;
@@ -84,12 +83,12 @@ export const usePaymaster = () => {
       throw new Error("Gas coin not found");
     }
 
-    return { signature: response.data.signature, gasInput, request }
-  }
+    return { signature: response.data.signature, gasInput, request };
+  };
 
   return {
     allocate,
     metadata,
     fetchSignature,
-  }
-}
+  };
+};

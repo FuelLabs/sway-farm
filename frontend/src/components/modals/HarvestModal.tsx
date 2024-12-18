@@ -2,7 +2,11 @@ import { Spinner, Button, BoxCentered } from "@fuel-ui/react";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
 
-import { buttonStyle, FUEL_PROVIDER_URL } from "../../constants";
+import {
+  buttonStyle,
+  FUEL_PROVIDER_URL,
+  useGaslessWalletSupported,
+} from "../../constants";
 import type { FarmContract } from "../../sway-api";
 import type { Modals } from "../../constants";
 import { useWallet } from "@fuels/react";
@@ -27,14 +31,20 @@ export default function HarvestModal({
   setModal,
   onHarvestSuccess,
 }: HarvestProps) {
-  const [status, setStatus] = useState<"error" | "none" | "loading" | "retrying">("none");
+  const [status, setStatus] = useState<
+    "error" | "none" | "loading" | "retrying"
+  >("none");
   const { wallet } = useWallet();
+  const paymaster = usePaymaster();
+  const isGaslessSupported = useGaslessWalletSupported();
 
   async function harvestWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
-    
+
     const addressIdentityInput = {
-      Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
     };
 
     const tx = await contract.functions
@@ -50,6 +60,47 @@ export default function HarvestModal({
     return tx;
   }
 
+  async function harvestWithGasStation() {
+    if (!wallet || !contract) throw new Error("Wallet or contract not found");
+
+    const provider = await Provider.create(FUEL_PROVIDER_URL);
+    const { maxValuePerCoin } = await paymaster.metadata();
+    const { coin: gasCoin, jobId } = await paymaster.allocate();
+
+    const addressIdentityInput = {
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
+    };
+
+    const scope = contract.functions.harvest(tileArray, addressIdentityInput);
+    const request = await scope.getTransactionRequest();
+    request.addCoinInput(gasCoin);
+    request.addCoinOutput(
+      gasCoin.owner,
+      gasCoin.amount.sub(maxValuePerCoin),
+      provider.getBaseAssetId(),
+    );
+    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+
+    const txCost = await wallet.getTransactionCost(request);
+    const { gasUsed, maxFee } = txCost;
+    request.gasLimit = gasUsed;
+    request.maxFee = maxFee;
+
+    const { signature } = await paymaster.fetchSignature(request, jobId);
+    request.updateWitnessByOwner(gasCoin.owner, signature);
+    const tx = await wallet.sendTransaction(request);
+
+    if (tx) {
+      console.log("tx", tx);
+      onHarvestSuccess(tileArray[0]);
+      setModal("plant");
+      updatePageNum();
+      toast.success("Seed harvested!");
+    }
+  }
+
   async function harvestItem() {
     if (!wallet) {
       throw new Error("No wallet found");
@@ -59,59 +110,20 @@ export default function HarvestModal({
         setStatus("loading");
         setCanMove(false);
 
-        try {
-          // Try with gas station first
-          const provider = await Provider.create(FUEL_PROVIDER_URL);
-
-          const paymaster = usePaymaster();
-          const { maxValuePerCoin } = await paymaster.metadata();
-          const { coin: gasCoin, jobId } = await paymaster.allocate();
-
-          const addressIdentityInput = {
-            Address: {
-              bits: Address.fromAddressOrString(
-                wallet.address.toString()
-              ).toB256(),
-            },
-          };
-          // const result = await contract.functions
-          //   .harvest(tileArray, addressIdentityInput)
-          //   .call();
-          const scope = contract.functions.harvest(
-            tileArray,
-            addressIdentityInput
-          );
-          const request = await scope.getTransactionRequest();
-          request.addCoinInput(gasCoin);
-          request.addCoinOutput(
-            gasCoin.owner,
-            gasCoin.amount.sub(maxValuePerCoin),
-            provider.getBaseAssetId()
-          );
-          request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
-          const txCost = await wallet.getTransactionCost(request);
-          const { gasUsed, maxFee } = txCost;
-          request.gasLimit = gasUsed;
-          request.maxFee = maxFee;
-          console.log(`Harvest Cost gasLimit: ${gasUsed}, Maxfee: ${maxFee}`);
-
-          const { signature } = await paymaster.fetchSignature(request, jobId);
-          request.updateWitnessByOwner(gasCoin.owner, signature);
-
-          console.log("harvest request manually", request.toJSON());
-          const tx = await wallet.sendTransaction(request);
-          if (tx) {
-            console.log("tx", tx);
-            onHarvestSuccess(tileArray[0]); // Update tile state
-            setModal("plant"); // Close modal
-            updatePageNum(); // Update other state
-            toast.success("Seed harvested!");
+        if (isGaslessSupported) {
+          try {
+            await harvestWithGasStation();
+          } catch (error) {
+            console.log(
+              "Gas station failed, trying direct transaction...",
+              error,
+            );
+            toast.error("Failed to harvest the seed :( Retrying with alternate method...");
+            setStatus("retrying");
+            await harvestWithoutGasStation();
           }
-          // setStatus('none');
-        } catch (error) {
-          console.log("Gas station failed, trying direct transaction...", error);
-          setStatus("retrying");
-          toast.error("Failed to harvest the seed :( Retrying with alternate method...");
+        } else {
+          console.log("Using direct transaction method...");
           await harvestWithoutGasStation();
         }
 
