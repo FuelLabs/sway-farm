@@ -1,6 +1,7 @@
 import { Spinner, Button, BoxCentered } from "@fuel-ui/react";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
+import { cssObj } from "@fuel-ui/css";
 
 import {
   buttonStyle,
@@ -13,6 +14,8 @@ import { useWallet } from "@fuels/react";
 import { Address, Provider } from "fuels";
 import { usePaymaster } from "../../hooks/usePaymaster";
 import { toast } from "react-hot-toast";
+import { useWalletFunds } from "../../hooks/useWalletFunds";
+import { NoFundsMessage } from "./NoFundsMessage";
 
 interface HarvestProps {
   contract: FarmContract | null;
@@ -37,6 +40,8 @@ export default function HarvestModal({
   const { wallet } = useWallet();
   const paymaster = usePaymaster();
   const isGaslessSupported = useGaslessWalletSupported();
+  const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
+    useWalletFunds(contract);
 
   async function harvestWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
@@ -79,7 +84,7 @@ export default function HarvestModal({
     request.addCoinOutput(
       gasCoin.owner,
       gasCoin.amount.sub(maxValuePerCoin),
-      provider.getBaseAssetId()
+      provider.getBaseAssetId(),
     );
     request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
 
@@ -113,7 +118,7 @@ export default function HarvestModal({
         if (!canUseGasless) {
           toast.error(
             "Hourly gasless transaction limit reached. Trying regular transaction...",
-            { duration: 5000 }
+            { duration: 5000 },
           );
         }
         if (isGaslessSupported && canUseGasless) {
@@ -122,17 +127,23 @@ export default function HarvestModal({
           } catch (error) {
             console.log(
               "Gas station failed, trying direct transaction...",
-              error
+              error,
             );
-            toast.error(
-              "Failed to harvest the seed :( Retrying with alternate method..."
-            );
+            toast.error("Gas Station error, please sign from wallet.");
             setStatus("retrying");
-            await harvestWithoutGasStation();
+            if (!hasFunds) {
+              showNoFundsMessage();
+            } else {
+              await harvestWithoutGasStation();
+            }
           }
         } else {
-          console.log("Using direct transaction method...");
-          await harvestWithoutGasStation();
+          if (!hasFunds) {
+            showNoFundsMessage();
+          } else {
+            console.log("Using direct transaction method...");
+            await harvestWithoutGasStation();
+          }
         }
 
         setStatus("none");
@@ -176,7 +187,10 @@ export default function HarvestModal({
           </Button>
         </div>
       )}
-      {status === "none" && (
+      {status === "none" && !hasFunds && showNoFunds && (
+        <NoFundsMessage onRecheck={getBalance} />
+      )}
+      {status === "none" && !hasFunds && !showNoFunds && (
         <>
           <div style={styles.items}>Harvest this item?</div>
           <Button css={buttonStyle} onPress={harvestItem}>
@@ -189,6 +203,16 @@ export default function HarvestModal({
 }
 
 const styles = {
+  container: cssObj({
+    flexDirection: "column",
+    fontFamily: "pressStart2P",
+    fontSize: "14px",
+    gap: "20px",
+  }),
+  link: cssObj({
+    fontFamily: "pressStart2P",
+    fontSize: "14px",
+  }),
   items: {
     marginBottom: "20px",
   },

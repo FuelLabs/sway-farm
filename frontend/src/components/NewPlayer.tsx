@@ -35,7 +35,7 @@ export default function NewPlayer({
     "error" | "loading" | "retrying" | "none"
   >("none");
   const [hasFunds, setHasFunds] = useState<boolean>(false);
-
+  const [showNoFunds, setShowNoFunds] = useState<boolean>(false);
   const { wallet } = useWallet();
   const paymaster = usePaymaster();
   const isGaslessSupported = useGaslessWalletSupported();
@@ -53,11 +53,6 @@ export default function NewPlayer({
 
     if (balanceNum) {
       setHasFunds(balanceNum > 0);
-      if (balanceNum > 0) {
-        toast.success("You have enough funds to play!");
-      } else {
-        toast.error("You need some ETH to play. Please visit the Bridge.");
-      }
     }
   }
 
@@ -146,7 +141,7 @@ export default function NewPlayer({
         if (!canUseGasless) {
           toast.error(
             "Hourly gasless transaction limit reached. Trying regular transaction...",
-            { duration: 5000 }
+            { duration: 5000 },
           );
         }
         if (isGaslessSupported && canUseGasless) {
@@ -159,11 +154,25 @@ export default function NewPlayer({
             );
             toast.error("Gas Station error, please sign from wallet.");
             setStatus("retrying");
-            await createPlayerWithoutGasStation();
+            if (!hasFunds) {
+              setShowNoFunds(true);
+              setTimeout(() => {
+                setShowNoFunds(false);
+              }, 5000);
+            } else {
+              await createPlayerWithoutGasStation();
+            }
           }
         } else {
-          console.log("Using direct transaction method...");
-          await createPlayerWithoutGasStation();
+          if (!hasFunds) {
+            setShowNoFunds(true);
+            setTimeout(() => {
+              setShowNoFunds(false);
+            }, 5000);
+          } else {
+            console.log("Using direct transaction method...");
+            await createPlayerWithoutGasStation();
+          }
         }
 
         setStatus("none");
@@ -181,12 +190,12 @@ export default function NewPlayer({
 
   return (
     <div className="new-player-modal">
-      {status === "none" && (
+      {status === "none" && !showNoFunds && (
         <Button css={buttonStyle} onPress={handleNewPlayer}>
           Make A New Player
         </Button>
       )}
-      {status === "none" && !hasFunds && (
+      {status === "none" && !hasFunds && showNoFunds && (
         <BoxCentered css={styles.container}>
           You need some ETH to play:
           <Link isExternal href={`https://app.fuel.network/bridge`}>
@@ -233,7 +242,6 @@ const styles = {
     fontFamily: "pressStart2P",
     fontSize: "14px",
     gap: "20px",
-    display: "none",
   }),
   link: cssObj({
     fontFamily: "pressStart2P",

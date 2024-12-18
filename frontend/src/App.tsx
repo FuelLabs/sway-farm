@@ -1,6 +1,6 @@
 import { cssObj } from "@fuel-ui/css";
 import { Box, BoxCentered, Heading } from "@fuel-ui/react";
-import { useIsConnected, useWallet, useCurrentConnector } from "@fuels/react";
+import { useIsConnected, useWallet } from "@fuels/react";
 //Add Analytics
 import { useState, useEffect, useMemo } from "react";
 
@@ -22,13 +22,11 @@ function App() {
   );
   const { isConnected } = useIsConnected();
   const { wallet } = useWallet();
-  const { currentConnector } = useCurrentConnector();
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
     const mobile = /(iphone|android|windows phone)/.test(userAgent);
     setIsMobile(mobile);
-    console.log("currentConnector", currentConnector?.name);
   }, []);
 
   const contract = useMemo(() => {

@@ -1,6 +1,8 @@
 import { Button } from "@fuel-ui/react";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
+import { useWalletFunds } from "../../hooks/useWalletFunds";
+import { NoFundsMessage } from "./NoFundsMessage";
 
 import {
   buttonStyle,
@@ -41,6 +43,8 @@ export default function PlantModal({
   const { wallet } = useWallet();
   const paymaster = usePaymaster();
   const isGaslessSupported = useGaslessWalletSupported();
+  const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
+    useWalletFunds(contract);
 
   async function plantWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
@@ -59,7 +63,7 @@ export default function PlantModal({
     if (tx) {
       onPlantSuccess(tileArray[0]);
       setModal("none");
-      toast.success("Planted the seed!");
+      toast.success("Seed planted!");
       updatePageNum();
     }
     return tx;
@@ -106,7 +110,7 @@ export default function PlantModal({
       onPlantSuccess(tileArray[0]);
       setModal("none");
       updatePageNum();
-      toast.success("Planted the seed!");
+      toast.success("Seed planted!");
     }
   }
 
@@ -122,7 +126,7 @@ export default function PlantModal({
         if (!canUseGasless) {
           toast.error(
             "Hourly gasless transaction limit reached. Trying regular transaction...",
-            { duration: 5000 }
+            { duration: 5000 },
           );
         }
         if (isGaslessSupported && canUseGasless) {
@@ -133,15 +137,21 @@ export default function PlantModal({
               "Gas station failed, trying direct transaction...",
               error,
             );
+            toast.error("Gas Station error, please sign from wallet.");
             setStatus("retrying");
-            toast.error(
-              "Failed to plant the seed :( Retrying with alternate method...",
-            );
-            await plantWithoutGasStation();
+            if (!hasFunds) {
+              showNoFundsMessage();
+            } else {
+              await plantWithoutGasStation();
+            }
           }
         } else {
-          console.log("Using direct transaction method...");
-          await plantWithoutGasStation();
+          if (!hasFunds) {
+            showNoFundsMessage();
+          } else {
+            console.log("Using direct transaction method...");
+            await plantWithoutGasStation();
+          }
         }
 
         setStatus("none");
@@ -176,7 +186,7 @@ export default function PlantModal({
           </Button>
         </div>
       )}
-      {status === "none" && (
+      {status === "none" && !showNoFunds && (
         <>
           {seeds > 0 ? (
             <>
@@ -189,6 +199,9 @@ export default function PlantModal({
             <div>You don&apos;t have any seeds to plant.</div>
           )}
         </>
+      )}
+      {status === "none" && !hasFunds && showNoFunds && (
+        <NoFundsMessage onRecheck={getBalance} />
       )}
     </div>
   );

@@ -2,6 +2,8 @@ import { Button, Spinner, BoxCentered } from "@fuel-ui/react";
 import { type BytesLike, Address, bn, Provider } from "fuels";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
+import { useWalletFunds } from "../../hooks/useWalletFunds";
+import { NoFundsMessage } from "./NoFundsMessage";
 import { FUEL_PROVIDER_URL, useGaslessWalletSupported } from "../../constants";
 import { buttonStyle, FoodTypeInput } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts/FarmContract";
@@ -28,6 +30,8 @@ export default function BuySeeds({
   const { wallet } = useWallet();
   const paymaster = usePaymaster();
   const isGaslessSupported = useGaslessWalletSupported();
+  const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
+    useWalletFunds(contract);
 
   async function buyWithGasStation() {
     if (!wallet) {
@@ -88,7 +92,7 @@ export default function BuySeeds({
       estimateTxDependencies: false,
     });
     if (tx) {
-      console.log("tx", tx);
+      toast.success("Successfully bought seeds!");
       updatePageNum();
     }
   }
@@ -116,6 +120,8 @@ export default function BuySeeds({
       .call();
 
     if (tx) {
+      toast.success("Successfully bought seeds!");
+
       updatePageNum();
     }
     return tx;
@@ -130,11 +136,12 @@ export default function BuySeeds({
         setStatus("loading");
         setCanMove(false);
         const canUseGasless = await paymaster.shouldUseGasless();
-        if(!canUseGasless) {
-          toast.error("Hourly gasless transaction limit reached. Trying regular transaction...", 
-            { duration: 5000 });
+        if (!canUseGasless) {
+          toast.error(
+            "Hourly gasless transaction limit reached. Trying regular transaction...",
+            { duration: 5000 },
+          );
         }
-
         if (isGaslessSupported && canUseGasless) {
           try {
             await buyWithGasStation();
@@ -143,16 +150,24 @@ export default function BuySeeds({
               "Gas station failed, trying direct transaction...",
               error,
             );
+            toast.error("Gas Station error, please sign from wallet.");
             setStatus("retrying");
-            await buyWithoutGasStation();
+            if (!hasFunds) {
+              showNoFundsMessage();
+            } else {
+              await buyWithoutGasStation();
+            }
           }
         } else {
-          console.log("Using direct transaction method...");
-          await buyWithoutGasStation();
+          if (!hasFunds) {
+            showNoFundsMessage();
+          } else {
+            console.log("Using direct transaction method...");
+            await buyWithoutGasStation();
+          }
         }
 
         setStatus("none");
-        toast.success("Successfully bought seeds!");
       } catch (err) {
         console.log("Error in BuySeeds:", err);
         setStatus("error");
@@ -193,13 +208,16 @@ export default function BuySeeds({
           </Button>
         </div>
       )}
-      {status === "none" && (
+      {status === "none" && !showNoFunds && (
         <>
           <div className="market-header">Buy Seeds</div>
           <Button css={buttonStyle} variant="outlined" onPress={buySeeds}>
             Buy 10 seeds
           </Button>
         </>
+      )}
+      {status === "none" && !hasFunds && showNoFunds && (
+        <NoFundsMessage onRecheck={getBalance} />
       )}
     </>
   );

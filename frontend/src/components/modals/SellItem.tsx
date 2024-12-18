@@ -2,6 +2,8 @@ import { Button } from "@fuel-ui/react";
 import { Address, InputType, Provider, bn } from "fuels";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
+import { useWalletFunds } from "../../hooks/useWalletFunds";
+import { NoFundsMessage } from "./NoFundsMessage";
 
 import {
   buttonStyle,
@@ -34,6 +36,8 @@ export default function SellItem({
   const { wallet } = useWallet();
   const paymaster = usePaymaster();
   const isGaslessSupported = useGaslessWalletSupported();
+  const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
+    useWalletFunds(contract);
 
   async function sellWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
@@ -128,7 +132,7 @@ export default function SellItem({
         if (!canUseGasless) {
           toast.error(
             "Hourly gasless transaction limit reached. Trying regular transaction...",
-            { duration: 5000 }
+            { duration: 5000 },
           );
         }
         if (isGaslessSupported && canUseGasless) {
@@ -139,12 +143,21 @@ export default function SellItem({
               "Gas station failed, trying direct transaction...",
               error,
             );
+            toast.error("Gas Station error, please sign from wallet.");
             setStatus("retrying");
-            await sellWithoutGasStation();
+            if (!hasFunds) {
+              showNoFundsMessage();
+            } else {
+              await sellWithoutGasStation();
+            }
           }
         } else {
-          console.log("Using direct transaction method...");
-          await sellWithoutGasStation();
+          if (!hasFunds) {
+            showNoFundsMessage();
+          } else {
+            console.log("Using direct transaction method...");
+            await sellWithoutGasStation();
+          }
         }
 
         setStatus("none");
@@ -181,10 +194,13 @@ export default function SellItem({
           </Button>
         </div>
       )}
-      {status === "none" && (
+      {status === "none" && !showNoFunds && (
         <Button css={buttonStyle} variant="outlined" onPress={sellItems}>
           Sell All Items
         </Button>
+      )}
+      {status === "none" && !hasFunds && showNoFunds && (
+        <NoFundsMessage onRecheck={getBalance} />
       )}
     </>
   );
