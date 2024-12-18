@@ -1,6 +1,7 @@
 import { cssObj } from "@fuel-ui/css";
 import type { Asset, BN, NetworkFuel } from "fuels";
 import { Vector3 } from "three";
+import { useCurrentConnector } from "@fuels/react";
 
 // import contractIds from './sway-api/contract-ids.json';
 
@@ -90,4 +91,9 @@ export const buttonStyle = cssObj({
 
 export enum FoodTypeInput {
   Tomatoes = "Tomatoes",
+}
+
+export function useGaslessWalletSupported() {
+  const { currentConnector } = useCurrentConnector();
+  return currentConnector?.name === "Fuelet Wallet" || currentConnector?.name === "Burner Wallet";
 }

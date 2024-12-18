@@ -2,13 +2,12 @@ import { Button } from "@fuel-ui/react";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
 
-import { buttonStyle, FoodTypeInput, FUEL_PROVIDER_URL } from "../../constants";
+import { buttonStyle, FoodTypeInput, FUEL_PROVIDER_URL, useGaslessWalletSupported } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts";
 import type { Modals } from "../../constants";
 import Loading from "../Loading";
-import { Address, type Coin, Provider, bn } from "fuels";
+import { Address, Provider } from "fuels";
 import { useWallet } from "@fuels/react";
-import axios from "axios";
 import { usePaymaster } from "../../hooks/usePaymaster";
 
 interface PlantModalProps {
@@ -32,6 +31,8 @@ export default function PlantModal({
 }: PlantModalProps) {
   const [status, setStatus] = useState<"error" | "none" | "loading" | "retrying">("none");
   const { wallet } = useWallet();
+  const paymaster = usePaymaster();
+  const isGaslessSupported = useGaslessWalletSupported();
 
   async function plantWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
@@ -53,6 +54,50 @@ export default function PlantModal({
     return tx;
   }
 
+  async function plantWithGasStation() {
+    if (!wallet || !contract) throw new Error("Wallet or contract not found");
+    
+    const provider = await Provider.create(FUEL_PROVIDER_URL);
+    const { maxValuePerCoin } = await paymaster.metadata();
+    const { coin: gasCoin, jobId } = await paymaster.allocate();
+
+    const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
+    const addressIdentityInput = {
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
+    };
+
+    const scope = await contract.functions.plant_seed_at_index(
+      seedType,
+      tileArray[0],
+      addressIdentityInput
+    );
+    const request = await scope.getTransactionRequest();
+    request.addCoinInput(gasCoin);
+    request.addCoinOutput(
+      gasCoin.owner,
+      gasCoin.amount.sub(maxValuePerCoin),
+      provider.getBaseAssetId()
+    );
+    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+    
+    const txCost = await wallet.getTransactionCost(request);
+    const { gasUsed, maxFee } = txCost;
+    request.gasLimit = gasUsed;
+    request.maxFee = maxFee;
+
+    const { signature } = await paymaster.fetchSignature(request, jobId);
+    request.updateWitnessByOwner(gasCoin.owner, signature);
+
+    const tx = await wallet.sendTransaction(request);
+    if (tx) {
+      onPlantSuccess(tileArray[0]);
+      setModal("none");
+      updatePageNum();
+    }
+  }
+
   async function handlePlant() {
     if (!wallet) {
       throw new Error("No wallet found");
@@ -61,65 +106,23 @@ export default function PlantModal({
       try {
         setStatus("loading");
         setCanMove(false);
-    const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
 
-        try {
-          // Try with gas station first
-          const provider = await Provider.create(FUEL_PROVIDER_URL);
-
-          const paymaster = usePaymaster();
-          const { maxValuePerCoin } = await paymaster.metadata();
-          const { coin: gasCoin, jobId } = await paymaster.allocate();
-
-          const addressIdentityInput = {
-            Address: {
-              bits: Address.fromAddressOrString(
-                wallet.address.toString()
-              ).toB256(),
-            },
-          };
-          // const tx = await contract.functions
-          //   .plant_seed_at_index(seedType, tileArray[0], addressIdentityInput)
-          //   .call();
-          const scope = await contract.functions.plant_seed_at_index(
-            seedType,
-            tileArray[0],
-            addressIdentityInput
-          );
-          const request = await scope.getTransactionRequest();
-          request.addCoinInput(gasCoin);
-          request.addCoinOutput(
-            gasCoin.owner,
-            gasCoin.amount.sub(maxValuePerCoin),
-            provider.getBaseAssetId()
-          );
-          request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
-          const txCost = await wallet.getTransactionCost(request);
-          const { gasUsed, maxFee } = txCost;
-          request.gasLimit = gasUsed;
-          request.maxFee = maxFee;
-          console.log(`Plant Cost gasLimit: ${gasUsed}, Maxfee: ${maxFee}`);
-
-          const { signature } = await paymaster.fetchSignature(request, jobId);
-          request.updateWitnessByOwner(gasCoin.owner, signature);
-
-          const tx = await wallet.sendTransaction(request);
-          if (tx) {
-            console.log("tx", tx);
-            onPlantSuccess(tileArray[0]);
-            setModal("none");
-            updatePageNum();
+        if (isGaslessSupported) {
+          try {
+            await plantWithGasStation();
+          } catch (error) {
+            console.log("Gas station failed, trying direct transaction...", error);
+            setStatus("retrying");
+            await plantWithoutGasStation();
           }
-          // setStatus('none');
-        } catch (error) {
-          console.log("Gas station failed, trying direct transaction...", error);
-          setStatus("retrying");
+        } else {
+          console.log("Using direct transaction method...");
           await plantWithoutGasStation();
         }
 
         setStatus("none");
       } catch (err) {
-        console.log("Error in PlantModal", err);
+        console.log("Error in PlantModal:", err);
         setStatus("error");
       } finally {
         setCanMove(true);
