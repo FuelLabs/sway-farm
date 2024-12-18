@@ -167,25 +167,24 @@ export default function BuySeeds({
       {status === "loading" && (
         <BoxCentered>
           <Spinner color="#754a1e" />
-          <p>Processing transaction...</p>
         </BoxCentered>
       )}
       {status === "retrying" && (
         <BoxCentered>
           <Spinner color="#754a1e" />
-          <p>Retrying with alternate method...</p>
         </BoxCentered>
       )}
       {status === "error" && (
         <div>
-          <p>Transaction failed! Please try again.</p>
+          <p>Something went wrong!</p>
           <Button
             css={buttonStyle}
             onPress={() => {
               setStatus("none");
+              updatePageNum();
             }}
           >
-            Buy 10 seeds
+            Try Again
           </Button>
         </div>
       )}

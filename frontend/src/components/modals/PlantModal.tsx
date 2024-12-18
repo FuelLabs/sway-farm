@@ -159,7 +159,7 @@ export default function PlantModal({
       {status === "retrying" && <Loading />}
       {status === "error" && (
         <div>
-          <p>Planting failed! Please try again.</p>
+          <p>Something went wrong!</p>
           <Button
             css={buttonStyle}
             onPress={() => {

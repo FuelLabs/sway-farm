@@ -16,6 +16,7 @@ import { PlayerOutput } from "../sway-api/contracts/FarmContract";
 import { Address, BN, Provider } from "fuels";
 import { usePaymaster } from "../hooks/usePaymaster";
 import { cssObj } from "@fuel-ui/css";
+import { toast } from "react-hot-toast";
 
 interface NewPlayerProps {
   contract: FarmContract | null;
@@ -52,6 +53,11 @@ export default function NewPlayer({
 
     if (balanceNum) {
       setHasFunds(balanceNum > 0);
+      if (balanceNum > 0) {
+        toast.success("You have enough funds to play!");
+      } else {
+        toast.error("You need some ETH to play. Please visit the Bridge.");
+      }
     }
   }
 
@@ -78,6 +84,7 @@ export default function NewPlayer({
       } as PlayerOutput);
       setModal("none");
       updatePageNum();
+      toast.success("Welcome to Sway Farm! 🌱");
     }
     return tx;
   }
@@ -124,6 +131,7 @@ export default function NewPlayer({
       } as PlayerOutput);
       setModal("none");
       updatePageNum();
+      toast.success("Welcome to Sway Farm! 🌱");
     }
   }
 
@@ -143,6 +151,7 @@ export default function NewPlayer({
               "Gas station failed, trying direct transaction...",
               error,
             );
+            toast.error("Gas Station error, please sign from wallet.");
             setStatus("retrying");
             await createPlayerWithoutGasStation();
           }
@@ -155,10 +164,12 @@ export default function NewPlayer({
       } catch (err) {
         console.log("Error in NewPlayer:", err);
         setStatus("error");
+        toast.error("Failed to create player :(.");
       }
     } else {
       console.log("ERROR: contract missing");
       setStatus("error");
+      toast.error("Failed to create player :(");
     }
   }
 
@@ -185,22 +196,21 @@ export default function NewPlayer({
       {status === "loading" && (
         <BoxCentered>
           <Loading />
-          <p>Creating new player...</p>
         </BoxCentered>
       )}
       {status === "retrying" && (
         <BoxCentered>
           <Loading />
-          <p>Retrying with alternate method...</p>
         </BoxCentered>
       )}
       {status === "error" && (
         <div>
-          <p>Failed to create player! Please try again.</p>
+          <p>Something went wrong!</p>
           <Button
             css={buttonStyle}
             onPress={() => {
               setStatus("none");
+              updatePageNum();
             }}
           >
             Try Again

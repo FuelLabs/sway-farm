@@ -20,6 +20,10 @@ import type { Config as WagmiConfig } from "@wagmi/core";
 import "./index.css";
 import App from "./App.tsx";
 import { Toaster } from "react-hot-toast";
+import {
+  CustomSuccessIcon,
+  CustomErrorIcon,
+} from "./components/toast/ToastIcons";
 
 const queryClient = new QueryClient();
 const networks = [
@@ -28,6 +32,7 @@ const networks = [
     url: FUEL_PROVIDER_URL,
   },
 ];
+
 const FUEL_CONFIG = createFuelConfig(() => {
   const WalletConnectProjectId = "35b967d8f17700b2de24f0abee77e579";
   const wagmiConfig = createConfig({
@@ -99,6 +104,14 @@ createRoot(document.getElementById("root")!).render(
               border: "4px solid #754a1e",
               borderRadius: "8px",
               color: "black",
+              padding: "8px 12px",
+              fontSize: "14px",
+            },
+            success: {
+              icon: <CustomSuccessIcon />,
+            },
+            error: {
+              icon: <CustomErrorIcon />,
             },
             position: "bottom-center",
           }}

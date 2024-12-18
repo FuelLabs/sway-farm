@@ -149,22 +149,21 @@ export default function HarvestModal({
       {status === "loading" && (
         <BoxCentered>
           <Spinner color="#754a1e" />
-          <p>Processing harvest...</p>
         </BoxCentered>
       )}
       {status === "retrying" && (
         <BoxCentered>
           <Spinner color="#754a1e" />
-          <p>Retrying with alternate method...</p>
         </BoxCentered>
       )}
       {status === "error" && (
         <div>
-          <p>Harvest failed! Please try again.</p>
+          <p>Something went wrong!</p>
           <Button
             css={buttonStyle}
             onPress={() => {
               setStatus("none");
+              updatePageNum();
             }}
           >
             Try Again
