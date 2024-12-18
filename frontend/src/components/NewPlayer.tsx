@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { Modals } from "../constants";
 
-import { buttonStyle, FUEL_PROVIDER_URL, useGaslessWalletSupported } from "../constants";
+import {
+  buttonStyle,
+  FUEL_PROVIDER_URL,
+  useGaslessWalletSupported,
+} from "../constants";
 import type { FarmContract } from "../sway-api";
 
 import Loading from "./Loading";
@@ -26,34 +30,38 @@ export default function NewPlayer({
   setPlayer,
   setModal,
 }: NewPlayerProps) {
-  const [status, setStatus] = useState<"error" | "loading" | "retrying" | "none">("none");
+  const [status, setStatus] = useState<
+    "error" | "loading" | "retrying" | "none"
+  >("none");
   const [hasFunds, setHasFunds] = useState<boolean>(false);
 
   const { wallet } = useWallet();
   const paymaster = usePaymaster();
   const isGaslessSupported = useGaslessWalletSupported();
 
-    useEffect(() => {
-      getBalance();
-    }, [wallet]);
+  useEffect(() => {
+    getBalance();
+  }, [wallet]);
 
-    async function getBalance() {
-      const thisWallet = wallet ?? contract?.account;
-      console.log(wallet, "wallet");
-      const baseAssetId = thisWallet?.provider.getBaseAssetId();
-      const balance = await thisWallet!.getBalance(baseAssetId);
-      const balanceNum = balance?.toNumber();
+  async function getBalance() {
+    const thisWallet = wallet ?? contract?.account;
+    console.log(wallet, "wallet");
+    const baseAssetId = thisWallet?.provider.getBaseAssetId();
+    const balance = await thisWallet!.getBalance(baseAssetId);
+    const balanceNum = balance?.toNumber();
 
-      if (balanceNum) {
-        setHasFunds(balanceNum > 0);
+    if (balanceNum) {
+      setHasFunds(balanceNum > 0);
     }
   }
 
   async function createPlayerWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
-    
+
     const addressIdentityInput = {
-      Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
     };
 
     const tx = await contract.functions
@@ -82,24 +90,24 @@ export default function NewPlayer({
     const { coin: gasCoin, jobId } = await paymaster.allocate();
 
     const addressIdentityInput = {
-      Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
     };
 
-    const scope = contract.functions
-      .new_player(addressIdentityInput)
-      .txParams({
-        variableOutputs: 1,
-      });
+    const scope = contract.functions.new_player(addressIdentityInput).txParams({
+      variableOutputs: 1,
+    });
     const request = await scope.getTransactionRequest();
-    
+
     request.addCoinInput(gasCoin);
     request.addCoinOutput(
       gasCoin.owner,
       gasCoin.amount.sub(maxValuePerCoin),
-      provider.getBaseAssetId()
+      provider.getBaseAssetId(),
     );
     request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
-    
+
     const txCost = await wallet.getTransactionCost(request);
     const { gasUsed, maxFee } = txCost;
     request.gasLimit = gasUsed;
@@ -131,7 +139,10 @@ export default function NewPlayer({
           try {
             await createPlayerWithGasStation();
           } catch (error) {
-            console.log("Gas station failed, trying direct transaction...", error);
+            console.log(
+              "Gas station failed, trying direct transaction...",
+              error,
+            );
             setStatus("retrying");
             await createPlayerWithoutGasStation();
           }

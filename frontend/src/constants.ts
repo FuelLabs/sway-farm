@@ -95,5 +95,8 @@ export enum FoodTypeInput {
 
 export function useGaslessWalletSupported() {
   const { currentConnector } = useCurrentConnector();
-  return currentConnector?.name === "Fuelet Wallet" || currentConnector?.name === "Burner Wallet";
+  return (
+    currentConnector?.name === "Fuelet Wallet" ||
+    currentConnector?.name === "Burner Wallet"
+  );
 }

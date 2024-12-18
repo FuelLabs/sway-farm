@@ -2,7 +2,12 @@ import { Button } from "@fuel-ui/react";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
 
-import { buttonStyle, FoodTypeInput, FUEL_PROVIDER_URL, useGaslessWalletSupported } from "../../constants";
+import {
+  buttonStyle,
+  FoodTypeInput,
+  FUEL_PROVIDER_URL,
+  useGaslessWalletSupported,
+} from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts";
 import type { Modals } from "../../constants";
 import Loading from "../Loading";
@@ -29,17 +34,21 @@ export default function PlantModal({
   onPlantSuccess,
   setModal,
 }: PlantModalProps) {
-  const [status, setStatus] = useState<"error" | "none" | "loading" | "retrying">("none");
+  const [status, setStatus] = useState<
+    "error" | "none" | "loading" | "retrying"
+  >("none");
   const { wallet } = useWallet();
   const paymaster = usePaymaster();
   const isGaslessSupported = useGaslessWalletSupported();
 
   async function plantWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
-    
+
     const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
     const addressIdentityInput = {
-      Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
     };
 
     const tx = await contract.functions
@@ -56,7 +65,7 @@ export default function PlantModal({
 
   async function plantWithGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
-    
+
     const provider = await Provider.create(FUEL_PROVIDER_URL);
     const { maxValuePerCoin } = await paymaster.metadata();
     const { coin: gasCoin, jobId } = await paymaster.allocate();
@@ -71,17 +80,17 @@ export default function PlantModal({
     const scope = await contract.functions.plant_seed_at_index(
       seedType,
       tileArray[0],
-      addressIdentityInput
+      addressIdentityInput,
     );
     const request = await scope.getTransactionRequest();
     request.addCoinInput(gasCoin);
     request.addCoinOutput(
       gasCoin.owner,
       gasCoin.amount.sub(maxValuePerCoin),
-      provider.getBaseAssetId()
+      provider.getBaseAssetId(),
     );
     request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
-    
+
     const txCost = await wallet.getTransactionCost(request);
     const { gasUsed, maxFee } = txCost;
     request.gasLimit = gasUsed;
@@ -111,7 +120,10 @@ export default function PlantModal({
           try {
             await plantWithGasStation();
           } catch (error) {
-            console.log("Gas station failed, trying direct transaction...", error);
+            console.log(
+              "Gas station failed, trying direct transaction...",
+              error,
+            );
             setStatus("retrying");
             await plantWithoutGasStation();
           }
@@ -135,12 +147,8 @@ export default function PlantModal({
 
   return (
     <div className="plant-modal">
-      {status === "loading" && (
-        <Loading />
-      )}
-      {status === "retrying" && (
-        <Loading />
-      )}
+      {status === "loading" && <Loading />}
+      {status === "retrying" && <Loading />}
       {status === "error" && (
         <div>
           <p>Planting failed! Please try again.</p>

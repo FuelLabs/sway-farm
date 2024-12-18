@@ -1,18 +1,11 @@
 import { Button, Spinner, BoxCentered } from "@fuel-ui/react";
-import {
-  type BytesLike,
-  Address,
-  bn,
-  Provider,
-} from "fuels";
+import { type BytesLike, Address, bn, Provider } from "fuels";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
 import { FUEL_PROVIDER_URL, useGaslessWalletSupported } from "../../constants";
 import { buttonStyle, FoodTypeInput } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts/FarmContract";
-import {
-  useWallet,
-} from "@fuels/react";
+import { useWallet } from "@fuels/react";
 import { usePaymaster } from "../../hooks/usePaymaster";
 
 interface BuySeedsProps {
@@ -28,7 +21,9 @@ export default function BuySeeds({
   setCanMove,
   farmCoinAssetID,
 }: BuySeedsProps) {
-  const [status, setStatus] = useState<"error" | "none" | "loading" | "retrying">("none");
+  const [status, setStatus] = useState<
+    "error" | "none" | "loading" | "retrying"
+  >("none");
   const { wallet } = useWallet();
   const paymaster = usePaymaster();
   const isGaslessSupported = useGaslessWalletSupported();
@@ -81,11 +76,11 @@ export default function BuySeeds({
     request.addCoinOutput(
       gasCoin.owner,
       gasCoin.amount.sub(maxValuePerCoin),
-      provider.getBaseAssetId()
+      provider.getBaseAssetId(),
     );
     request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
 
-    const {signature} = await paymaster.fetchSignature(request, jobId);
+    const { signature } = await paymaster.fetchSignature(request, jobId);
     request.updateWitnessByOwner(gasCoin.owner, signature);
 
     const tx = await wallet.sendTransaction(request, {
@@ -99,15 +94,17 @@ export default function BuySeeds({
 
   async function buyWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
-    
+
     const amount = 10;
     const realAmount = amount / 1_000_000_000;
     const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
     const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
     const price = 750_000 * amount;
-    
+
     const addressIdentityInput = {
-      Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
     };
 
     const tx = await contract.functions
@@ -136,7 +133,10 @@ export default function BuySeeds({
           try {
             await buyWithGasStation();
           } catch (error) {
-            console.log("Gas station failed, trying direct transaction...", error);
+            console.log(
+              "Gas station failed, trying direct transaction...",
+              error,
+            );
             setStatus("retrying");
             await buyWithoutGasStation();
           }

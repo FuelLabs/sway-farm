@@ -3,7 +3,12 @@ import { Address, InputType, Provider, bn } from "fuels";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
 
-import { buttonStyle, FoodTypeInput, FUEL_PROVIDER_URL, useGaslessWalletSupported } from "../../constants";
+import {
+  buttonStyle,
+  FoodTypeInput,
+  FUEL_PROVIDER_URL,
+  useGaslessWalletSupported,
+} from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts";
 import Loading from "../Loading";
 import { useWallet } from "@fuels/react";
@@ -22,19 +27,23 @@ export default function SellItem({
   items,
   setCanMove,
 }: SellItemProps) {
-  const [status, setStatus] = useState<"error" | "none" | "loading" | "retrying">("none");
+  const [status, setStatus] = useState<
+    "error" | "none" | "loading" | "retrying"
+  >("none");
   const { wallet } = useWallet();
   const paymaster = usePaymaster();
   const isGaslessSupported = useGaslessWalletSupported();
 
   async function sellWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
-    
+
     const realAmount = items / 1_000_000_000;
     const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
     const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
     const addressIdentityInput = {
-      Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
     };
 
     const tx = await contract.functions
@@ -66,16 +75,14 @@ export default function SellItem({
     const scope = contract.functions.sell_item(
       seedType,
       inputAmount,
-      addressIdentityInput
+      addressIdentityInput,
     );
     const request = await scope.getTransactionRequest();
     const txCost = await wallet.getTransactionCost(request);
     const { gasUsed, missingContractIds, outputVariables, maxFee } = txCost;
-    
+
     // Clean coin inputs before add new coins to the request
-    request.inputs = request.inputs.filter(
-      (i) => i.type !== InputType.Coin
-    );
+    request.inputs = request.inputs.filter((i) => i.type !== InputType.Coin);
 
     // Adding missing contract ids
     missingContractIds.forEach((contractId) => {
@@ -91,9 +98,12 @@ export default function SellItem({
     request.addCoinOutput(
       gasCoin.owner,
       gasCoin.amount.sub(maxValuePerCoin),
-      provider.getChain().consensusParameters.baseAssetId
+      provider.getChain().consensusParameters.baseAssetId,
     );
-    request.addChangeOutput(gasCoin.owner, provider.getChain().consensusParameters.baseAssetId);
+    request.addChangeOutput(
+      gasCoin.owner,
+      provider.getChain().consensusParameters.baseAssetId,
+    );
 
     const { signature } = await paymaster.fetchSignature(request, jobId);
     request.updateWitnessByOwner(gasCoin.owner, signature);
@@ -117,7 +127,10 @@ export default function SellItem({
           try {
             await sellWithGasStation();
           } catch (error) {
-            console.log("Gas station failed, trying direct transaction...", error);
+            console.log(
+              "Gas station failed, trying direct transaction...",
+              error,
+            );
             setStatus("retrying");
             await sellWithoutGasStation();
           }

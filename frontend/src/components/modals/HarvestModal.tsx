@@ -2,7 +2,11 @@ import { Spinner, Button, BoxCentered } from "@fuel-ui/react";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
 
-import { buttonStyle, FUEL_PROVIDER_URL, useGaslessWalletSupported } from "../../constants";
+import {
+  buttonStyle,
+  FUEL_PROVIDER_URL,
+  useGaslessWalletSupported,
+} from "../../constants";
 import type { FarmContract } from "../../sway-api";
 import type { Modals } from "../../constants";
 import { useWallet } from "@fuels/react";
@@ -25,16 +29,20 @@ export default function HarvestModal({
   setModal,
   onHarvestSuccess,
 }: HarvestProps) {
-  const [status, setStatus] = useState<"error" | "none" | "loading" | "retrying">("none");
+  const [status, setStatus] = useState<
+    "error" | "none" | "loading" | "retrying"
+  >("none");
   const { wallet } = useWallet();
   const paymaster = usePaymaster();
   const isGaslessSupported = useGaslessWalletSupported();
 
   async function harvestWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
-    
+
     const addressIdentityInput = {
-      Address: { bits: Address.fromAddressOrString(wallet.address.toString()).toB256() },
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
     };
 
     const tx = await contract.functions
@@ -68,10 +76,10 @@ export default function HarvestModal({
     request.addCoinOutput(
       gasCoin.owner,
       gasCoin.amount.sub(maxValuePerCoin),
-      provider.getBaseAssetId()
+      provider.getBaseAssetId(),
     );
     request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
-    
+
     const txCost = await wallet.getTransactionCost(request);
     const { gasUsed, maxFee } = txCost;
     request.gasLimit = gasUsed;
@@ -80,7 +88,7 @@ export default function HarvestModal({
     const { signature } = await paymaster.fetchSignature(request, jobId);
     request.updateWitnessByOwner(gasCoin.owner, signature);
     const tx = await wallet.sendTransaction(request);
-    
+
     if (tx) {
       console.log("tx", tx);
       onHarvestSuccess(tileArray[0]);
@@ -102,7 +110,10 @@ export default function HarvestModal({
           try {
             await harvestWithGasStation();
           } catch (error) {
-            console.log("Gas station failed, trying direct transaction...", error);
+            console.log(
+              "Gas station failed, trying direct transaction...",
+              error,
+            );
             setStatus("retrying");
             await harvestWithoutGasStation();
           }
