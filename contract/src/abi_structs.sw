@@ -5,29 +5,29 @@ use std::{bytes::Bytes, hash::{Hash, Hasher}};
 abi GameContract {
     // initialize player, mint some coins
     #[storage(read, write)]
-    fn new_player();
+    fn new_player(address: Identity);
 
     // get asset ID
     fn get_asset_id() -> AssetId;
 
     // level up farming skill
     #[storage(read, write)]
-    fn level_up();
+    fn level_up(address: Identity);
 
     // buy any amount of a certain seed
     #[storage(read, write), payable]
-    fn buy_seeds(food_type: FoodType, amount: u64);
+    fn buy_seeds(food_type: FoodType, amount: u64, address: Identity);
 
     #[storage(read, write)]
-    fn plant_seed_at_index(food_type: FoodType, index: u64);
+    fn plant_seed_at_index(food_type: FoodType, index: u64, address: Identity);
 
     // harvest grown seeds at certain indexes
     #[storage(read, write)]
-    fn harvest(indexes: Vec<u64>);
+    fn harvest(indexes: Vec<u64>, address: Identity);
 
     // sell a harvested item
     #[storage(read, write)]
-    fn sell_item(food_type: FoodType, amount: u64);
+    fn sell_item(food_type: FoodType, amount: u64, address: Identity);
 
     #[storage(read)]
     fn get_player(id: Identity) -> Option<Player>;
@@ -45,7 +45,7 @@ abi GameContract {
     fn can_level_up(id: Identity) -> bool;
 
     #[storage(read)]
-    fn can_harvest(index: u64) -> bool;
+    fn can_harvest(index: u64, address: Identity) -> bool;
 }
 
 pub struct Player {
