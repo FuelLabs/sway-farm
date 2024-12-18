@@ -25,7 +25,7 @@ type PaymasterAllocate = {
 };
 
 export const usePaymaster = () => {
-  const baseUrl = "http://167.71.42.88:3000";
+  const baseUrl = "https://fuelstation-sepolia.xyz:3000";
   const metadataUrl = `${baseUrl}/metadata`;
   const allocateUrl = `${baseUrl}/allocate-coin`;
   const signUrl = `${baseUrl}/sign`;
