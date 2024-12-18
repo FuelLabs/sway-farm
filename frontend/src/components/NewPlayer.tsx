@@ -1,6 +1,6 @@
-import { BoxCentered, Button } from "@fuel-ui/react";
+import { BoxCentered, Button, Link } from "@fuel-ui/react";
 import { useWallet } from "@fuels/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { Modals } from "../constants";
 
@@ -27,9 +27,27 @@ export default function NewPlayer({
   setModal,
 }: NewPlayerProps) {
   const [status, setStatus] = useState<"error" | "loading" | "retrying" | "none">("none");
+  const [hasFunds, setHasFunds] = useState<boolean>(false);
+
   const { wallet } = useWallet();
   const paymaster = usePaymaster();
   const isGaslessSupported = useGaslessWalletSupported();
+
+    useEffect(() => {
+      getBalance();
+    }, [wallet]);
+
+    async function getBalance() {
+      const thisWallet = wallet ?? contract?.account;
+      console.log(wallet, "wallet");
+      const baseAssetId = thisWallet?.provider.getBaseAssetId();
+      const balance = await thisWallet!.getBalance(baseAssetId);
+      const balanceNum = balance?.toNumber();
+
+      if (balanceNum) {
+        setHasFunds(balanceNum > 0);
+    }
+  }
 
   async function createPlayerWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
@@ -140,6 +158,19 @@ export default function NewPlayer({
           Make A New Player
         </Button>
       )}
+      {status === "none" && !hasFunds && (
+        <BoxCentered css={styles.container}>
+          You need some ETH to play:
+          <Link isExternal href={`https://app.fuel.network/bridge`}>
+            <Button css={styles.link} variant="link">
+              Go to Bridge
+            </Button>
+          </Link>
+          <Button css={buttonStyle} onPress={getBalance}>
+            Recheck balance
+          </Button>
+        </BoxCentered>
+      )}
       {status === "loading" && (
         <BoxCentered>
           <Loading />
@@ -175,6 +206,7 @@ const styles = {
     fontFamily: "pressStart2P",
     fontSize: "14px",
     gap: "20px",
+    display: "none",
   }),
   link: cssObj({
     fontFamily: "pressStart2P",

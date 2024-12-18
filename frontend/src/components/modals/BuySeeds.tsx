@@ -12,9 +12,6 @@ import { buttonStyle, FoodTypeInput } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts/FarmContract";
 import {
   useWallet,
-  useIsConnected,
-  useNetwork,
-  useBalance,
 } from "@fuels/react";
 import { usePaymaster } from "../../hooks/usePaymaster";
 
