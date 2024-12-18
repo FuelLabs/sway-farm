@@ -7,6 +7,7 @@ import { buttonStyle, FoodTypeInput } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts/FarmContract";
 import { useWallet } from "@fuels/react";
 import { usePaymaster } from "../../hooks/usePaymaster";
+import { toast } from "react-hot-toast";
 
 interface BuySeedsProps {
   contract: FarmContract | null;
@@ -146,15 +147,18 @@ export default function BuySeeds({
         }
 
         setStatus("none");
+        toast.success("Successfully bought seeds!");
       } catch (err) {
         console.log("Error in BuySeeds:", err);
         setStatus("error");
+        toast.error("Failed to buy seeds :( Please try again.");
       } finally {
         setCanMove(true);
       }
     } else {
       console.log("ERROR: contract missing");
       setStatus("error");
+      toast.error("Failed to buy seeds :( Please try again.");
     }
   }
 

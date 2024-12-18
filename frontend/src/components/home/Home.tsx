@@ -3,6 +3,8 @@ import { Button, Box } from "@fuel-ui/react";
 import { useConnectUI } from "@fuels/react";
 
 import Instructions from "./Instructions.tsx";
+import { UnsupportedWalletsNoticeModal } from "../modals/UnsupportedWalletsNoticeModal.tsx";
+import { useState } from "react";
 
 interface HomeProps {
   isMobile: boolean;
@@ -10,23 +12,36 @@ interface HomeProps {
 
 export default function Home({ isMobile }: HomeProps) {
   const { connect, isConnecting } = useConnectUI();
+  const [isUnsupportedWalletModalOpen, setIsUnsupportedWalletModalOpen] =
+    useState(false);
+
+  const onConnectPress = () => {
+    setIsUnsupportedWalletModalOpen(true);
+  };
 
   return (
     <div>
       <Instructions isMobile={isMobile} />
       <Box>
         <Box css={styles.download}>
-          <p>Connect with the Fuel Wallet</p>
+          <p>Connect Your Fuel Wallet</p>
           <Button
             css={styles.button}
             onPress={() => {
-              connect();
+              onConnectPress();
             }}
           >
             {isConnecting ? "Connecting" : "Connect"}
           </Button>
         </Box>
       </Box>
+      <UnsupportedWalletsNoticeModal
+        isOpen={isUnsupportedWalletModalOpen}
+        onClose={() => {
+          setIsUnsupportedWalletModalOpen(false);
+          connect();
+        }}
+      />
     </div>
   );
 }

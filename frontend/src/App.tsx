@@ -64,6 +64,7 @@ function App() {
             <Heading css={styles.heading} as={"h1"}>
               SWAY FARM
             </Heading>
+            <span style={styles.gaslessLine}>Now completely GASLESS! 🎉</span>
             <Home isMobile={isMobile} />
           </BoxCentered>
         </BoxCentered>
@@ -128,5 +129,9 @@ const styles = {
     "@sm": {
       display: "none",
     },
+  }),
+  gaslessLine: cssObj({
+    color: "white",
+    fontSize: "20px",
   }),
 };

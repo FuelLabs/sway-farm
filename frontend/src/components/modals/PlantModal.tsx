@@ -14,6 +14,7 @@ import Loading from "../Loading";
 import { Address, Provider } from "fuels";
 import { useWallet } from "@fuels/react";
 import { usePaymaster } from "../../hooks/usePaymaster";
+import { toast } from "react-hot-toast";
 
 interface PlantModalProps {
   contract: FarmContract | null;
@@ -58,6 +59,7 @@ export default function PlantModal({
     if (tx) {
       onPlantSuccess(tileArray[0]);
       setModal("none");
+      toast.success("Planted the seed!");
       updatePageNum();
     }
     return tx;
@@ -104,6 +106,7 @@ export default function PlantModal({
       onPlantSuccess(tileArray[0]);
       setModal("none");
       updatePageNum();
+      toast.success("Planted the seed!");
     }
   }
 
@@ -125,6 +128,9 @@ export default function PlantModal({
               error,
             );
             setStatus("retrying");
+            toast.error(
+              "Failed to plant the seed :( Retrying with alternate method...",
+            );
             await plantWithoutGasStation();
           }
         } else {
@@ -136,12 +142,14 @@ export default function PlantModal({
       } catch (err) {
         console.log("Error in PlantModal:", err);
         setStatus("error");
+        toast.error("Failed to plant the seed :( Please try again.");
       } finally {
         setCanMove(true);
       }
     } else {
       console.log("ERROR: contract missing");
       setStatus("error");
+      toast.error("Failed to plant the seed :( Please try again.");
     }
   }
 
