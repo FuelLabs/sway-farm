@@ -1,4 +1,10 @@
-export const UnsupportedWalletsNoticeModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+export const UnsupportedWalletsNoticeModal = ({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) => {
   if (!isOpen) return null;
 
   return (
@@ -49,11 +55,12 @@ export const UnsupportedWalletsNoticeModal = ({ isOpen, onClose }: { isOpen: boo
             letterSpacing: "0.4px",
           }}
         >
-          Note: Gasless transactions are currently only supported for the Burner wallet & Fuelet Wallet.
+          Note: Gasless transactions are currently only supported for the Burner
+          wallet & Fuelet Wallet.
           <br />
           <br />
-          Support for other wallets is coming soon. If you use these other wallets, you can still play the game by paying gas fees
-          yourself.
+          Support for other wallets is coming soon. If you use these other
+          wallets, you can still play the game by paying gas fees yourself.
         </div>
         <button
           onClick={onClose}
