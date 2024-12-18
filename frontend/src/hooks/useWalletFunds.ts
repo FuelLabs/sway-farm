@@ -22,7 +22,7 @@ export function useWalletFunds(contract: FarmContract | null) {
     }
   }
 
-  const showNoFundsMessage = (duration = 15000) => {
+  const showNoFundsMessage = (duration = 1000) => {
     setShowNoFunds(true);
     setTimeout(() => {
       setShowNoFunds(false);

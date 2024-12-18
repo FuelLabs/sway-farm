@@ -9,7 +9,7 @@ import {
   FoodTypeInput,
   FUEL_PROVIDER_URL,
   useGaslessWalletSupported,
-  GAS_STATION_CHANGE_OUTPUT_ADDRESS,
+  // GAS_STATION_CHANGE_OUTPUT_ADDRESS,
 } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts";
 import type { Modals } from "../../constants";
@@ -96,10 +96,7 @@ export default function PlantModal({
       gasCoin.amount.sub(maxValuePerCoin),
       provider.getBaseAssetId(),
     );
-    request.addChangeOutput(
-      Address.fromString(GAS_STATION_CHANGE_OUTPUT_ADDRESS),
-      provider.getBaseAssetId(),
-    );
+    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
 
     const txCost = await wallet.getTransactionCost(request);
     const { gasUsed, maxFee } = txCost;

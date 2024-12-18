@@ -8,7 +8,7 @@ import {
   buttonStyle,
   FUEL_PROVIDER_URL,
   useGaslessWalletSupported,
-  GAS_STATION_CHANGE_OUTPUT_ADDRESS,
+  // GAS_STATION_CHANGE_OUTPUT_ADDRESS,
 } from "../constants";
 import type { FarmContract } from "../sway-api";
 
@@ -109,20 +109,17 @@ export default function NewPlayer({
       gasCoin.amount.sub(maxValuePerCoin),
       provider.getBaseAssetId(),
     );
-    request.addChangeOutput(
-      Address.fromString(GAS_STATION_CHANGE_OUTPUT_ADDRESS),
-      provider.getBaseAssetId(),
-    );
-    request.outputs = request.outputs.map((output) => {
-      if (
-        output.type === 2 &&
-        output.assetId ===
-          "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
-      ) {
-        return { ...output, to: GAS_STATION_CHANGE_OUTPUT_ADDRESS };
-      }
-      return output;
-    });
+    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+    // request.outputs = request.outputs.map((output) => {
+    //   if (
+    //     output.type === 2 &&
+    //     output.assetId ===
+    //       "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
+    //   ) {
+    //     return { ...output, to: GAS_STATION_CHANGE_OUTPUT_ADDRESS };
+    //   }
+    //   return output;
+    // });
     const txCost = await wallet.getTransactionCost(request);
     const { gasUsed, maxFee } = txCost;
     request.gasLimit = gasUsed;

@@ -29,7 +29,7 @@ type PaymasterAllocate = {
 };
 
 export const usePaymaster = () => {
-  const baseUrl = "http://67.207.79.9:3001";
+  const baseUrl = "https://fuelstation-mainnet.xyz:3001";
   const metadataUrl = `${baseUrl}/metadata`;
   const allocateUrl = `${baseUrl}/allocate-coin`;
   const signUrl = `${baseUrl}/sign`;

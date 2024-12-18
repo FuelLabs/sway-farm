@@ -10,7 +10,7 @@ import {
   FoodTypeInput,
   FUEL_PROVIDER_URL,
   useGaslessWalletSupported,
-  GAS_STATION_CHANGE_OUTPUT_ADDRESS,
+  // GAS_STATION_CHANGE_OUTPUT_ADDRESS,
 } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts";
 import Loading from "../Loading";
@@ -107,7 +107,7 @@ export default function SellItem({
       provider.getChain().consensusParameters.baseAssetId,
     );
     request.addChangeOutput(
-      Address.fromString(GAS_STATION_CHANGE_OUTPUT_ADDRESS),
+      gasCoin.owner,
       provider.getChain().consensusParameters.baseAssetId,
     );
 
