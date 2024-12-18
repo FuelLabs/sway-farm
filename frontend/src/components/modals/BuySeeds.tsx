@@ -16,6 +16,7 @@ interface BuySeedsProps {
   updatePageNum: () => void;
   setCanMove: Dispatch<SetStateAction<boolean>>;
   farmCoinAssetID: BytesLike;
+  onBuySuccess: () => void;
 }
 
 export default function BuySeeds({
@@ -23,6 +24,7 @@ export default function BuySeeds({
   updatePageNum,
   setCanMove,
   farmCoinAssetID,
+  onBuySuccess,
 }: BuySeedsProps) {
   const [status, setStatus] = useState<
     "error" | "none" | "loading" | "retrying"
@@ -93,6 +95,7 @@ export default function BuySeeds({
     });
     if (tx) {
       toast.success("Successfully bought seeds!");
+      onBuySuccess();
       updatePageNum();
     }
   }
@@ -121,7 +124,7 @@ export default function BuySeeds({
 
     if (tx) {
       toast.success("Successfully bought seeds!");
-
+      onBuySuccess();
       updatePageNum();
     }
     return tx;

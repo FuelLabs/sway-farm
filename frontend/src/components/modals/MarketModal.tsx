@@ -12,6 +12,7 @@ interface MarketModalProps {
   items: number;
   setCanMove: Dispatch<SetStateAction<boolean>>;
   farmCoinAssetID: BytesLike;
+  onBuySuccess: () => void;
 }
 
 export default function MarketModal({
@@ -20,6 +21,7 @@ export default function MarketModal({
   items,
   setCanMove,
   farmCoinAssetID,
+  onBuySuccess,
 }: MarketModalProps) {
   return (
     <div className="market-modal">
@@ -28,6 +30,7 @@ export default function MarketModal({
         updatePageNum={updatePageNum}
         setCanMove={setCanMove}
         farmCoinAssetID={farmCoinAssetID}
+        onBuySuccess={onBuySuccess}
       />
       {items > 0 && (
         <SellItem

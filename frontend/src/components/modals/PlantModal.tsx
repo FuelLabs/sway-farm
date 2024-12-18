@@ -63,7 +63,7 @@ export default function PlantModal({
     if (tx) {
       onPlantSuccess(tileArray[0]);
       setModal("none");
-      toast.success("Seed planted!");
+      toast.success("Seed Planted!");
       updatePageNum();
     }
     return tx;
@@ -110,7 +110,7 @@ export default function PlantModal({
       onPlantSuccess(tileArray[0]);
       setModal("none");
       updatePageNum();
-      toast.success("Seed planted!");
+      toast.success("Seed Planted!");
     }
   }
 

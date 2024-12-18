@@ -79,7 +79,7 @@ export default function NewPlayer({
       } as PlayerOutput);
       setModal("none");
       updatePageNum();
-      toast.success("Welcome to Sway Farm! 🌱");
+      toast.success("Welcome to Sway Farm!");
     }
     return tx;
   }
@@ -126,7 +126,7 @@ export default function NewPlayer({
       } as PlayerOutput);
       setModal("none");
       updatePageNum();
-      toast.success("Welcome to Sway Farm! 🌱");
+      toast.success("Welcome to Sway Farm!");
     }
   }
 

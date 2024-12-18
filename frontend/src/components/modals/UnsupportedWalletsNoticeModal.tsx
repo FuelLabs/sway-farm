@@ -16,7 +16,7 @@ export const UnsupportedWalletsNoticeModal = ({
         left: 0,
         width: "100%",
         height: "100%",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        backgroundColor: "rgba(0, 0, 0, 0.7)",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -27,8 +27,8 @@ export const UnsupportedWalletsNoticeModal = ({
         className="modal-content"
         onClick={(e) => e.stopPropagation()}
         style={{
-          backgroundColor: "white",
-          padding: "20px",
+          backgroundColor: "rgb(18, 18, 18)",
+          padding: "30px",
           borderRadius: "8px",
           maxWidth: "400px",
           width: "90%",
@@ -36,18 +36,22 @@ export const UnsupportedWalletsNoticeModal = ({
         }}
       >
         <div
-          style={{ fontWeight: "bold", marginBottom: "15px", fontSize: "16px" }}
+          style={{
+            fontWeight: "bold",
+            marginBottom: "15px",
+            fontSize: "18px",
+            color: "green",
+          }}
         >
           Wallet Support Notice
         </div>
-        <div style={{ fontSize: "14px" }}>
+        <div style={{ fontSize: "14px", color: "white", marginTop: "10px" }}>
           Note: Gasless transactions are currently only supported for the Burner
-          wallet & Fuelet.
+          wallet & Fuelet Wallet.
           <br />
           <br />
           Support for other wallets is coming soon. If you use these other
-          wallets, you can still play the game, but you will need to pay gas
-          fees yourself.
+          wallets, you can still play the game by paying gas fees yourself.
         </div>
         <button
           onClick={onClose}
@@ -56,8 +60,8 @@ export const UnsupportedWalletsNoticeModal = ({
             padding: "8px 16px",
             borderRadius: "4px",
             border: "none",
-            backgroundColor: "#007bff",
-            color: "white",
+            backgroundColor: "#102a9e",
+            color: "#d0cdcd",
             cursor: "pointer",
           }}
         >
@@ -67,3 +71,4 @@ export const UnsupportedWalletsNoticeModal = ({
     </div>
   );
 };
+
