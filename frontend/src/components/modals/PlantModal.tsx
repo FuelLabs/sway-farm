@@ -129,7 +129,7 @@ export default function PlantModal({
             );
             setStatus("retrying");
             toast.error(
-               "Failed to plant the seed :( Retrying with alternate method..."
+              "Failed to plant the seed :( Retrying with alternate method...",
             );
             await plantWithoutGasStation();
           }

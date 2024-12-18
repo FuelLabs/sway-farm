@@ -106,5 +106,5 @@ createRoot(document.getElementById("root")!).render(
         <App />
       </FuelProvider>
     </QueryClientProvider>{" "}
-  </StrictMode>
+  </StrictMode>,
 );

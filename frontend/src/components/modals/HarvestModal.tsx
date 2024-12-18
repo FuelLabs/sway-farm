@@ -12,7 +12,7 @@ import type { Modals } from "../../constants";
 import { useWallet } from "@fuels/react";
 import { Address, Provider } from "fuels";
 import { usePaymaster } from "../../hooks/usePaymaster";
-import { toast } from 'react-hot-toast'
+import { toast } from "react-hot-toast";
 
 interface HarvestProps {
   contract: FarmContract | null;
@@ -118,7 +118,9 @@ export default function HarvestModal({
               "Gas station failed, trying direct transaction...",
               error,
             );
-            toast.error("Failed to harvest the seed :( Retrying with alternate method...");
+            toast.error(
+              "Failed to harvest the seed :( Retrying with alternate method...",
+            );
             setStatus("retrying");
             await harvestWithoutGasStation();
           }

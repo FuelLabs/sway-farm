@@ -18,7 +18,7 @@ import { Analytics } from "@vercel/analytics/react";
 function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [farmCoinAssetID, setFarmCoinAssetId] = useState<string | null>(
-    FARM_COIN_ASSET_ID
+    FARM_COIN_ASSET_ID,
   );
   const { isConnected } = useIsConnected();
   const { wallet } = useWallet();
