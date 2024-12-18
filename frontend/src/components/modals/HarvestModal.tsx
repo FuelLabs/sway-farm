@@ -7,6 +7,7 @@ import {
   buttonStyle,
   FUEL_PROVIDER_URL,
   useGaslessWalletSupported,
+  GAS_STATION_CHANGE_OUTPUT_ADDRESS,
 } from "../../constants";
 import type { FarmContract } from "../../sway-api";
 import type { Modals } from "../../constants";
@@ -86,7 +87,10 @@ export default function HarvestModal({
       gasCoin.amount.sub(maxValuePerCoin),
       provider.getBaseAssetId(),
     );
-    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+    request.addChangeOutput(
+      Address.fromString(GAS_STATION_CHANGE_OUTPUT_ADDRESS),
+      provider.getBaseAssetId(),
+    );
 
     const txCost = await wallet.getTransactionCost(request);
     const { gasUsed, maxFee } = txCost;
@@ -100,6 +104,7 @@ export default function HarvestModal({
     if (tx) {
       console.log("tx", tx);
       onHarvestSuccess(tileArray[0]);
+      await paymaster.postJobComplete(jobId);
       setModal("plant");
       updatePageNum();
       toast.success("Seed harvested!");

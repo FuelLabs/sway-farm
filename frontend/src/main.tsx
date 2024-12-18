@@ -28,7 +28,7 @@ import {
 const queryClient = new QueryClient();
 const networks = [
   {
-    chainId: CHAIN_IDS.fuel.testnet,
+    chainId: CHAIN_IDS.fuel.mainnet,
     url: FUEL_PROVIDER_URL,
   },
 ];

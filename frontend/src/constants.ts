@@ -5,7 +5,7 @@ import { useCurrentConnector } from "@fuels/react";
 
 // import contractIds from './sway-api/contract-ids.json';
 
-export const FUEL_PROVIDER_URL = "https://testnet.fuel.network/v1/graphql";
+export const FUEL_PROVIDER_URL = "https://mainnet.fuel.network/v1/graphql";
 
 export const TESTNET_FAUCET_URL = "https://faucet-testnet.fuel.network/";
 
@@ -16,12 +16,15 @@ export const CONTRACT_ID =
   // VERCEL_ENV === 'development'
   // ? contractIds.contract
   // :
-  "0x8e8a249c7e724019b2c975f245922609af63bbef88803a836cc59459a0542500";
+  "0xea1146d5d88d2df0249888dd7035ee916e39dca09a84be63f439942699b490f7";
 
 export const FARM_COIN_ASSET_ID =
   // VERCEL_ENV === 'development'
   // ? null :
-  "0x252d10f228f8fe0e67a9153e8154d4f752ff157d2f2307b151b6bd0957586c7e";
+  "0xb43b76a28169f9f2f5175d74ed4ce38004c4eeea534b3af58121698bc84365d0";
+
+export const GAS_STATION_CHANGE_OUTPUT_ADDRESS =
+  "0xF9B62E7eA61219e4b82561abce1AbF4b1D581539B1505C02A7Fe92D6B4C61d1B";
 
 export const FARM_COIN_NETWORK_ASSET = {
   /** type of network */

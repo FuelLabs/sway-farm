@@ -10,6 +10,7 @@ import {
   FoodTypeInput,
   FUEL_PROVIDER_URL,
   useGaslessWalletSupported,
+  GAS_STATION_CHANGE_OUTPUT_ADDRESS,
 } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts";
 import Loading from "../Loading";
@@ -106,7 +107,7 @@ export default function SellItem({
       provider.getChain().consensusParameters.baseAssetId,
     );
     request.addChangeOutput(
-      gasCoin.owner,
+      Address.fromString(GAS_STATION_CHANGE_OUTPUT_ADDRESS),
       provider.getChain().consensusParameters.baseAssetId,
     );
 
@@ -116,6 +117,7 @@ export default function SellItem({
     const tx = await wallet.sendTransaction(request);
     if (tx) {
       updatePageNum();
+      await paymaster.postJobComplete(jobId);
       toast.success("Successfully sold the item!");
     }
   }

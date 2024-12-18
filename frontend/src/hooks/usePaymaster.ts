@@ -29,10 +29,11 @@ type PaymasterAllocate = {
 };
 
 export const usePaymaster = () => {
-  const baseUrl = "https://fuelstation-sepolia.xyz:3000";
+  const baseUrl = "http://67.207.79.9:3001";
   const metadataUrl = `${baseUrl}/metadata`;
   const allocateUrl = `${baseUrl}/allocate-coin`;
   const signUrl = `${baseUrl}/sign`;
+  // const jobCompleteUrl = `${baseUrl}/jobs/${jobId}/complete`;
 
   const metadata = async (): Promise<PaymasterMetadata> => {
     const { data: MetaDataResponse } =
@@ -90,6 +91,17 @@ export const usePaymaster = () => {
 
     return { signature: response.data.signature, gasInput, request };
   };
+  const postJobComplete = async (jobId: string) => {
+    // return;
+    try {
+      const response = await axios.post(`${baseUrl}/jobs/${jobId}/complete`);
+      console.log("response", response);
+      return true;
+    } catch (error) {
+      console.error("Failed to post job complete:", error);
+      return true;
+    }
+  };
 
   const shouldUseGasless = async (): Promise<boolean> => {
     try {
@@ -109,5 +121,6 @@ export const usePaymaster = () => {
     metadata,
     fetchSignature,
     shouldUseGasless,
+    postJobComplete,
   };
 };

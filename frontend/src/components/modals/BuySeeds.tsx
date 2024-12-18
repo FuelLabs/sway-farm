@@ -4,7 +4,7 @@ import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
 import { useWalletFunds } from "../../hooks/useWalletFunds";
 import { NoFundsMessage } from "./NoFundsMessage";
-import { FUEL_PROVIDER_URL, useGaslessWalletSupported } from "../../constants";
+import { FUEL_PROVIDER_URL, useGaslessWalletSupported, GAS_STATION_CHANGE_OUTPUT_ADDRESS } from "../../constants";
 import { buttonStyle, FoodTypeInput } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts/FarmContract";
 import { useWallet } from "@fuels/react";
@@ -69,8 +69,8 @@ export default function BuySeeds({
     const txCost = await wallet.getTransactionCost(request, {
       quantities: coins,
     });
-
     const { gasUsed, missingContractIds, outputVariables, maxFee } = txCost;
+    console.log("Max fee", Number(maxFee), "gas used", Number(gasUsed));
     missingContractIds.forEach((contractId) => {
       request.addContractInputAndOutput(Address.fromString(contractId));
     });
@@ -85,7 +85,19 @@ export default function BuySeeds({
       gasCoin.amount.sub(maxValuePerCoin),
       provider.getBaseAssetId(),
     );
-    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+    console.log("change output", GAS_STATION_CHANGE_OUTPUT_ADDRESS);
+    request.addChangeOutput(
+      Address.fromString(GAS_STATION_CHANGE_OUTPUT_ADDRESS),
+      provider.getBaseAssetId(),
+    );
+    //change output of type 2 with assetID "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07" to GAS_STATION_CHANGE_OUTPUT_ADDRESS
+    request.outputs = request.outputs.map((output) => {
+      if (output.type === 2 && output.assetId === "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07") {
+        return { ...output, to: GAS_STATION_CHANGE_OUTPUT_ADDRESS };
+      }
+      return output;
+    });
+    console.log("request", request);
 
     const { signature } = await paymaster.fetchSignature(request, jobId);
     request.updateWitnessByOwner(gasCoin.owner, signature);
@@ -96,6 +108,7 @@ export default function BuySeeds({
     if (tx) {
       toast.success("Successfully bought seeds!");
       onBuySuccess();
+      await paymaster.postJobComplete(jobId);
       updatePageNum();
     }
   }
