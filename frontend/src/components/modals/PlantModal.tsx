@@ -118,8 +118,14 @@ export default function PlantModal({
       try {
         setStatus("loading");
         setCanMove(false);
-
-        if (isGaslessSupported) {
+        const canUseGasless = await paymaster.shouldUseGasless();
+        if (!canUseGasless) {
+          toast.error(
+            "Hourly gasless transaction limit reached. Trying regular transaction...",
+            { duration: 5000 }
+          );
+        }
+        if (isGaslessSupported && canUseGasless) {
           try {
             await plantWithGasStation();
           } catch (error) {

@@ -79,7 +79,7 @@ export default function HarvestModal({
     request.addCoinOutput(
       gasCoin.owner,
       gasCoin.amount.sub(maxValuePerCoin),
-      provider.getBaseAssetId(),
+      provider.getBaseAssetId()
     );
     request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
 
@@ -109,17 +109,23 @@ export default function HarvestModal({
       try {
         setStatus("loading");
         setCanMove(false);
-
-        if (isGaslessSupported) {
+        const canUseGasless = await paymaster.shouldUseGasless();
+        if (!canUseGasless) {
+          toast.error(
+            "Hourly gasless transaction limit reached. Trying regular transaction...",
+            { duration: 5000 }
+          );
+        }
+        if (isGaslessSupported && canUseGasless) {
           try {
             await harvestWithGasStation();
           } catch (error) {
             console.log(
               "Gas station failed, trying direct transaction...",
-              error,
+              error
             );
             toast.error(
-              "Failed to harvest the seed :( Retrying with alternate method...",
+              "Failed to harvest the seed :( Retrying with alternate method..."
             );
             setStatus("retrying");
             await harvestWithoutGasStation();

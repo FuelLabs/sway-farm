@@ -3,6 +3,10 @@ import { Address, type Coin, TransactionRequest, bn } from "fuels";
 
 type PaymasterMetadata = {
   maxValuePerCoin: string;
+  allocateCoinRateLimit: {
+    totalHits: number;
+    resetTime: string;
+  };
 };
 
 type PaymasterAllocateResponse = {
@@ -33,11 +37,12 @@ export const usePaymaster = () => {
   const metadata = async (): Promise<PaymasterMetadata> => {
     const { data: MetaDataResponse } =
       await axios.get<PaymasterMetadata>(metadataUrl);
-    const { maxValuePerCoin } = MetaDataResponse;
+    console.log("MetaDataResponse", MetaDataResponse);
+    const { maxValuePerCoin, allocateCoinRateLimit } = MetaDataResponse;
     if (!maxValuePerCoin) {
       throw new Error("No maxValuePerCoin found");
     }
-    return { maxValuePerCoin };
+    return { maxValuePerCoin, allocateCoinRateLimit };
   };
 
   const allocate = async (): Promise<PaymasterAllocate> => {
@@ -86,9 +91,23 @@ export const usePaymaster = () => {
     return { signature: response.data.signature, gasInput, request };
   };
 
+  const shouldUseGasless = async (): Promise<boolean> => {
+    try {
+      if (window.location.hostname === "localhost") {
+        return true;
+      }
+      const { allocateCoinRateLimit } = await metadata();
+      return allocateCoinRateLimit.totalHits < 19;
+    } catch (error) {
+      console.error("Failed to check rate limit:", error);
+      return false;
+    }
+  };
+
   return {
     allocate,
     metadata,
     fetchSignature,
+    shouldUseGasless,
   };
 };
