@@ -83,7 +83,19 @@ export default function PlantModal({
     if (tx) {
       onPlantSuccess(tileArray[0]);
       setModal("none");
-      toast.success("Seed Planted!");
+      toast.success(() => (
+        <div
+          onClick={() =>
+            window.open(
+              `https://app.fuel.network/tx/${tx.transactionId}/simple`,
+              "_blank",
+            )
+          }
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+        >
+          Seed Planted!
+        </div>
+      ));
       updatePageNum();
     }
     return tx;
@@ -131,7 +143,16 @@ export default function PlantModal({
       await paymaster.postJobComplete(jobId);
       setModal("none");
       updatePageNum();
-      toast.success("Seed Planted!");
+      toast.success(() => (
+        <div
+          onClick={() =>
+            window.open(`https://app.fuel.network/tx/${tx.id}/simple`, "_blank")
+          }
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+        >
+          Seed Planted!
+        </div>
+      ));
     }
   }
 

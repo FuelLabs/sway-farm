@@ -78,6 +78,19 @@ export default function SellItem({
 
     if (tx) {
       updatePageNum();
+      toast.success(() => (
+        <div
+          onClick={() =>
+            window.open(
+              `https://app.fuel.network/tx/${tx.transactionId}/simple`,
+              "_blank",
+            )
+          }
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+        >
+          Successfully sold the item!
+        </div>
+      ));
     }
     return tx;
   }
@@ -138,7 +151,16 @@ export default function SellItem({
     if (tx) {
       updatePageNum();
       await paymaster.postJobComplete(jobId);
-      toast.success("Successfully sold the item!");
+      toast.success(() => (
+        <div
+          onClick={() =>
+            window.open(`https://app.fuel.network/tx/${tx.id}/simple`, "_blank")
+          }
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+        >
+          Successfully sold the item!
+        </div>
+      ));
     }
   }
 

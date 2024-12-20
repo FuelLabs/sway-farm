@@ -125,8 +125,18 @@ export default function BuySeeds({
     const tx = await wallet.sendTransaction(request, {
       estimateTxDependencies: false,
     });
+    console.log("tx", tx);
     if (tx) {
-      toast.success("Successfully bought seeds!");
+      toast.success(() => (
+        <div
+          onClick={() =>
+            window.open(`https://app.fuel.network/tx/${tx.id}/simple`, "_blank")
+          }
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+        >
+          Successfully bought seeds!
+        </div>
+      ));
       onBuySuccess();
       await paymaster.postJobComplete(jobId);
       updatePageNum();
@@ -156,7 +166,19 @@ export default function BuySeeds({
       .call();
 
     if (tx) {
-      toast.success("Successfully bought seeds!");
+      toast.success(() => (
+        <div
+          onClick={() =>
+            window.open(
+              `https://app.fuel.network/tx/${tx.transactionId}/simple`,
+              "_blank",
+            )
+          }
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+        >
+          Successfully bought seeds!
+        </div>
+      ));
       onBuySuccess();
       updatePageNum();
     }

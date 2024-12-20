@@ -82,7 +82,19 @@ export default function HarvestModal({
       onHarvestSuccess(tileArray[0]);
       setModal("plant");
       updatePageNum();
-      toast.success("Seed harvested!");
+      toast.success(() => (
+        <div
+          onClick={() =>
+            window.open(
+              `https://app.fuel.network/tx/${tx.transactionId}/simple`,
+              "_blank",
+            )
+          }
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+        >
+          Seed harvested!
+        </div>
+      ));
     }
     return tx;
   }
@@ -124,7 +136,16 @@ export default function HarvestModal({
       await paymaster.postJobComplete(jobId);
       setModal("plant");
       updatePageNum();
-      toast.success("Seed harvested!");
+      toast.success(() => (
+        <div
+          onClick={() =>
+            window.open(`https://app.fuel.network/tx/${tx.id}/simple`, "_blank")
+          }
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+        >
+          Seed harvested!
+        </div>
+      ));
     }
   }
 

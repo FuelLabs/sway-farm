@@ -102,7 +102,19 @@ export default function NewPlayer({
       } as PlayerOutput);
       setModal("none");
       updatePageNum();
-      toast.success("Welcome to Sway Farm!");
+      toast.success(() => (
+        <div
+          onClick={() =>
+            window.open(
+              `https://app.fuel.network/tx/${tx.transactionId}/simple`,
+              "_blank",
+            )
+          }
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+        >
+          Welcome to Sway Farm!
+        </div>
+      ));
     }
     return tx;
   }
@@ -159,7 +171,16 @@ export default function NewPlayer({
       await paymaster.postJobComplete(jobId);
       setModal("none");
       updatePageNum();
-      toast.success("Welcome to Sway Farm!");
+      toast.success(() => (
+        <div
+          onClick={() =>
+            window.open(`https://app.fuel.network/tx/${tx.id}/simple`, "_blank")
+          }
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+        >
+          Welcome to Sway Farm!
+        </div>
+      ));
     }
   }
 
