@@ -113,7 +113,7 @@ createRoot(document.getElementById("root")!).render(
             error: {
               icon: <CustomErrorIcon />,
             },
-            position: "bottom-center",
+            position: window.innerWidth <= 768 ? "top-center" : "bottom-center",
           }}
         />
         <App />
