@@ -42,7 +42,9 @@ export const usePaymaster = () => {
       console.log("reCAPTCHA not yet available");
       return null;
     }
-    const token = await executeRecaptcha("global_token");
+    const token = await executeRecaptcha(
+      Math.random().toString(36).substring(2, 7),
+    );
 
     // Check if token exists and is less than 2 minutes old
     if (token) {
