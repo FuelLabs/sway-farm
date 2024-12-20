@@ -1,6 +1,6 @@
 import { BoxCentered, Button, Link } from "@fuel-ui/react";
 import { useWallet } from "@fuels/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { Modals } from "../constants";
 
@@ -41,11 +41,7 @@ export default function NewPlayer({
   const paymaster = usePaymaster();
   const isGaslessSupported = useGaslessWalletSupported();
 
-  useEffect(() => {
-    getBalance();
-  }, [wallet]);
-
-  async function getBalance() {
+  const getBalance = useCallback(async () => {
     const thisWallet = wallet ?? contract?.account;
     console.log(wallet, "wallet");
     const baseAssetId = thisWallet?.provider.getBaseAssetId();
@@ -55,7 +51,33 @@ export default function NewPlayer({
     if (balanceNum) {
       setHasFunds(balanceNum > 0);
     }
-  }
+  }, [wallet, contract]);
+
+  useEffect(() => {
+    getBalance();
+  }, [wallet, getBalance]);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+
+        if (status === "error") {
+          setStatus("none");
+          updatePageNum();
+        } else if (status === "none" && !showNoFunds) {
+          handleNewPlayer();
+        } else if (status === "none" && !hasFunds && showNoFunds) {
+          getBalance();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleGlobalKeyDown);
+    };
+  }, [status, showNoFunds, hasFunds]);
 
   async function createPlayerWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
@@ -202,19 +224,42 @@ export default function NewPlayer({
   return (
     <div className="new-player-modal">
       {status === "none" && !showNoFunds && (
-        <Button css={buttonStyle} onPress={handleNewPlayer}>
+        <Button
+          css={buttonStyle}
+          onPress={handleNewPlayer}
+          role="button"
+          tabIndex={0}
+          aria-label="Create new player"
+        >
           Make A New Player
         </Button>
       )}
       {status === "none" && !hasFunds && showNoFunds && (
         <BoxCentered css={styles.container}>
           You need some ETH to play:
-          <Link isExternal href={`https://app.fuel.network/bridge`}>
-            <Button css={styles.link} variant="link">
+          <Link
+            isExternal
+            href={`https://app.fuel.network/bridge`}
+            role="link"
+            tabIndex={0}
+          >
+            <Button
+              css={styles.link}
+              variant="link"
+              role="button"
+              tabIndex={0}
+              aria-label="Go to Bridge"
+            >
               Go to Bridge
             </Button>
           </Link>
-          <Button css={buttonStyle} onPress={getBalance}>
+          <Button
+            css={buttonStyle}
+            onPress={getBalance}
+            role="button"
+            tabIndex={0}
+            aria-label="Recheck balance"
+          >
             Recheck balance
           </Button>
         </BoxCentered>
@@ -238,6 +283,9 @@ export default function NewPlayer({
               setStatus("none");
               updatePageNum();
             }}
+            role="button"
+            tabIndex={0}
+            aria-label="Try again"
           >
             Try Again
           </Button>

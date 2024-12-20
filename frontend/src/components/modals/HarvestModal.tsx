@@ -1,6 +1,6 @@
 import { Spinner, Button, BoxCentered } from "@fuel-ui/react";
 import type { Dispatch, SetStateAction } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cssObj } from "@fuel-ui/css";
 
 import {
@@ -43,6 +43,27 @@ export default function HarvestModal({
   const isGaslessSupported = useGaslessWalletSupported();
   const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
     useWalletFunds(contract);
+
+  // Add global keyboard event listener
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+
+        if (status === "error") {
+          setStatus("none");
+          updatePageNum();
+        } else if (status === "none" && !hasFunds && !showNoFunds) {
+          harvestItem();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleGlobalKeyDown);
+    };
+  }, [status, hasFunds, showNoFunds]);
 
   async function harvestWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
@@ -99,7 +120,6 @@ export default function HarvestModal({
     const tx = await wallet.sendTransaction(request);
 
     if (tx) {
-      console.log("tx", tx);
       onHarvestSuccess(tileArray[0]);
       await paymaster.postJobComplete(jobId);
       setModal("plant");
@@ -184,6 +204,9 @@ export default function HarvestModal({
               setStatus("none");
               updatePageNum();
             }}
+            role="button"
+            tabIndex={0}
+            aria-label="Try again"
           >
             Try Again
           </Button>
@@ -195,7 +218,13 @@ export default function HarvestModal({
       {status === "none" && !hasFunds && !showNoFunds && (
         <>
           <div style={styles.items}>Harvest this item?</div>
-          <Button css={buttonStyle} onPress={harvestItem}>
+          <Button
+            css={buttonStyle}
+            onPress={harvestItem}
+            role="button"
+            tabIndex={0}
+            aria-label="Harvest item"
+          >
             Harvest
           </Button>
         </>

@@ -1,7 +1,7 @@
 import { Button, Spinner, BoxCentered } from "@fuel-ui/react";
 import { type BytesLike, Address, bn, Provider } from "fuels";
 import type { Dispatch, SetStateAction } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWalletFunds } from "../../hooks/useWalletFunds";
 import { NoFundsMessage } from "./NoFundsMessage";
 import {
@@ -38,6 +38,26 @@ export default function BuySeeds({
   const isGaslessSupported = useGaslessWalletSupported();
   const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
     useWalletFunds(contract);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+
+        if (status === "error") {
+          setStatus("none");
+          updatePageNum();
+        } else if (status === "none" && !showNoFunds) {
+          buySeeds();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleGlobalKeyDown);
+    };
+  }, [status, showNoFunds]);
 
   async function buyWithGasStation() {
     if (!wallet) {
@@ -219,6 +239,9 @@ export default function BuySeeds({
               setStatus("none");
               updatePageNum();
             }}
+            role="button"
+            tabIndex={0}
+            aria-label="Try again"
           >
             Try Again
           </Button>
@@ -227,7 +250,14 @@ export default function BuySeeds({
       {status === "none" && !showNoFunds && (
         <>
           <div className="market-header">Buy Seeds</div>
-          <Button css={buttonStyle} variant="outlined" onPress={buySeeds}>
+          <Button
+            css={buttonStyle}
+            variant="outlined"
+            onPress={buySeeds}
+            role="button"
+            tabIndex={0}
+            aria-label="Buy 10 seeds"
+          >
             Buy 10 seeds
           </Button>
         </>

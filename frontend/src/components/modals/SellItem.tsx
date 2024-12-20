@@ -1,7 +1,7 @@
 import { Button } from "@fuel-ui/react";
 import { Address, InputType, Provider, bn } from "fuels";
 import type { Dispatch, SetStateAction } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWalletFunds } from "../../hooks/useWalletFunds";
 import { NoFundsMessage } from "./NoFundsMessage";
 
@@ -39,6 +39,26 @@ export default function SellItem({
   const isGaslessSupported = useGaslessWalletSupported();
   const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
     useWalletFunds(contract);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
+      if (e.key === "Shift") {
+        e.preventDefault();
+
+        if (status === "error") {
+          setStatus("none");
+          updatePageNum();
+        } else if (status === "none" && !showNoFunds) {
+          sellItems();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleGlobalKeyDown);
+    };
+  }, [status, showNoFunds]);
 
   async function sellWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
@@ -191,13 +211,23 @@ export default function SellItem({
               setStatus("none");
               updatePageNum();
             }}
+            role="button"
+            tabIndex={0}
+            aria-label="Try again (press S or Shift)"
           >
             Try Again
           </Button>
         </div>
       )}
       {status === "none" && !showNoFunds && (
-        <Button css={buttonStyle} variant="outlined" onPress={sellItems}>
+        <Button
+          css={buttonStyle}
+          variant="outlined"
+          onPress={sellItems}
+          role="button"
+          tabIndex={0}
+          aria-label="Sell all items (press S or Shift)"
+        >
           Sell All Items
         </Button>
       )}

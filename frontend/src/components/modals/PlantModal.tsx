@@ -1,6 +1,6 @@
 import { Button } from "@fuel-ui/react";
 import type { Dispatch, SetStateAction } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWalletFunds } from "../../hooks/useWalletFunds";
 import { NoFundsMessage } from "./NoFundsMessage";
 
@@ -46,6 +46,25 @@ export default function PlantModal({
   const isGaslessSupported = useGaslessWalletSupported();
   const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
     useWalletFunds(contract);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+
+        if (status === "error") {
+          setStatus("none");
+        } else if (status === "none" && !showNoFunds && seeds > 0) {
+          handlePlant();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleGlobalKeyDown);
+    };
+  }, [status, showNoFunds, seeds]);
 
   async function plantWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
@@ -183,6 +202,9 @@ export default function PlantModal({
             onPress={() => {
               setStatus("none");
             }}
+            role="button"
+            tabIndex={0}
+            aria-label="Try again"
           >
             Try Again
           </Button>
@@ -193,7 +215,13 @@ export default function PlantModal({
           {seeds > 0 ? (
             <>
               <div style={styles.seeds}>Plant a seed here?</div>
-              <Button css={buttonStyle} onPress={handlePlant}>
+              <Button
+                css={buttonStyle}
+                onPress={handlePlant}
+                role="button"
+                tabIndex={0}
+                aria-label="Plant seed"
+              >
                 Plant
               </Button>
             </>
