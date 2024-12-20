@@ -33,6 +33,32 @@ export default function Home({ isMobile }: HomeProps) {
           >
             {isConnecting ? "Connecting" : "Connect"}
           </Button>
+          <div
+            style={{
+              color: "#aaa",
+              fontSize: "8px",
+              marginTop: "6px",
+              lineHeight: "12px",
+            }}
+          >
+            This site is protected by reCAPTCHA and the Google
+            <a
+              href="https://policies.google.com/privacy"
+              style={{ color: "#aaa", textDecoration: "underline" }}
+            >
+              {" "}
+              Privacy Policy
+            </a>{" "}
+            and
+            <a
+              href="https://policies.google.com/terms"
+              style={{ color: "#aaa", textDecoration: "underline" }}
+            >
+              {" "}
+              Terms of Service
+            </a>{" "}
+            apply.
+          </div>
         </Box>
       </Box>
       <UnsupportedWalletsNoticeModal

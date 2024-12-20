@@ -2,7 +2,8 @@ import { cssObj } from "@fuel-ui/css";
 import { Box, BoxCentered, Heading } from "@fuel-ui/react";
 import { useIsConnected, useWallet } from "@fuels/react";
 //Add Analytics
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 import Game from "./components/Game.tsx";
 import Home from "./components/home/Home.tsx";
@@ -15,7 +16,15 @@ import "./App.css";
 import { FarmContract } from "./sway-api/index.ts";
 import { Analytics } from "@vercel/analytics/react";
 
+function useInterval(callback: () => void, delay: number) {
+  useEffect(() => {
+    const intervalId = setInterval(callback, delay);
+    return () => clearInterval(intervalId);
+  }, [callback, delay]);
+}
+
 function App() {
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const [isMobile, setIsMobile] = useState(false);
   const [farmCoinAssetID, setFarmCoinAssetId] = useState<string | null>(
     FARM_COIN_ASSET_ID,
@@ -47,6 +56,30 @@ function App() {
     }
     getAssetId();
   }, [contract]);
+
+  const generateAndStoreToken = useCallback(async () => {
+    if (!executeRecaptcha) {
+      console.log("reCAPTCHA not yet available");
+      return;
+    }
+
+    try {
+      const token = await executeRecaptcha("global_token");
+      localStorage.setItem("recaptcha_token", token);
+      localStorage.setItem("recaptcha_timestamp", Date.now().toString());
+      console.log("New reCAPTCHA token generated");
+    } catch (error) {
+      console.error("Failed to generate reCAPTCHA token:", error);
+    }
+  }, [executeRecaptcha]);
+
+  useEffect(() => {
+    generateAndStoreToken();
+  }, [generateAndStoreToken]);
+
+  useInterval(() => {
+    generateAndStoreToken();
+  }, 60000);
 
   return (
     <Box css={styles.root}>

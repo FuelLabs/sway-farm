@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Address, type Coin, TransactionRequest, bn } from "fuels";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 type PaymasterMetadata = {
   maxValuePerCoin: string;
@@ -34,10 +35,34 @@ export const usePaymaster = () => {
   const allocateUrl = `${baseUrl}/allocate-coin`;
   const signUrl = `${baseUrl}/sign`;
   // const jobCompleteUrl = `${baseUrl}/jobs/${jobId}/complete`;
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
+  const getRecaptchaToken = async (): Promise<string | null> => {
+    if (!executeRecaptcha) {
+      console.log("reCAPTCHA not yet available");
+      return null;
+    }
+    const token = await executeRecaptcha("global_token");
+
+    // Check if token exists and is less than 2 minutes old
+    if (token) {
+      return token;
+    }
+    return null;
+  };
 
   const metadata = async (): Promise<PaymasterMetadata> => {
-    const { data: MetaDataResponse } =
-      await axios.get<PaymasterMetadata>(metadataUrl);
+    const token = getRecaptchaToken();
+    if (!token) {
+      throw new Error("No valid reCAPTCHA token available");
+    }
+
+    const { data: MetaDataResponse } = await axios.get<PaymasterMetadata>(
+      metadataUrl,
+      {
+        data: { recaptchaToken: token },
+      },
+    );
     console.log("MetaDataResponse", MetaDataResponse);
     const { maxValuePerCoin, allocateCoinRateLimit } = MetaDataResponse;
     if (!maxValuePerCoin) {
@@ -47,7 +72,14 @@ export const usePaymaster = () => {
   };
 
   const allocate = async (): Promise<PaymasterAllocate> => {
-    const { data } = await axios.post<PaymasterAllocateResponse>(allocateUrl);
+    const token = await getRecaptchaToken();
+    if (!token) {
+      throw new Error("No valid reCAPTCHA token available");
+    }
+
+    const { data } = await axios.post<PaymasterAllocateResponse>(allocateUrl, {
+      recaptchaToken: token,
+    });
     const { jobId, utxoId, coin } = data;
 
     if (!coin) {
@@ -69,10 +101,15 @@ export const usePaymaster = () => {
   };
 
   const fetchSignature = async (request: TransactionRequest, jobId: string) => {
-    // return;
+    const token = await getRecaptchaToken();
+    if (!token) {
+      throw new Error("No valid reCAPTCHA token available");
+    }
+
     const response = await axios.post(signUrl, {
       request: request.toJSON(),
       jobId,
+      recaptchaToken: token,
     });
     if (response.status !== 200) {
       throw new Error("Failed to sign transaction");
@@ -91,10 +128,17 @@ export const usePaymaster = () => {
 
     return { signature: response.data.signature, gasInput, request };
   };
+
   const postJobComplete = async (jobId: string) => {
-    // return;
+    const token = await getRecaptchaToken();
+    if (!token) {
+      throw new Error("No valid reCAPTCHA token available");
+    }
+
     try {
-      const response = await axios.post(`${baseUrl}/jobs/${jobId}/complete`);
+      const response = await axios.post(`${baseUrl}/jobs/${jobId}/complete`, {
+        recaptchaToken: token,
+      });
       console.log("response", response);
       return true;
     } catch (error) {
