@@ -3,6 +3,8 @@ import { Button, Box } from "@fuel-ui/react";
 import { useConnectUI } from "@fuels/react";
 
 import Instructions from "./Instructions.tsx";
+import { UnsupportedWalletsNoticeModal } from "../modals/UnsupportedWalletsNoticeModal.tsx";
+import { useState } from "react";
 
 interface HomeProps {
   isMobile: boolean;
@@ -10,23 +12,62 @@ interface HomeProps {
 
 export default function Home({ isMobile }: HomeProps) {
   const { connect, isConnecting } = useConnectUI();
+  const [isUnsupportedWalletModalOpen, setIsUnsupportedWalletModalOpen] =
+    useState(false);
+
+  const onConnectPress = () => {
+    setIsUnsupportedWalletModalOpen(true);
+  };
 
   return (
     <div>
       <Instructions isMobile={isMobile} />
       <Box>
         <Box css={styles.download}>
-          <p>Connect with the Fuel Wallet</p>
+          <p>Connect Your Fuel Wallet</p>
           <Button
             css={styles.button}
             onPress={() => {
-              connect();
+              onConnectPress();
             }}
           >
             {isConnecting ? "Connecting" : "Connect"}
           </Button>
+          <div
+            style={{
+              color: "#aaa",
+              fontSize: "8px",
+              marginTop: "6px",
+              lineHeight: "12px",
+            }}
+          >
+            This site is protected by reCAPTCHA and the Google
+            <a
+              href="https://policies.google.com/privacy"
+              style={{ color: "#aaa", textDecoration: "underline" }}
+            >
+              {" "}
+              Privacy Policy
+            </a>{" "}
+            and
+            <a
+              href="https://policies.google.com/terms"
+              style={{ color: "#aaa", textDecoration: "underline" }}
+            >
+              {" "}
+              Terms of Service
+            </a>{" "}
+            apply.
+          </div>
         </Box>
       </Box>
+      <UnsupportedWalletsNoticeModal
+        isOpen={isUnsupportedWalletModalOpen}
+        onClose={() => {
+          setIsUnsupportedWalletModalOpen(false);
+          connect();
+        }}
+      />
     </div>
   );
 }

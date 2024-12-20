@@ -19,6 +19,12 @@ import { walletConnect } from "@wagmi/connectors";
 import type { Config as WagmiConfig } from "@wagmi/core";
 import "./index.css";
 import App from "./App.tsx";
+import { Toaster } from "react-hot-toast";
+import {
+  CustomSuccessIcon,
+  CustomErrorIcon,
+} from "./components/toast/ToastIcons";
+import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 
 const queryClient = new QueryClient();
 const networks = [
@@ -27,6 +33,7 @@ const networks = [
     url: FUEL_PROVIDER_URL,
   },
 ];
+
 const FUEL_CONFIG = createFuelConfig(() => {
   const WalletConnectProjectId = "35b967d8f17700b2de24f0abee77e579";
   const wagmiConfig = createConfig({
@@ -84,15 +91,44 @@ const FUEL_CONFIG = createFuelConfig(() => {
 });
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <FuelProvider
-        networks={networks}
-        fuelConfig={FUEL_CONFIG}
-        uiConfig={{ suggestBridge: false }}
-        theme="dark"
-      >
-        <App />
-      </FuelProvider>
-    </QueryClientProvider>{" "}
+    <GoogleReCaptchaProvider
+      reCaptchaKey="6LfyiaEqAAAAAP0ckAfpXF38fbJiwVK1nY0z2wsM"
+      scriptProps={{
+        async: true,
+        defer: true,
+        appendTo: "head",
+      }}
+    >
+      <QueryClientProvider client={queryClient}>
+        <FuelProvider
+          networks={networks}
+          fuelConfig={FUEL_CONFIG}
+          uiConfig={{ suggestBridge: false }}
+          theme="dark"
+        >
+          <Toaster
+            toastOptions={{
+              style: {
+                backgroundColor: "#ac7339",
+                border: "4px solid #754a1e",
+                borderRadius: "8px",
+                color: "black",
+                padding: "8px 12px",
+                fontSize: "14px",
+              },
+              success: {
+                icon: <CustomSuccessIcon />,
+              },
+              error: {
+                icon: <CustomErrorIcon />,
+              },
+              position:
+                window.innerWidth <= 768 ? "top-center" : "bottom-center",
+            }}
+          />
+          <App />
+        </FuelProvider>
+      </QueryClientProvider>
+    </GoogleReCaptchaProvider>
   </StrictMode>,
 );

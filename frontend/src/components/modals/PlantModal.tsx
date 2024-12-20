@@ -1,11 +1,23 @@
 import { Button } from "@fuel-ui/react";
 import type { Dispatch, SetStateAction } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useWalletFunds } from "../../hooks/useWalletFunds";
+import { NoFundsMessage } from "./NoFundsMessage";
 
-import { buttonStyle, FoodTypeInput } from "../../constants";
+import {
+  buttonStyle,
+  FoodTypeInput,
+  FUEL_PROVIDER_URL,
+  useGaslessWalletSupported,
+  // GAS_STATION_CHANGE_OUTPUT_ADDRESS,
+} from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts";
 import type { Modals } from "../../constants";
 import Loading from "../Loading";
+import { Address, Provider } from "fuels";
+import { useWallet } from "@fuels/react";
+import { usePaymaster } from "../../hooks/usePaymaster";
+import { toast } from "react-hot-toast";
 
 interface PlantModalProps {
   contract: FarmContract | null;
@@ -26,41 +38,183 @@ export default function PlantModal({
   onPlantSuccess,
   setModal,
 }: PlantModalProps) {
-  const [status, setStatus] = useState<"error" | "none" | "loading">("none");
+  const [status, setStatus] = useState<
+    "error" | "none" | "loading" | "retrying"
+  >("none");
+  const { wallet } = useWallet();
+  const paymaster = usePaymaster();
+  const isGaslessSupported = useGaslessWalletSupported();
+  const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
+    useWalletFunds(contract);
 
-  // TODO: choose several plots and plant multiple seeds at once
-  // const [amount, setAmount] = useState<string>("0");
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+
+        if (status === "error") {
+          setStatus("none");
+        } else if (status === "none" && !showNoFunds && seeds > 0) {
+          handlePlant();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleGlobalKeyDown);
+    };
+  }, [status, showNoFunds, seeds]);
+
+  async function plantWithoutGasStation() {
+    if (!wallet || !contract) throw new Error("Wallet or contract not found");
+
+    const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
+    const addressIdentityInput = {
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
+    };
+
+    const tx = await contract.functions
+      .plant_seed_at_index(seedType, tileArray[0], addressIdentityInput)
+      .call();
+
+    if (tx) {
+      onPlantSuccess(tileArray[0]);
+      setModal("none");
+      toast.success(() => (
+        <div
+          onClick={() =>
+            window.open(
+              `https://app.fuel.network/tx/${tx.transactionId}/simple`,
+              "_blank",
+            )
+          }
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+        >
+          Seed Planted!
+        </div>
+      ));
+      updatePageNum();
+    }
+    return tx;
+  }
+
+  async function plantWithGasStation() {
+    if (!wallet || !contract) throw new Error("Wallet or contract not found");
+
+    const provider = await Provider.create(FUEL_PROVIDER_URL);
+    const { maxValuePerCoin } = await paymaster.metadata();
+    const { coin: gasCoin, jobId } = await paymaster.allocate();
+
+    const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
+    const addressIdentityInput = {
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
+    };
+
+    const scope = await contract.functions.plant_seed_at_index(
+      seedType,
+      tileArray[0],
+      addressIdentityInput,
+    );
+    const request = await scope.getTransactionRequest();
+    request.addCoinInput(gasCoin);
+    request.addCoinOutput(
+      gasCoin.owner,
+      gasCoin.amount.sub(maxValuePerCoin),
+      provider.getBaseAssetId(),
+    );
+    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+
+    const txCost = await wallet.getTransactionCost(request);
+    const { gasUsed, maxFee } = txCost;
+    request.gasLimit = gasUsed;
+    request.maxFee = maxFee;
+
+    const { signature } = await paymaster.fetchSignature(request, jobId);
+    request.updateWitnessByOwner(gasCoin.owner, signature);
+
+    const tx = await wallet.sendTransaction(request);
+    if (tx) {
+      onPlantSuccess(tileArray[0]);
+      await paymaster.postJobComplete(jobId);
+      setModal("none");
+      updatePageNum();
+      toast.success(() => (
+        <div
+          onClick={() =>
+            window.open(`https://app.fuel.network/tx/${tx.id}/simple`, "_blank")
+          }
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+        >
+          Seed Planted!
+        </div>
+      ));
+    }
+  }
 
   async function handlePlant() {
+    if (!wallet) {
+      throw new Error("No wallet found");
+    }
     if (contract !== null) {
       try {
         setStatus("loading");
         setCanMove(false);
-        const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
-
-        const tx = await contract.functions
-          .plant_seed_at_index(seedType, tileArray[0])
-          .call();
-
-        if (tx) {
-          onPlantSuccess(tileArray[0]);
-          setModal("none");
-          updatePageNum();
+        const canUseGasless = await paymaster.shouldUseGasless();
+        if (!canUseGasless) {
+          toast.error(
+            "Hourly gasless transaction limit reached. Trying regular transaction...",
+            { duration: 5000 },
+          );
         }
-        // setStatus('none');
+        if (isGaslessSupported && canUseGasless) {
+          try {
+            await plantWithGasStation();
+          } catch (error) {
+            console.log(
+              "Gas station failed, trying direct transaction...",
+              error,
+            );
+            toast.error("Gas Station error, please sign from wallet.");
+            setStatus("retrying");
+            if (!hasFunds) {
+              showNoFundsMessage();
+            } else {
+              await plantWithoutGasStation();
+            }
+          }
+        } else {
+          if (!hasFunds) {
+            showNoFundsMessage();
+          } else {
+            console.log("Using direct transaction method...");
+            await plantWithoutGasStation();
+          }
+        }
+
+        setStatus("none");
       } catch (err) {
-        console.log("Error in PlantModal", err);
+        console.log("Error in PlantModal:", err);
         setStatus("error");
+        toast.error("Failed to plant the seed :( Please try again.");
+      } finally {
+        setCanMove(true);
       }
-      setCanMove(true);
     } else {
       console.log("ERROR: contract missing");
       setStatus("error");
+      toast.error("Failed to plant the seed :( Please try again.");
     }
   }
 
   return (
     <div className="plant-modal">
+      {status === "loading" && <Loading />}
+      {status === "retrying" && <Loading />}
       {status === "error" && (
         <div>
           <p>Something went wrong!</p>
@@ -68,19 +222,27 @@ export default function PlantModal({
             css={buttonStyle}
             onPress={() => {
               setStatus("none");
-              updatePageNum();
             }}
+            role="button"
+            tabIndex={0}
+            aria-label="Try again"
           >
             Try Again
           </Button>
         </div>
       )}
-      {status === "none" && (
+      {status === "none" && !showNoFunds && (
         <>
           {seeds > 0 ? (
             <>
               <div style={styles.seeds}>Plant a seed here?</div>
-              <Button css={buttonStyle} onPress={handlePlant}>
+              <Button
+                css={buttonStyle}
+                onPress={handlePlant}
+                role="button"
+                tabIndex={0}
+                aria-label="Plant seed"
+              >
                 Plant
               </Button>
             </>
@@ -89,7 +251,9 @@ export default function PlantModal({
           )}
         </>
       )}
-      {status === "loading" && <Loading />}
+      {status === "none" && !hasFunds && showNoFunds && (
+        <NoFundsMessage onRecheck={getBalance} />
+      )}
     </div>
   );
 }
