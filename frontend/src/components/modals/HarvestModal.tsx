@@ -1,10 +1,21 @@
 import { Spinner, Button, BoxCentered } from "@fuel-ui/react";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
+import { cssObj } from "@fuel-ui/css";
 
-import { buttonStyle } from "../../constants";
+import {
+  buttonStyle,
+  FUEL_PROVIDER_URL,
+  useGaslessWalletSupported,
+} from "../../constants";
 import type { FarmContract } from "../../sway-api";
 import type { Modals } from "../../constants";
+import { useWallet } from "@fuels/react";
+import { Address, Provider } from "fuels";
+import { usePaymaster } from "../../hooks/usePaymaster";
+import { toast } from "react-hot-toast";
+import { useWalletFunds } from "../../hooks/useWalletFunds";
+import { NoFundsMessage } from "./NoFundsMessage";
 
 interface HarvestProps {
   contract: FarmContract | null;
@@ -23,34 +34,154 @@ export default function HarvestModal({
   setModal,
   onHarvestSuccess,
 }: HarvestProps) {
-  const [status, setStatus] = useState<"error" | "none" | "loading">("none");
+  const [status, setStatus] = useState<
+    "error" | "none" | "loading" | "retrying"
+  >("none");
+  const { wallet } = useWallet();
+  const paymaster = usePaymaster();
+  const isGaslessSupported = useGaslessWalletSupported();
+  const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
+    useWalletFunds(contract);
+
+  async function harvestWithoutGasStation() {
+    if (!wallet || !contract) throw new Error("Wallet or contract not found");
+
+    const addressIdentityInput = {
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
+    };
+
+    const tx = await contract.functions
+      .harvest(tileArray, addressIdentityInput)
+      .call();
+
+    if (tx) {
+      onHarvestSuccess(tileArray[0]);
+      setModal("plant");
+      updatePageNum();
+      toast.success("Seed harvested!");
+    }
+    return tx;
+  }
+
+  async function harvestWithGasStation() {
+    if (!wallet || !contract) throw new Error("Wallet or contract not found");
+
+    const provider = await Provider.create(FUEL_PROVIDER_URL);
+    const { maxValuePerCoin } = await paymaster.metadata();
+    const { coin: gasCoin, jobId } = await paymaster.allocate();
+
+    const addressIdentityInput = {
+      Address: {
+        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+      },
+    };
+
+    const scope = contract.functions.harvest(tileArray, addressIdentityInput);
+    const request = await scope.getTransactionRequest();
+    request.addCoinInput(gasCoin);
+    request.addCoinOutput(
+      gasCoin.owner,
+      gasCoin.amount.sub(maxValuePerCoin),
+      provider.getBaseAssetId(),
+    );
+    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+
+    const txCost = await wallet.getTransactionCost(request);
+    const { gasUsed, maxFee } = txCost;
+    request.gasLimit = gasUsed;
+    request.maxFee = maxFee;
+
+    const { signature } = await paymaster.fetchSignature(request, jobId);
+    request.updateWitnessByOwner(gasCoin.owner, signature);
+    console.log("Updated witness");
+    console.log("request", request);
+    const tx = await wallet.sendTransaction(request, {
+      skipCustomFee: true,
+      onBeforeSend: async (txRequest) => {
+        // sign again
+        const { signature } = await paymaster.fetchSignature(txRequest, jobId);
+        txRequest.updateWitnessByOwner(gasCoin.owner, signature);
+        console.log("Updated witness again");
+        return txRequest;
+      }
+    });
+    console.log("Transaction sent");
+
+    if (tx) {
+      console.log("tx", tx);
+      onHarvestSuccess(tileArray[0]);
+      setModal("plant");
+      updatePageNum();
+      toast.success("Seed harvested!");
+      console.log("Harvest completed successfully");
+    }
+  }
 
   async function harvestItem() {
+    if (!wallet) {
+      throw new Error("No wallet found");
+    }
     if (contract !== null) {
       try {
         setStatus("loading");
         setCanMove(false);
-        const result = await contract.functions.harvest(tileArray).call();
-        if (result) {
-          onHarvestSuccess(tileArray[0]); // Update tile state
-          setModal("plant"); // Close modal
-          updatePageNum(); // Update other state
+        const canUseGasless = await paymaster.shouldUseGasless();
+        if (!canUseGasless) {
+          toast.error(
+            "Hourly gasless transaction limit reached. Trying regular transaction...",
+            { duration: 5000 },
+          );
         }
-        // setStatus('none');
+        if (isGaslessSupported && canUseGasless) {
+          try {
+            await harvestWithGasStation();
+          } catch (error) {
+            console.log(
+              "Gas station failed, trying direct transaction...",
+              error,
+            );
+            toast.error("Gas Station error, please sign from wallet.");
+            setStatus("retrying");
+            if (!hasFunds) {
+              showNoFundsMessage();
+            } else {
+              await harvestWithoutGasStation();
+            }
+          }
+        } else {
+          if (!hasFunds) {
+            showNoFundsMessage();
+          } else {
+            console.log("Using direct transaction method...");
+            await harvestWithoutGasStation();
+          }
+        }
+
+        setStatus("none");
       } catch (err) {
         console.log("Error in HarvestModal:", err);
         setStatus("error");
+        toast.error("Failed to harvest the seed :( Please try again.");
+      } finally {
+        setCanMove(true);
       }
-      setCanMove(true);
     } else {
       console.log("ERROR: contract missing");
       setStatus("error");
+      toast.error("Failed to harvest the seed :( Please try again.");
     }
   }
 
   return (
     <div className="harvest-modal">
       {status === "loading" && (
+        <BoxCentered>
+          <Spinner color="#754a1e" />
+        </BoxCentered>
+      )}
+      {status === "retrying" && (
         <BoxCentered>
           <Spinner color="#754a1e" />
         </BoxCentered>
@@ -69,7 +200,10 @@ export default function HarvestModal({
           </Button>
         </div>
       )}
-      {status === "none" && (
+      {status === "none" && !hasFunds && showNoFunds && (
+        <NoFundsMessage onRecheck={getBalance} />
+      )}
+      {status === "none" && !hasFunds && !showNoFunds && (
         <>
           <div style={styles.items}>Harvest this item?</div>
           <Button css={buttonStyle} onPress={harvestItem}>
@@ -82,6 +216,16 @@ export default function HarvestModal({
 }
 
 const styles = {
+  container: cssObj({
+    flexDirection: "column",
+    fontFamily: "pressStart2P",
+    fontSize: "14px",
+    gap: "20px",
+  }),
+  link: cssObj({
+    fontFamily: "pressStart2P",
+    fontSize: "14px",
+  }),
   items: {
     marginBottom: "20px",
   },
