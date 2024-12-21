@@ -95,7 +95,19 @@ export default function HarvestModal({
 
     const { signature } = await paymaster.fetchSignature(request, jobId);
     request.updateWitnessByOwner(gasCoin.owner, signature);
-    const tx = await wallet.sendTransaction(request);
+    console.log("Updated witness");
+    console.log("request", request);
+    const tx = await wallet.sendTransaction(request, {
+      skipCustomFee: true,
+      onBeforeSend: async (txRequest) => {
+        // sign again
+        const { signature } = await paymaster.fetchSignature(txRequest, jobId);
+        txRequest.updateWitnessByOwner(gasCoin.owner, signature);
+        console.log("Updated witness again");
+        return txRequest;
+      }
+    });
+    console.log("Transaction sent");
 
     if (tx) {
       console.log("tx", tx);
@@ -103,6 +115,7 @@ export default function HarvestModal({
       setModal("plant");
       updatePageNum();
       toast.success("Seed harvested!");
+      console.log("Harvest completed successfully");
     }
   }
 
