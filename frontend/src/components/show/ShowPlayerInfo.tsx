@@ -1,6 +1,7 @@
 import { cssObj } from "@fuel-ui/css";
 import { Flex, Box } from "@fuel-ui/react";
 import type { BytesLike } from "fuels";
+import { useWallet } from "@fuels/react";
 
 import type {
   FarmContract,
@@ -8,6 +9,8 @@ import type {
 } from "../../sway-api/contracts/FarmContract";
 
 import ShowCoins from "./ShowCoins";
+import { useState } from "react";
+import { useEffect } from "react";
 
 interface PlayerProps {
   player: PlayerOutput | null;
@@ -15,7 +18,8 @@ interface PlayerProps {
   updateNum: number;
   farmCoinAssetID: BytesLike;
 }
-
+const dollarFarmAssetID =
+  "0x9858ea1307794a769dc91aaad7dc7ddb9fa29dadb08345ba82c8f762b2eb0c97";
 export default function ShowPlayerInfo({
   player,
   contract,
@@ -26,6 +30,16 @@ export default function ShowPlayerInfo({
   if (player !== null) {
     valSold = parseFloat(player.total_value_sold.format().toLocaleString());
   }
+  const [balance, setBalance] = useState<string>();
+  const { wallet } = useWallet();
+  useEffect(() => {
+    (async () => {
+      const balance = await wallet?.getBalance(dollarFarmAssetID);
+      const balanceinBN = balance?.div(10 ** 9);
+      setBalance(balanceinBN?.toString());
+    })();
+  }, [wallet]);
+  console.log("balance", balance);
 
   return (
     <Box css={styles.playerInfo}>
@@ -36,6 +50,7 @@ export default function ShowPlayerInfo({
           updateNum={updateNum}
           farmCoinAssetID={farmCoinAssetID}
         />
+        <Box css={styles.box}>$FARM: {balance ?? "0"}</Box>
       </Flex>
     </Box>
   );

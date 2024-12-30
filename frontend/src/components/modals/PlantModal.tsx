@@ -39,7 +39,7 @@ export default function PlantModal({
   setModal,
 }: PlantModalProps) {
   const [status, setStatus] = useState<
-    "error" | "none" | "loading" | "retrying"
+    "error" | "none" | "loading" | "retrying" | "accelerating"
   >("none");
   const { wallet } = useWallet();
   const paymaster = usePaymaster();
@@ -166,6 +166,7 @@ export default function PlantModal({
 
       tx = await wallet.sendTransaction(request);
     } else {
+      setStatus("accelerating");
       const scope = contract.functions
         .accelerate_plant_seed_at_index(
           seedType,
@@ -289,6 +290,12 @@ export default function PlantModal({
   return (
     <div className="plant-modal">
       {status === "loading" && <Loading />}
+      {status === "accelerating" && (
+        <div>
+          <p>$FARM detected, accelerating harvest...</p>
+          <Loading />
+        </div>
+      )}
       {status === "retrying" && <Loading />}
       {status === "error" && (
         <div>
