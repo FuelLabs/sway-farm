@@ -5,8 +5,8 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 
 /*
-  Fuels version: 0.96.1
-  Forc version: 0.66.2
+  Fuels version: 0.97.2
+  Forc version: 0.66.5
   Fuel-Core version: 0.40.0
 */
 
@@ -43,11 +43,13 @@ export type InvalidErrorInput = Enum<{
   NotEnoughTokens: BigNumberish;
   NotEnoughSeeds: BigNumberish;
   IncorrectAssetId: AssetIdInput;
+  IncorrectAmount: BigNumberish;
 }>;
 export type InvalidErrorOutput = Enum<{
   NotEnoughTokens: BN;
   NotEnoughSeeds: BN;
   IncorrectAssetId: AssetIdOutput;
+  IncorrectAmount: BN;
 }>;
 
 export type AddressInput = { bits: string };
@@ -308,6 +310,11 @@ const abi = {
         {
           name: "IncorrectAssetId",
           typeId: 18,
+        },
+        {
+          name: "IncorrectAmount",
+          typeId:
+            "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0",
         },
       ],
     },
@@ -614,6 +621,38 @@ const abi = {
             "dd4644d33ac916b71370850ec51a826df462bfe9036feea1005aaa7b743ab891",
         },
         {
+          name: "index",
+          concreteTypeId:
+            "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0",
+        },
+        {
+          name: "address",
+          concreteTypeId:
+            "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335",
+        },
+      ],
+      name: "accelerate_plant_seed_at_index",
+      output:
+        "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      attributes: [
+        {
+          name: "storage",
+          arguments: ["read", "write"],
+        },
+        {
+          name: "payable",
+          arguments: [],
+        },
+      ],
+    },
+    {
+      inputs: [
+        {
+          name: "food_type",
+          concreteTypeId:
+            "dd4644d33ac916b71370850ec51a826df462bfe9036feea1005aaa7b743ab891",
+        },
+        {
           name: "amount",
           concreteTypeId:
             "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0",
@@ -891,6 +930,11 @@ const abi = {
         "85a139d61290013fdfeb54e57606f4b698f12e78570c66e08fc4dd1edf1cd265",
     },
     {
+      logId: "3925692269668348193",
+      concreteTypeId:
+        "367adc51ef143121cc025b27bca40f0972ae0c837affe871f78ab6fd0d46c0a4",
+    },
+    {
       logId: "5635241471306563277",
       concreteTypeId:
         "4e346642e8c6fecd12cde09058c03a3b9e844865eb13a855552e98f746ca205d",
@@ -916,11 +960,6 @@ const abi = {
         "02599dd8b27fe93ca33ffc3c3d482d044ac47bae38bca27acfcf69463711466b",
     },
     {
-      logId: "3925692269668348193",
-      concreteTypeId:
-        "367adc51ef143121cc025b27bca40f0972ae0c837affe871f78ab6fd0d46c0a4",
-    },
-    {
       logId: "11192939610819626128",
       concreteTypeId:
         "9b554f45f74d8490bdfc1ecc51f971eac4cf3df795b0ceeff85c5f74dc77db71",
@@ -938,6 +977,7 @@ export class FarmContractInterface extends Interface {
   }
 
   declare functions: {
+    accelerate_plant_seed_at_index: FunctionFragment;
     buy_seeds: FunctionFragment;
     can_harvest: FunctionFragment;
     can_level_up: FunctionFragment;
@@ -960,6 +1000,10 @@ export class FarmContract extends Contract {
 
   declare interface: FarmContractInterface;
   declare functions: {
+    accelerate_plant_seed_at_index: InvokeFunction<
+      [food_type: FoodTypeInput, index: BigNumberish, address: IdentityInput],
+      void
+    >;
     buy_seeds: InvokeFunction<
       [food_type: FoodTypeInput, amount: BigNumberish, address: IdentityInput],
       void

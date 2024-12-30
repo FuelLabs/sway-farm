@@ -20,6 +20,8 @@ abi GameContract {
 
     #[storage(read, write)]
     fn plant_seed_at_index(food_type: FoodType, index: u64, address: Identity);
+    #[storage(read, write), payable]
+    fn accelerate_plant_seed_at_index(food_type: FoodType, index: u64, address: Identity);
 
     // harvest grown seeds at certain indexes
     #[storage(read, write)]

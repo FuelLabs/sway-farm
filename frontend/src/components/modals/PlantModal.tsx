@@ -46,7 +46,8 @@ export default function PlantModal({
   const isGaslessSupported = useGaslessWalletSupported();
   const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
     useWalletFunds(contract);
-
+  const dollarFarmAssetID =
+    "0x9858ea1307794a769dc91aaad7dc7ddb9fa29dadb08345ba82c8f762b2eb0c97";
   useEffect(() => {
     const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -75,10 +76,31 @@ export default function PlantModal({
         bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
       },
     };
+    const resources = await wallet.getResourcesToSpend([
+      { amount: 100000, assetId: dollarFarmAssetID },
+    ]);
+    console.log("resources", resources);
+    const balance = Number(await wallet.getBalance(dollarFarmAssetID));
 
-    const tx = await contract.functions
-      .plant_seed_at_index(seedType, tileArray[0], addressIdentityInput)
-      .call();
+    let tx;
+    if (balance > 10) {
+      // If balance is greater than 10, use accelerate_plant_seed_at_index
+      tx = await contract.functions
+        .accelerate_plant_seed_at_index(
+          seedType,
+          tileArray[0],
+          addressIdentityInput,
+        )
+        .callParams({
+          forward: [10, dollarFarmAssetID],
+        })
+        .call();
+    } else {
+      // Otherwise, use plant_seed_at_index
+      tx = await contract.functions
+        .plant_seed_at_index(seedType, tileArray[0], addressIdentityInput)
+        .call();
+    }
 
     if (tx) {
       onPlantSuccess(tileArray[0]);
@@ -115,32 +137,85 @@ export default function PlantModal({
       },
     };
 
-    const scope = await contract.functions.plant_seed_at_index(
-      seedType,
-      tileArray[0],
-      addressIdentityInput,
-    );
-    const request = await scope.getTransactionRequest();
-    request.addCoinInput(gasCoin);
-    request.addCoinOutput(
-      gasCoin.owner,
-      gasCoin.amount.sub(maxValuePerCoin),
-      provider.getBaseAssetId(),
-    );
-    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+    const balance = Number(await wallet.getBalance(dollarFarmAssetID));
+    console.log(balance);
 
-    const txCost = await wallet.getTransactionCost(request);
-    const { gasUsed, maxFee } = txCost;
-    request.gasLimit = gasUsed;
-    request.maxFee = maxFee;
+    let tx;
+    if (balance < 10) {
+      const scope = contract.functions.plant_seed_at_index(
+        seedType,
+        tileArray[0],
+        addressIdentityInput,
+      );
+      const request = await scope.getTransactionRequest();
+      request.addCoinInput(gasCoin);
+      request.addCoinOutput(
+        gasCoin.owner,
+        gasCoin.amount.sub(maxValuePerCoin),
+        provider.getBaseAssetId(),
+      );
+      request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
 
-    const { signature } = await paymaster.fetchSignature(request, jobId);
-    request.updateWitnessByOwner(gasCoin.owner, signature);
+      const txCost = await wallet.getTransactionCost(request);
+      const { gasUsed, maxFee } = txCost;
+      request.gasLimit = gasUsed;
+      request.maxFee = maxFee;
 
-    const tx = await wallet.sendTransaction(request);
+      const { signature } = await paymaster.fetchSignature(request, jobId);
+      request.updateWitnessByOwner(gasCoin.owner, signature);
+
+      tx = await wallet.sendTransaction(request);
+    } else {
+      const scope = contract.functions
+        .accelerate_plant_seed_at_index(
+          seedType,
+          tileArray[0],
+          addressIdentityInput,
+        )
+        .callParams({
+          forward: [10, dollarFarmAssetID],
+        });
+      const request = await scope.getTransactionRequest();
+      const { coins } = await wallet.getCoins(dollarFarmAssetID);
+
+      // request.addCoinInput(coins[0]);
+      const resources = await wallet.getResourcesToSpend([
+        { amount: 10, assetId: dollarFarmAssetID },
+      ]);
+      request.addResources(resources);
+      request.addChangeOutput(wallet.address, dollarFarmAssetID);
+      request.addCoinInput(gasCoin);
+      request.addCoinOutput(
+        gasCoin.owner,
+        gasCoin.amount.sub(maxValuePerCoin),
+        provider.getBaseAssetId(),
+      );
+      request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+
+      const txCost = await wallet.getTransactionCost(request, {
+        quantities: coins,
+      });
+      const { gasUsed, missingContractIds, outputVariables, maxFee } = txCost;
+      console.log("Max fee", Number(maxFee), "gas used", Number(gasUsed));
+      missingContractIds.forEach((contractId) => {
+        request.addContractInputAndOutput(Address.fromString(contractId));
+      });
+
+      request.addVariableOutputs(outputVariables);
+      request.gasLimit = gasUsed;
+      request.maxFee = maxFee;
+
+      const { signature } = await paymaster.fetchSignature(request, jobId);
+      request.updateWitnessByOwner(gasCoin.owner, signature);
+
+      tx = await wallet.sendTransaction(request);
+    }
+
     if (tx) {
       onPlantSuccess(tileArray[0]);
-      await paymaster.postJobComplete(jobId);
+      if (balance > 10) {
+        await paymaster.postJobComplete(jobId);
+      }
       setModal("none");
       updatePageNum();
       toast.success(() => (
