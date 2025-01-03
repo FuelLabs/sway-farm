@@ -1,6 +1,7 @@
 import { cssObj } from "@fuel-ui/css";
 import type { Asset, BN, NetworkFuel } from "fuels";
 import { Vector3 } from "three";
+import { useCurrentConnector } from "@fuels/react";
 
 // import contractIds from './sway-api/contract-ids.json';
 
@@ -15,12 +16,15 @@ export const CONTRACT_ID =
   // VERCEL_ENV === 'development'
   // ? contractIds.contract
   // :
-  "0x4a6914d9ee51445a57cfddf8690eb3f072933925d6cdfa6c1e5f953dd5b8e610";
+  "0xe774c453cc4a4e9c346441984a5db6ed6292ae1f14cae6530eb4b4e89ced4414";
 
 export const FARM_COIN_ASSET_ID =
   // VERCEL_ENV === 'development'
   // ? null :
-  "0x733ec985c18486afd9c1e4decd82cc6c19548bb5c2b2280bae2ca3435375b321";
+  "0x64019f1305cfb7e76440a335cb082aaf173c9cfb9a710e38fedce1c1ea023b61";
+
+export const GAS_STATION_CHANGE_OUTPUT_ADDRESS =
+  "0xF9B62E7eA61219e4b82561abce1AbF4b1D581539B1505C02A7Fe92D6B4C61d1B";
 
 export const FARM_COIN_NETWORK_ASSET = {
   /** type of network */
@@ -90,4 +94,12 @@ export const buttonStyle = cssObj({
 
 export enum FoodTypeInput {
   Tomatoes = "Tomatoes",
+}
+
+export function useGaslessWalletSupported() {
+  const { currentConnector } = useCurrentConnector();
+  return (
+    currentConnector?.name === "Fuelet Wallet" ||
+    currentConnector?.name === "Burner Wallet"
+  );
 }

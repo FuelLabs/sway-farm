@@ -28,6 +28,7 @@ const styles = {
     fontFamily: "pressStart2P",
     color: "#aaa",
     maxWidth: "800px",
+    margin: "0 auto",
   }),
   text: {
     fontSize: "14px",

@@ -11,6 +11,7 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "noEmitOnError": false,
 
     /* Linting */
     "strict": true,

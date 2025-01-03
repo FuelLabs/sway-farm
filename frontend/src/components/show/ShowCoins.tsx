@@ -30,7 +30,7 @@ export default function ShowCoins({
   }, [wallet, updateNum, contract]);
 
   if (balance) {
-    return <Box css={styles}>Farm Coins: {balance.format()}</Box>;
+    return <Box css={styles}>In-app Coins: {balance.format()}</Box>;
   }
 
   return null;

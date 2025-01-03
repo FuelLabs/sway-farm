@@ -104,7 +104,7 @@ export default function Game({
     // fetches player info 30 seconds
     const interval = setInterval(() => {
       setUpdateNum(updateNum + 1);
-    }, 10000);
+    }, 20000);
 
     return () => clearInterval(interval);
   }, [contract, updateNum]);
@@ -112,7 +112,7 @@ export default function Game({
   const updatePageNum = () => {
     setTimeout(() => {
       setUpdateNum(updateNum + 1);
-    }, 3000);
+    }, 3500);
   };
   const handlePlantSuccess = (position: number) => {
     setSeeds((prev) => prev - 1);
@@ -131,6 +131,9 @@ export default function Game({
         inner: newInner,
       } as GardenVectorOutput;
     });
+  };
+  const handleBuySuccess = () => {
+    setSeeds((prev) => prev + 10);
   };
   const onHarvestSuccess = (position: number) => {
     setItems((prev) => prev + 1);
@@ -253,6 +256,7 @@ export default function Game({
                   items={items}
                   setCanMove={setCanMove}
                   farmCoinAssetID={farmCoinAssetID}
+                  onBuySuccess={handleBuySuccess}
                 />
               )}
             </>
