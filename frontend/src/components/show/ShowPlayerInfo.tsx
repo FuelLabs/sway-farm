@@ -39,7 +39,6 @@ export default function ShowPlayerInfo({
       setBalance(balanceinBN?.toString());
     })();
   }, [wallet]);
-  console.log("balance", balance);
 
   return (
     <Box css={styles.playerInfo}>
