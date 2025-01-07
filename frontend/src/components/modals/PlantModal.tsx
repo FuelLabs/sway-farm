@@ -76,10 +76,7 @@ export default function PlantModal({
         bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
       },
     };
-    const resources = await wallet.getResourcesToSpend([
-      { amount: 100000, assetId: dollarFarmAssetID },
-    ]);
-    console.log("resources", resources);
+
     const balance = Number(await wallet.getBalance(dollarFarmAssetID));
 
     let tx;
@@ -96,6 +93,7 @@ export default function PlantModal({
         })
         .call();
     } else {
+      console.log("planting without gas station");
       // Otherwise, use plant_seed_at_index
       tx = await contract.functions
         .plant_seed_at_index(seedType, tileArray[0], addressIdentityInput)
