@@ -162,7 +162,7 @@ export default function NewPlayer({
     const { signature } = await paymaster.fetchSignature(request, jobId);
     request.updateWitnessByOwner(gasCoin.owner, signature);
 
-    const tx = await wallet.sendTransaction(request);
+    const tx = await wallet.sendTransaction(request, {skipCustomFee: true});
     if (tx) {
       setPlayer({
         farming_skill: new BN(1),

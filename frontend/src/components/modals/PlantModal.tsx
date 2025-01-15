@@ -162,7 +162,7 @@ export default function PlantModal({
       const { signature } = await paymaster.fetchSignature(request, jobId);
       request.updateWitnessByOwner(gasCoin.owner, signature);
 
-      tx = await wallet.sendTransaction(request);
+      tx = await wallet.sendTransaction(request, { skipCustomFee: true });
     } else {
       setStatus("accelerating");
       const scope = contract.functions
@@ -207,7 +207,7 @@ export default function PlantModal({
       const { signature } = await paymaster.fetchSignature(request, jobId);
       request.updateWitnessByOwner(gasCoin.owner, signature);
 
-      tx = await wallet.sendTransaction(request);
+      tx = await wallet.sendTransaction(request, { skipCustomFee: true });
     }
 
     if (tx) {

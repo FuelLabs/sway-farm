@@ -124,6 +124,7 @@ export default function BuySeeds({
 
     const tx = await wallet.sendTransaction(request, {
       estimateTxDependencies: false,
+      skipCustomFee: true,
     });
     console.log("tx", tx);
     if (tx) {
