@@ -122,7 +122,7 @@ export default function NewPlayer({
   async function createPlayerWithGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
 
-    const provider = await Provider.create(FUEL_PROVIDER_URL);
+    const provider = new Provider(FUEL_PROVIDER_URL);
     const { maxValuePerCoin } = await paymaster.metadata();
     const { coin: gasCoin, jobId } = await paymaster.allocate();
 
@@ -141,9 +141,9 @@ export default function NewPlayer({
     request.addCoinOutput(
       gasCoin.owner,
       gasCoin.amount.sub(maxValuePerCoin),
-      provider.getBaseAssetId(),
+      await provider.getBaseAssetId(),
     );
-    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+    request.addChangeOutput(gasCoin.owner, await provider.getBaseAssetId());
     // request.outputs = request.outputs.map((output) => {
     //   if (
     //     output.type === 2 &&

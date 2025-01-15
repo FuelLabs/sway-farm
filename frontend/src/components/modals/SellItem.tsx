@@ -98,7 +98,7 @@ export default function SellItem({
   async function sellWithGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
 
-    const provider = await Provider.create(FUEL_PROVIDER_URL);
+    const provider = new Provider(FUEL_PROVIDER_URL);
     const { maxValuePerCoin } = await paymaster.metadata();
     const { coin: gasCoin, jobId } = await paymaster.allocate();
 
@@ -137,11 +137,11 @@ export default function SellItem({
     request.addCoinOutput(
       gasCoin.owner,
       gasCoin.amount.sub(maxValuePerCoin),
-      provider.getChain().consensusParameters.baseAssetId,
+      (await provider.getChain()).consensusParameters.baseAssetId,
     );
     request.addChangeOutput(
       gasCoin.owner,
-      provider.getChain().consensusParameters.baseAssetId,
+      (await provider.getChain()).consensusParameters.baseAssetId,
     );
 
     const { signature } = await paymaster.fetchSignature(request, jobId);

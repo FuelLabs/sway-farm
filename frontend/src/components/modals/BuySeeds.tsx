@@ -63,7 +63,7 @@ export default function BuySeeds({
     if (!wallet) {
       throw new Error("No wallet found");
     }
-    const provider = await Provider.create(FUEL_PROVIDER_URL);
+    const provider = new Provider(FUEL_PROVIDER_URL);
 
     const { maxValuePerCoin } = await paymaster.metadata();
     const { coin: gasCoin, jobId } = await paymaster.allocate();
@@ -95,10 +95,10 @@ export default function BuySeeds({
     request.addCoinOutput(
       gasCoin.owner,
       gasCoin.amount.sub(maxValuePerCoin),
-      provider.getBaseAssetId(),
+      await provider.getBaseAssetId(),
     );
     console.log("change output", GAS_STATION_CHANGE_OUTPUT_ADDRESS);
-    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+    request.addChangeOutput(gasCoin.owner, await provider.getBaseAssetId());
     //change output of type 2 with assetID "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07" to GAS_STATION_CHANGE_OUTPUT_ADDRESS
     // request.outputs = request.outputs.map((output) => {
     //   if (output.type === 2 && output.assetId === "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07") {
