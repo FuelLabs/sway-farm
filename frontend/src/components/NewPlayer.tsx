@@ -44,7 +44,7 @@ export default function NewPlayer({
   const getBalance = useCallback(async () => {
     const thisWallet = wallet ?? contract?.account;
     console.log(wallet, "wallet");
-    const baseAssetId = thisWallet?.provider.getBaseAssetId();
+    const baseAssetId = await thisWallet?.provider.getBaseAssetId();
     const balance = await thisWallet!.getBalance(baseAssetId);
     const balanceNum = balance?.toNumber();
 
@@ -122,7 +122,7 @@ export default function NewPlayer({
   async function createPlayerWithGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
 
-    const provider = await Provider.create(FUEL_PROVIDER_URL);
+    const provider = new Provider(FUEL_PROVIDER_URL);
     const { maxValuePerCoin } = await paymaster.metadata();
     const { coin: gasCoin, jobId } = await paymaster.allocate();
 
@@ -141,9 +141,9 @@ export default function NewPlayer({
     request.addCoinOutput(
       gasCoin.owner,
       gasCoin.amount.sub(maxValuePerCoin),
-      provider.getBaseAssetId(),
+      await provider.getBaseAssetId(),
     );
-    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+    request.addChangeOutput(gasCoin.owner, await provider.getBaseAssetId());
     // request.outputs = request.outputs.map((output) => {
     //   if (
     //     output.type === 2 &&
@@ -162,7 +162,7 @@ export default function NewPlayer({
     const { signature } = await paymaster.fetchSignature(request, jobId);
     request.updateWitnessByOwner(gasCoin.owner, signature);
 
-    const tx = await wallet.sendTransaction(request);
+    const tx = await wallet.sendTransaction(request, {skipCustomFee: true});
     if (tx) {
       setPlayer({
         farming_skill: new BN(1),
