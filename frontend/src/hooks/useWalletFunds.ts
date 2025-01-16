@@ -13,7 +13,7 @@ export function useWalletFunds(contract: FarmContract | null) {
 
   async function getBalance() {
     const thisWallet = wallet ?? contract?.account;
-    const baseAssetId = thisWallet?.provider.getBaseAssetId();
+    const baseAssetId = await thisWallet?.provider.getBaseAssetId();
     const balance = await thisWallet!.getBalance(baseAssetId);
     const balanceNum = balance?.toNumber();
 

@@ -44,7 +44,7 @@ export default function NewPlayer({
   const getBalance = useCallback(async () => {
     const thisWallet = wallet ?? contract?.account;
     console.log(wallet, "wallet");
-    const baseAssetId = thisWallet?.provider.getBaseAssetId();
+    const baseAssetId = await thisWallet?.provider.getBaseAssetId();
     const balance = await thisWallet!.getBalance(baseAssetId);
     const balanceNum = balance?.toNumber();
 
