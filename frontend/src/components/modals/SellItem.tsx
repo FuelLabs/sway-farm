@@ -72,9 +72,11 @@ export default function SellItem({
       },
     };
 
-    const tx = await contract.functions
+    const txRequest = await contract.functions
       .sell_item(seedType, inputAmount, addressIdentityInput)
-      .call();
+      .getTransactionRequest();
+    await txRequest.estimateAndFund(wallet);
+    const tx = await wallet.sendTransaction(txRequest, { skipCustomFee: true });
 
     if (tx) {
       updatePageNum();

@@ -14,7 +14,7 @@ import {
 import type { FarmContract } from "../../sway-api/contracts";
 import type { Modals } from "../../constants";
 import Loading from "../Loading";
-import { Address, Provider } from "fuels";
+import { Address, Provider, type TransactionRequest } from "fuels";
 import { useWallet } from "@fuels/react";
 import { usePaymaster } from "../../hooks/usePaymaster";
 import { toast } from "react-hot-toast";
@@ -79,10 +79,10 @@ export default function PlantModal({
 
     const balance = Number(await wallet.getBalance(dollarFarmAssetID));
 
-    let tx;
+    let txRequest: TransactionRequest;
     if (balance > 10) {
       // If balance is greater than 10, use accelerate_plant_seed_at_index
-      tx = await contract.functions
+      txRequest = await contract.functions
         .accelerate_plant_seed_at_index(
           seedType,
           tileArray[0],
@@ -91,14 +91,16 @@ export default function PlantModal({
         .callParams({
           forward: [10, dollarFarmAssetID],
         })
-        .call();
+        .getTransactionRequest();
     } else {
       console.log("planting without gas station");
       // Otherwise, use plant_seed_at_index
-      tx = await contract.functions
+      txRequest = await contract.functions
         .plant_seed_at_index(seedType, tileArray[0], addressIdentityInput)
-        .call();
+        .getTransactionRequest();
     }
+    await txRequest.estimateAndFund(wallet);
+    const tx = await wallet.sendTransaction(txRequest, { skipCustomFee: true });
 
     if (tx) {
       onPlantSuccess(tileArray[0]);

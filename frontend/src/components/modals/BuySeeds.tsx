@@ -159,12 +159,16 @@ export default function BuySeeds({
       },
     };
 
-    const tx = await contract.functions
+    const txRequest = await contract.functions
       .buy_seeds(seedType, inputAmount, addressIdentityInput)
       .callParams({
         forward: [price, farmCoinAssetID],
       })
-      .call();
+      .getTransactionRequest();
+    
+    await txRequest.estimateAndFund(wallet);
+    
+    const tx = await wallet.sendTransaction(txRequest, {skipCustomFee: true});
 
     if (tx) {
       toast.success(() => (

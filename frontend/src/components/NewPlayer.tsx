@@ -76,12 +76,16 @@ export default function NewPlayer({
       },
     };
 
-    const tx = await contract.functions
+    const txRequest = await contract.functions
       .new_player(addressIdentityInput)
       .txParams({
         variableOutputs: 1,
       })
-      .call();
+      .getTransactionRequest();
+
+    await txRequest.estimateAndFund(wallet);
+    const tx = await wallet.sendTransaction(txRequest, {skipCustomFee: true});
+
 
     if (tx) {
       setPlayer({
