@@ -1,5 +1,5 @@
 import { BoxCentered, Button, Link } from "@fuel-ui/react";
-import { useWallet } from "@fuels/react";
+import { useAccount, useBalance, useChainId, useWallet } from "@fuels/react";
 import { useEffect, useState, useCallback } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { Modals } from "../constants";
@@ -35,27 +35,15 @@ export default function NewPlayer({
   const [status, setStatus] = useState<
     "error" | "loading" | "retrying" | "none"
   >("none");
-  const [hasFunds, setHasFunds] = useState<boolean>(false);
+
   const [showNoFunds, setShowNoFunds] = useState<boolean>(false);
   const { wallet } = useWallet();
+  const { account } = useAccount();
+  const { balance, refetch: refetchBalance } = useBalance({account});
+
   const paymaster = usePaymaster();
   const isGaslessSupported = useGaslessWalletSupported();
-
-  const getBalance = useCallback(async () => {
-    const thisWallet = wallet ?? contract?.account;
-    console.log(wallet, "wallet");
-    const baseAssetId = await thisWallet?.provider.getBaseAssetId();
-    const balance = await thisWallet!.getBalance(baseAssetId);
-    const balanceNum = balance?.toNumber();
-
-    if (balanceNum) {
-      setHasFunds(balanceNum > 0);
-    }
-  }, [wallet, contract]);
-
-  useEffect(() => {
-    getBalance();
-  }, [wallet, getBalance]);
+  const hasFunds = !balance?.isZero();
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
@@ -68,7 +56,7 @@ export default function NewPlayer({
         } else if (status === "none" && !showNoFunds) {
           handleNewPlayer();
         } else if (status === "none" && !hasFunds && showNoFunds) {
-          getBalance();
+          refetchBalance();
         }
       }
     };
@@ -77,7 +65,7 @@ export default function NewPlayer({
     return () => {
       window.removeEventListener("keydown", handleGlobalKeyDown);
     };
-  }, [status, showNoFunds, hasFunds]);
+  }, [status, showNoFunds, hasFunds, refetchBalance]);
 
   async function createPlayerWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
@@ -276,7 +264,7 @@ export default function NewPlayer({
           </Link>
           <Button
             css={buttonStyle}
-            onPress={getBalance}
+            onPress={() => refetchBalance()}
             role="button"
             tabIndex={0}
             aria-label="Recheck balance"
