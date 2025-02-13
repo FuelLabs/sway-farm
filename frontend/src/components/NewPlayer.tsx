@@ -1,20 +1,19 @@
 import { BoxCentered, Button, Link } from "@fuel-ui/react";
-import { useAccount, useBalance, useChainId, useWallet } from "@fuels/react";
-import { useEffect, useState, useCallback } from "react";
+import { useAccount, useBalance, useWallet } from "@fuels/react";
+import { useEffect, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { Modals } from "../constants";
 
 import {
   buttonStyle,
-  FUEL_PROVIDER_URL,
   useGaslessWalletSupported,
   // GAS_STATION_CHANGE_OUTPUT_ADDRESS,
 } from "../constants";
 import type { FarmContract } from "../sway-api";
 
 import Loading from "./Loading";
-import { PlayerOutput } from "../sway-api/contracts/FarmContract";
-import { Address, BN, Provider } from "fuels";
+import type { PlayerOutput } from "../sway-api/contracts/FarmContract";
+import { Address, BN } from "fuels";
 import { usePaymaster } from "../hooks/usePaymaster";
 import { cssObj } from "@fuel-ui/css";
 import { toast } from "react-hot-toast";
