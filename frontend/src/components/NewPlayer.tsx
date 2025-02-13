@@ -110,8 +110,6 @@ export default function NewPlayer({
   async function createPlayerWithGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
 
-    const provider = new Provider(FUEL_PROVIDER_URL);
-    const { maxValuePerCoin } = await paymaster.metadata();
     const { coin: gasCoin, jobId } = await paymaster.allocate();
 
     const addressIdentityInput = {
@@ -125,13 +123,6 @@ export default function NewPlayer({
     });
     const request = await scope.getTransactionRequest();
 
-    request.addCoinInput(gasCoin);
-    request.addCoinOutput(
-      gasCoin.owner,
-      gasCoin.amount.sub(maxValuePerCoin),
-      await provider.getBaseAssetId(),
-    );
-    request.addChangeOutput(gasCoin.owner, await provider.getBaseAssetId());
     // request.outputs = request.outputs.map((output) => {
     //   if (
     //     output.type === 2 &&
@@ -142,11 +133,6 @@ export default function NewPlayer({
     //   }
     //   return output;
     // });
-    const txCost = await wallet.getTransactionCost(request);
-    const { gasUsed, maxFee } = txCost;
-    request.gasLimit = gasUsed;
-    request.maxFee = maxFee;
-    console.log("Max fee", Number(maxFee), "gas used", Number(gasUsed));
     const { signature } = await paymaster.fetchSignature(request, jobId);
     request.updateWitnessByOwner(gasCoin.owner, signature);
 
