@@ -38,7 +38,7 @@ export default function NewPlayer({
   const [showNoFunds, setShowNoFunds] = useState<boolean>(false);
   const { wallet } = useWallet();
   const { account } = useAccount();
-  const { balance, refetch: refetchBalance } = useBalance({account});
+  const { balance, refetch: refetchBalance } = useBalance({ account });
 
   const paymaster = usePaymaster();
   const isGaslessSupported = useGaslessWalletSupported();
@@ -83,8 +83,7 @@ export default function NewPlayer({
       .getTransactionRequest();
 
     await txRequest.estimateAndFund(wallet);
-    const tx = await wallet.sendTransaction(txRequest, {skipCustomFee: true});
-
+    const tx = await wallet.sendTransaction(txRequest, { skipCustomFee: true });
 
     if (tx) {
       setPlayer({
@@ -139,7 +138,7 @@ export default function NewPlayer({
     const { signature } = await paymaster.fetchSignature(request, jobId);
     request.updateWitnessByOwner(gasCoin.owner, signature);
 
-    const tx = await wallet.sendTransaction(request, {skipCustomFee: true});
+    const tx = await wallet.sendTransaction(request, { skipCustomFee: true });
     if (tx) {
       setPlayer({
         farming_skill: new BN(1),

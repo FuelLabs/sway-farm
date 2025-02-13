@@ -1040,10 +1040,7 @@ export class FarmContract extends Contract {
     >;
   };
 
-  constructor(
-    id: string | Address,
-    accountOrProvider: Account | Provider,
-  ) {
+  constructor(id: string | Address, accountOrProvider: Account | Provider) {
     super(id, abi, accountOrProvider);
   }
 }

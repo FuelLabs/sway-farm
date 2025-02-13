@@ -79,8 +79,8 @@ export default function HarvestModal({
       .getTransactionRequest();
 
     await txRequest.estimateAndFund(wallet);
-    
-    const tx = await wallet.sendTransaction(txRequest, {skipCustomFee: true});
+
+    const tx = await wallet.sendTransaction(txRequest, { skipCustomFee: true });
 
     if (tx) {
       onHarvestSuccess(tileArray[0]);

@@ -165,10 +165,10 @@ export default function BuySeeds({
         forward: [price, farmCoinAssetID],
       })
       .getTransactionRequest();
-    
+
     await txRequest.estimateAndFund(wallet);
-    
-    const tx = await wallet.sendTransaction(txRequest, {skipCustomFee: true});
+
+    const tx = await wallet.sendTransaction(txRequest, { skipCustomFee: true });
 
     if (tx) {
       toast.success(() => (
