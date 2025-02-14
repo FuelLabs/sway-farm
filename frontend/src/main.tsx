@@ -56,7 +56,7 @@ const FUEL_CONFIG = createFuelConfig(() => {
     ],
   });
 
-  const fuelProvider = Provider.create(FUEL_PROVIDER_URL);
+  const fuelProvider = new Provider(FUEL_PROVIDER_URL);
 
   const externalConnectorConfig = {
     chainId: CHAIN_IDS.fuel.mainnet,
