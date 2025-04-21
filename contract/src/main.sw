@@ -33,6 +33,7 @@ storage {
     player_seeds: StorageMap<(Identity, FoodType), u64> = StorageMap {},
     planted_seeds: StorageMap<Identity, GardenVector> = StorageMap {},
     player_items: StorageMap<(Identity, FoodType), u64> = StorageMap {},
+    player_position: StorageMap<Identity, PlayerPosition> = StorageMap {},
 }
 
 impl GameContract for Contract {
@@ -72,6 +73,17 @@ impl GameContract for Contract {
 
     fn get_asset_id() -> AssetId {
         AssetId::default()
+    }
+
+    #[storage(read, write)]
+    fn set_player_position(x: u64, y: u64, address: Identity) {
+        let sender = address;
+        storage.player_position.insert(sender, PlayerPosition { x, y });
+    }
+
+    #[storage(read)]
+    fn get_player_position(address: Identity) -> PlayerPosition {
+        storage.player_position.get(address).try_read().unwrap()
     }
 
     #[storage(read, write)]

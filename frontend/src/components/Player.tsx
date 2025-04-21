@@ -61,6 +61,19 @@ export default function Player({
   const [spriteMap, setSpriteMap] = useState<Texture>();
   const ref = useRef<Sprite>(null);
   const [, get] = useKeyboardControls<Controls>();
+  const lastSavedPosition = useRef<Vector3 | null>(null);
+
+  // Load initial position from localStorage
+  useEffect(() => {
+    const savedPosition = localStorage.getItem('playerPosition');
+    if (savedPosition) {
+      const { x, y, z } = JSON.parse(savedPosition);
+      if (ref.current) {
+        ref.current.position.set(x, y, z);
+        lastSavedPosition.current = new Vector3(x, y, z);
+      }
+    }
+  }, []);
 
   const tilesHoriz = 4;
   const tilesVert = 5;
@@ -85,6 +98,21 @@ export default function Player({
     updateCameraPosition();
 
     if (canMove) movePlayer(dl, state, mobileControlState);
+
+    // Save position if it has changed significantly
+    if (ref.current) {
+      const currentPos = ref.current.position;
+      if (!lastSavedPosition.current || 
+          Math.abs(currentPos.x - lastSavedPosition.current.x) > 0.1 ||
+          Math.abs(currentPos.y - lastSavedPosition.current.y) > 0.1) {
+        localStorage.setItem('playerPosition', JSON.stringify({
+          x: currentPos.x,
+          y: currentPos.y,
+          z: currentPos.z
+        }));
+        lastSavedPosition.current = currentPos.clone();
+      }
+    }
   });
 
   function updateCameraPosition() {
@@ -260,8 +288,13 @@ export default function Player({
   }
 
   if (spriteMap) {
+    const savedPosition = localStorage.getItem('playerPosition');
+    const initialPosition = savedPosition 
+      ? JSON.parse(savedPosition)
+      : { x: -3, y: 1.7, z: 2 };
+
     return (
-      <sprite ref={ref} position={[-3, 1.7, 2]}>
+      <sprite ref={ref} position={[initialPosition.x, initialPosition.y, initialPosition.z]}>
         <spriteMaterial attach="material" map={spriteMap} />
       </sprite>
     );
