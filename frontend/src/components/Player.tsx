@@ -470,6 +470,8 @@ export default function Player({
     mobileControlState: MobileControls,
   ) {
     if (!ref.current) return;
+
+    // Set movement direction
     if ((state.left && !state.right) || mobileControlState === "left") {
       velocity.x = -1;
       setCurrentTile(12);
@@ -502,40 +504,24 @@ export default function Player({
     )
       velocity.y = 0;
 
-    if (
-      state.left ||
-      state.right ||
-      mobileControlState === "left" ||
-      mobileControlState === "right"
-    ) {
-      if (
-        ref.current.position.x <= bounds.right &&
-        ref.current.position.x >= bounds.left
-      ) {
-        ref.current.translateX(4 * dl * velocity.x);
-      } else if (ref.current.position.x > bounds.right) {
-        ref.current.position.x = bounds.right;
-      } else if (ref.current.position.x < bounds.right) {
-        ref.current.position.x = bounds.left;
-      }
+    // Handle horizontal movement
+    if (velocity.x !== 0) {
+      const newX = ref.current.position.x + 4 * dl * velocity.x;
+      // Clamp the position within bounds
+      ref.current.position.x = Math.max(
+        bounds.left,
+        Math.min(bounds.right, newX)
+      );
     }
 
-    if (
-      state.back ||
-      state.forward ||
-      mobileControlState === "up" ||
-      mobileControlState === "down"
-    ) {
-      if (
-        ref.current.position.y <= bounds.top &&
-        ref.current.position.y >= bounds.bottom
-      ) {
-        ref.current.translateY(4 * dl * velocity.y);
-      } else if (ref.current.position.y > bounds.top) {
-        ref.current.position.y = bounds.top;
-      } else if (ref.current.position.y < bounds.top) {
-        ref.current.position.y = bounds.bottom;
-      }
+    // Handle vertical movement
+    if (velocity.y !== 0) {
+      const newY = ref.current.position.y + 4 * dl * velocity.y;
+      // Clamp the position within bounds
+      ref.current.position.y = Math.max(
+        bounds.bottom,
+        Math.min(bounds.top, newY)
+      );
     }
   }
 

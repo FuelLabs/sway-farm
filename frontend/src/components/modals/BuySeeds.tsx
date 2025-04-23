@@ -183,6 +183,7 @@ export default function BuySeeds({
           Successfully bought seeds!
         </div>
       ));
+      await tx.waitForResult();
       onBuySuccess();
       updatePageNum();
     }

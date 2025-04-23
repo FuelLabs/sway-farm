@@ -114,14 +114,15 @@ createRoot(document.getElementById("root")!).render(
           theme="dark"
         >
           <Toaster
+            gutter={2}
             toastOptions={{
               style: {
                 backgroundColor: "#ac7339",
                 border: "4px solid #754a1e",
                 borderRadius: "8px",
                 color: "black",
-                padding: "8px 12px",
-                fontSize: "14px",
+                padding: "4px 6px",
+                fontSize: "9px",
               },
               success: {
                 icon: <CustomSuccessIcon />,

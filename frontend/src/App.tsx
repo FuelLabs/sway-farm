@@ -18,6 +18,7 @@ import {
 import "./App.css";
 import { FarmContract } from "./sway-api/index.ts";
 import { Analytics } from "@vercel/analytics/react";
+import { useToasterStore, toast } from "react-hot-toast";
 
 const BASE_ASSET_ID =
   "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07";
@@ -29,7 +30,16 @@ function App() {
 
   const { isConnected } = useIsConnected();
   const { wallet } = useWallet();
+const { toasts } = useToasterStore();
 
+const TOAST_LIMIT = 3;
+
+useEffect(() => {
+  toasts
+    .filter((t) => t.visible) // Only consider visible toasts
+    .filter((_, i) => i >= TOAST_LIMIT) // Is toast index over limit?
+    .forEach((t) => toast.dismiss(t.id)); // Dismiss – Use toast.remove(t.id) for no exit animation
+}, [toasts]);
   const { balance } = useBalance({
     address: wallet?.address.toB256(),
     assetId: BASE_ASSET_ID,
