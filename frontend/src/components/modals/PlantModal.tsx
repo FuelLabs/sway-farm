@@ -119,6 +119,7 @@ export default function PlantModal({
           Seed Planted!
         </div>
       ));
+      await tx.waitForResult();
       updatePageNum();
     }
     return tx;
