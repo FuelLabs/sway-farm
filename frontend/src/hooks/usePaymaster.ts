@@ -150,16 +150,17 @@ export const usePaymaster = () => {
   };
 
   const shouldUseGasless = async (): Promise<boolean> => {
-    try {
-      if (window.location.hostname === "localhost") {
-        return true;
-      }
-      const { allocateCoinRateLimit } = await metadata();
-      return allocateCoinRateLimit.totalHits < 19;
-    } catch (error) {
-      console.error("Failed to check rate limit:", error);
-      return false;
-    }
+    // try {
+    //   if (window.location.hostname === "localhost") {
+    //     return true;
+    //   }
+    //   const { allocateCoinRateLimit } = await metadata();
+    //   return allocateCoinRateLimit.totalHits < 19;
+    // } catch (error) {
+    //   console.error("Failed to check rate limit:", error);
+    //   return false;
+    // }
+    return false;
   };
 
   return {
