@@ -105,6 +105,7 @@ export default function PlantModal({
     if (tx) {
       setOtherTransactionDone(true);
       onPlantSuccess(tileArray[0]);
+      await tx.waitForResult();
       setModal("none");
       toast.success(() => (
         <div
@@ -119,7 +120,6 @@ export default function PlantModal({
           Seed Planted!
         </div>
       ));
-      await tx.waitForResult();
       updatePageNum();
     }
     return tx;
