@@ -83,6 +83,7 @@ export default function HarvestModal({
     if (tx) {
       setOtherTransactionDone(true);
       onHarvestSuccess(tileArray[0]);
+      await tx.waitForResult();
       setModal("plant");
       updatePageNum();
       toast.success(() => (
