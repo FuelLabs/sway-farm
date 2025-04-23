@@ -58,12 +58,8 @@ function App() {
     getAssetId();
   }, [contract]);
   const transferBaseETH = useCallback(async () => {
-    console.log("Checking and transferring fuel...");
     if (!wallet) return;
-    console.log("debug 5");
-
     const ETHBalance = await wallet.getBalance(BASE_ASSET_ID);
-    console.log("ETH Balance:", Number(ETHBalance));
     if (ETHBalance.lt(2900000)) {
       try {
         const provider = new Provider(FUEL_PROVIDER_URL);
