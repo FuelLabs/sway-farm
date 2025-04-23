@@ -240,7 +240,7 @@ export default function HarvestModal({
       {status === "none" && !hasFunds && showNoFunds && (
         <NoFundsMessage onRecheck={getBalance} />
       )}
-      {status === "none" && !hasFunds && !showNoFunds && (
+      {status === "none" && !showNoFunds && (
         <>
           <div style={styles.items}>Harvest this item?</div>
           <Button
