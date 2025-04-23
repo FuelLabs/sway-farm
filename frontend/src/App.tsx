@@ -1,10 +1,11 @@
 import { cssObj } from "@fuel-ui/css";
 import { Box, BoxCentered, Heading } from "@fuel-ui/react";
-import { useIsConnected, useWallet } from "@fuels/react";
+import { useBalance, useIsConnected, useWallet } from "@fuels/react";
 //Add Analytics
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Provider, Wallet, WalletUnlocked } from "fuels";
 import { TransactionProvider } from "./contexts/TransactionContext.tsx";
+import FaucetingModal from "./components/FaucetingModal.tsx";
 
 import Game from "./components/Game.tsx";
 import Home from "./components/home/Home.tsx";
@@ -25,11 +26,18 @@ function App() {
   const [farmCoinAssetID, setFarmCoinAssetId] = useState<string | null>(
     FARM_COIN_ASSET_ID,
   );
+
   const { isConnected } = useIsConnected();
   const { wallet } = useWallet();
-  // const wallet: WalletUnlocked = Wallet.fromPrivateKey(
-  //   "0x2822e732c67f525cdf1df36a92a69fa16fcd25e1eee3e5be604b386ca6a5898d",
-  // );
+
+  const { balance } = useBalance({
+    address: wallet?.address.toB256(),
+    assetId: BASE_ASSET_ID,
+  });
+
+  useEffect(() => {
+    console.log('Current balance:', balance?.toString());
+  }, [balance]);
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -75,19 +83,52 @@ function App() {
     }
   }, [wallet]);
   useEffect(() => {
-    const intervalId = setInterval(transferBaseETH, 3000);
-    return () => clearInterval(intervalId);
-  }, [transferBaseETH]);
+    const checkBalanceAndSetInterval = async () => {
+      if (!wallet) return;
+      const ETHBalance = await wallet.getBalance(BASE_ASSET_ID);
+      if (ETHBalance.lt(2900000)) {
+        transferBaseETH();
+        return 2000; // 2 seconds if balance is low
+      }
+      return 30000; // 30 seconds if balance is sufficient
+    };
+
+    let intervalId: number;
+    
+    const setupInterval = async () => {
+      const interval = await checkBalanceAndSetInterval();
+      intervalId = window.setInterval(async () => {
+        const newInterval = await checkBalanceAndSetInterval();
+        if (newInterval !== interval) {
+          clearInterval(intervalId);
+          intervalId = window.setInterval(transferBaseETH, newInterval);
+        } else {
+          transferBaseETH();
+        }
+      }, interval);
+    };
+
+    setupInterval();
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [transferBaseETH, wallet]);
 
   return (
     <TransactionProvider>
       <Box css={styles.root}>
         {isConnected && farmCoinAssetID ? (
-          <Game
-            contract={contract}
-            isMobile={isMobile}
-            farmCoinAssetID={farmCoinAssetID}
-          />
+          <>
+            <FaucetingModal isOpen={!balance || balance.isZero()} />
+            <Game
+              contract={contract}
+              isMobile={isMobile}
+              farmCoinAssetID={farmCoinAssetID}
+            />
+          </>
         ) : (
           <BoxCentered css={styles.box}>
             <BoxCentered css={styles.innerBox}>

@@ -177,12 +177,12 @@ export default function SellItem({
         setStatus("loading");
         setCanMove(false);
         const canUseGasless = await paymaster.shouldUseGasless();
-        if (!canUseGasless) {
-          toast.error(
-            "Hourly gasless transaction limit reached. Trying regular transaction...",
-            { duration: 5000 },
-          );
-        }
+        // if (!canUseGasless) {
+        //   toast.error(
+        //     "Hourly gasless transaction limit reached. Trying regular transaction...",
+        //     { duration: 5000 },
+        //   );
+        // }
         if (isGaslessSupported && canUseGasless) {
           try {
             await sellWithGasStation();
