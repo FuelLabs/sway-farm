@@ -2,13 +2,14 @@ import { cssObj } from "@fuel-ui/css";
 import { Flex, Box } from "@fuel-ui/react";
 import { useWallet, useBalance, useDisconnect } from "@fuels/react";
 import { toast } from "react-hot-toast";
+import { useEffect } from "react";
 
 export default function WalletInfo() {
   const { wallet } = useWallet();
   const getTruncatedAddress = (address: string) => {
     return address.slice(0, 6) + "..." + address.slice(-4);
   };
-  const { balance } = useBalance({
+  const { balance, refetch } = useBalance({
     address: wallet?.address.toB256(),
   });
   const { disconnect } = useDisconnect();
@@ -17,6 +18,15 @@ export default function WalletInfo() {
   };
   const userAgent = navigator.userAgent.toLowerCase();
   const isMobile = /(iphone|android|windows phone)/.test(userAgent);
+  useEffect(() => {
+    // Set up polling interval
+    const interval = setInterval(() => {
+      refetch();
+    }, 5000);
+
+    // Cleanup on unmount
+    return () => clearInterval(interval);
+  }, [refetch]);
   return (
     <Box css={styles.container}>
       <Flex direction={"column"} justify="space-around">

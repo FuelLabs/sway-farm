@@ -1,22 +1,26 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+// import {
+//   BakoSafeConnector,
+//   createConfig as createFuelConfig,
+//   FueletWalletConnector,
+//   FuelWalletConnector,
+//   SolanaConnector,
+//   WalletConnectConnector,
+//   BurnerWalletConnector,
+// } from "@fuels/connectors";
 import {
-  BakoSafeConnector,
   createConfig as createFuelConfig,
-  FueletWalletConnector,
-  FuelWalletConnector,
-  SolanaConnector,
-  WalletConnectConnector,
   BurnerWalletConnector,
 } from "@fuels/connectors";
 import { FuelProvider } from "@fuels/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider, CHAIN_IDS } from "fuels";
 import { FUEL_PROVIDER_URL } from "./constants.ts";
-import { createConfig, http, injected } from "@wagmi/core";
-import { mainnet } from "@wagmi/core/chains";
-import { walletConnect } from "@wagmi/connectors";
-import type { Config as WagmiConfig } from "@wagmi/core";
+// import { createConfig, http, injected } from "@wagmi/core";
+// import { sepolia } from "@wagmi/core/chains";
+// import { walletConnect } from "@wagmi/connectors";
+// import type { Config as WagmiConfig } from "@wagmi/core";
 import "./index.css";
 import App from "./App.tsx";
 import { Toaster } from "react-hot-toast";
@@ -29,64 +33,67 @@ import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 const queryClient = new QueryClient();
 const networks = [
   {
-    chainId: CHAIN_IDS.fuel.mainnet,
+    chainId: CHAIN_IDS.fuel.devnet,
     url: FUEL_PROVIDER_URL,
   },
 ];
 
 const FUEL_CONFIG = createFuelConfig(() => {
-  const WalletConnectProjectId = "35b967d8f17700b2de24f0abee77e579";
-  const wagmiConfig = createConfig({
-    syncConnectedChain: false,
-    chains: [mainnet],
-    transports: {
-      [mainnet.id]: http(),
-    },
-    connectors: [
-      injected({ shimDisconnect: false }),
-      walletConnect({
-        projectId: WalletConnectProjectId,
-        metadata: {
-          name: "Sway Farm",
-          description: "Farm 🍅 on the Fuel network.",
-          url: "https://swayfarm.xyz/",
-          icons: ["https://connectors.fuel.network/logo_white.png"],
-        },
-      }),
-    ],
-  });
+  // const WalletConnectProjectId = "35b967d8f17700b2de24f0abee77e579";
+  // const wagmiConfig = createConfig({
+  //   syncConnectedChain: false,
+  //   chains: [sepolia],
+  //   transports: {
+  //     [sepolia.id]: http(),
+  //   },
+  //   connectors: [
+  //     injected({ shimDisconnect: false }),
+  //     walletConnect({
+  //       projectId: WalletConnectProjectId,
+  //       metadata: {
+  //         name: "Sway Farm",
+  //         description: "Farm 🍅 on the Fuel network.",
+  //         url: "https://swayfarm.xyz/",
+  //         icons: ["https://connectors.fuel.network/logo_white.png"],
+  //       },
+  //     }),
+  //   ],
+  // });
 
-  const fuelProvider = Provider.create(FUEL_PROVIDER_URL);
+  const fuelProvider = new Provider(FUEL_PROVIDER_URL);
 
-  const externalConnectorConfig = {
-    chainId: CHAIN_IDS.fuel.mainnet,
-    fuelProvider,
-  };
+  // const externalConnectorConfig = {
+  //   chainId: CHAIN_IDS.fuel.devnet,
+  //   fuelProvider,
+  // };
 
-  const fueletWalletConnector = new FueletWalletConnector();
-  const fuelWalletConnector = new FuelWalletConnector();
-  const bakoSafeConnector = new BakoSafeConnector();
+  // const fueletWalletConnector = new FueletWalletConnector();
+  // const fuelWalletConnector = new FuelWalletConnector();
+  // const bakoSafeConnector = new BakoSafeConnector();
   const burnerWalletConnector = new BurnerWalletConnector({ fuelProvider });
-  const walletConnectConnector = new WalletConnectConnector({
-    projectId: WalletConnectProjectId,
-    wagmiConfig: wagmiConfig as WagmiConfig,
-    ...externalConnectorConfig,
-  });
-  const solanaConnector = new SolanaConnector({
-    projectId: WalletConnectProjectId,
-    ...externalConnectorConfig,
-  });
-  const userAgent = navigator.userAgent.toLowerCase();
-  const isMobile = /(iphone|android|windows phone)/.test(userAgent);
+  // const walletConnectConnector = new WalletConnectConnector({
+  //   projectId: WalletConnectProjectId,
+  //   wagmiConfig: wagmiConfig as WagmiConfig,
+  //   ...externalConnectorConfig,
+  // });
+  // const solanaConnector = new SolanaConnector({
+  //   projectId: WalletConnectProjectId,
+  //   ...externalConnectorConfig,
+  // });
+  // const userAgent = navigator.userAgent.toLowerCase();
+  // const isMobile = /(iphone|android|windows phone)/.test(userAgent);
 
+  // return {
+  //   connectors: [
+  //     fueletWalletConnector,
+  //     walletConnectConnector,
+  //     solanaConnector,
+  //     burnerWalletConnector,
+  //     ...(isMobile ? [] : [fuelWalletConnector, bakoSafeConnector]),
+  //   ],
+  // };
   return {
-    connectors: [
-      fueletWalletConnector,
-      walletConnectConnector,
-      solanaConnector,
-      burnerWalletConnector,
-      ...(isMobile ? [] : [fuelWalletConnector, bakoSafeConnector]),
-    ],
+    connectors: [burnerWalletConnector],
   };
 });
 createRoot(document.getElementById("root")!).render(

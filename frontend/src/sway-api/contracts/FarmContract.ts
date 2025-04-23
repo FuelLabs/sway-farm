@@ -5,17 +5,17 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 
 /*
-  Fuels version: 0.97.2
-  Forc version: 0.66.5
-  Fuel-Core version: 0.40.0
+  Fuels version: 0.100.3
+  Forc version: 0.67.0
+  Fuel-Core version: 0.43.0
 */
 
-import { Contract, Interface } from "fuels";
+import { Contract as __Contract, Interface } from "fuels";
 import type {
   Provider,
   Account,
   StorageSlot,
-  AbstractAddress,
+  Address,
   BigNumberish,
   BN,
   FunctionFragment,
@@ -141,6 +141,8 @@ export type PlayerInput = {
   total_value_sold: BigNumberish;
 };
 export type PlayerOutput = { farming_skill: BN; total_value_sold: BN };
+export type PlayerPositionInput = { x: BigNumberish; y: BigNumberish };
+export type PlayerPositionOutput = { x: BN; y: BN };
 export type SellItemInput = {
   address: IdentityInput;
   food_type: FoodTypeInput;
@@ -246,22 +248,28 @@ const abi = {
       metadataTypeId: 15,
     },
     {
+      type: "struct abi_structs::PlayerPosition",
+      concreteTypeId:
+        "021ccd031a18f8c7cfe1de6a9a26ceceb1942fa2af02046a4756f56a960b2500",
+      metadataTypeId: 16,
+    },
+    {
       type: "struct abi_structs::SellItem",
       concreteTypeId:
         "9b554f45f74d8490bdfc1ecc51f971eac4cf3df795b0ceeff85c5f74dc77db71",
-      metadataTypeId: 16,
+      metadataTypeId: 17,
     },
     {
       type: "struct std::asset_id::AssetId",
       concreteTypeId:
         "c0710b6731b1dd59799cf6bef33eee3b3b04a2e40e80a0724090215bbf2ca974",
-      metadataTypeId: 18,
+      metadataTypeId: 19,
     },
     {
       type: "struct std::vec::Vec<u64>",
       concreteTypeId:
         "d5bfe1d4e1ace20166c9b50cadd47e862020561bde24f5189cfc2723f5ed76f4",
-      metadataTypeId: 21,
+      metadataTypeId: 22,
       typeArguments: [
         "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0",
       ],
@@ -309,7 +317,7 @@ const abi = {
         },
         {
           name: "IncorrectAssetId",
-          typeId: 18,
+          typeId: 19,
         },
         {
           name: "IncorrectAmount",
@@ -335,11 +343,11 @@ const abi = {
       components: [
         {
           name: "Address",
-          typeId: 17,
+          typeId: 18,
         },
         {
           name: "ContractId",
-          typeId: 19,
+          typeId: 20,
         },
       ],
     },
@@ -516,8 +524,24 @@ const abi = {
       ],
     },
     {
-      type: "struct abi_structs::SellItem",
+      type: "struct abi_structs::PlayerPosition",
       metadataTypeId: 16,
+      components: [
+        {
+          name: "x",
+          typeId:
+            "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0",
+        },
+        {
+          name: "y",
+          typeId:
+            "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0",
+        },
+      ],
+    },
+    {
+      type: "struct abi_structs::SellItem",
+      metadataTypeId: 17,
       components: [
         {
           name: "address",
@@ -545,16 +569,6 @@ const abi = {
     },
     {
       type: "struct std::address::Address",
-      metadataTypeId: 17,
-      components: [
-        {
-          name: "bits",
-          typeId: 1,
-        },
-      ],
-    },
-    {
-      type: "struct std::asset_id::AssetId",
       metadataTypeId: 18,
       components: [
         {
@@ -564,7 +578,7 @@ const abi = {
       ],
     },
     {
-      type: "struct std::contract_id::ContractId",
+      type: "struct std::asset_id::AssetId",
       metadataTypeId: 19,
       components: [
         {
@@ -574,8 +588,18 @@ const abi = {
       ],
     },
     {
-      type: "struct std::vec::RawVec",
+      type: "struct std::contract_id::ContractId",
       metadataTypeId: 20,
+      components: [
+        {
+          name: "bits",
+          typeId: 1,
+        },
+      ],
+    },
+    {
+      type: "struct std::vec::RawVec",
+      metadataTypeId: 21,
       components: [
         {
           name: "ptr",
@@ -591,11 +615,11 @@ const abi = {
     },
     {
       type: "struct std::vec::Vec",
-      metadataTypeId: 21,
+      metadataTypeId: 22,
       components: [
         {
           name: "buf",
-          typeId: 20,
+          typeId: 21,
           typeArguments: [
             {
               name: "",
@@ -787,6 +811,24 @@ const abi = {
     {
       inputs: [
         {
+          name: "address",
+          concreteTypeId:
+            "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335",
+        },
+      ],
+      name: "get_player_position",
+      output:
+        "021ccd031a18f8c7cfe1de6a9a26ceceb1942fa2af02046a4756f56a960b2500",
+      attributes: [
+        {
+          name: "storage",
+          arguments: ["read"],
+        },
+      ],
+    },
+    {
+      inputs: [
+        {
           name: "id",
           concreteTypeId:
             "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335",
@@ -922,6 +964,34 @@ const abi = {
         },
       ],
     },
+    {
+      inputs: [
+        {
+          name: "x",
+          concreteTypeId:
+            "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0",
+        },
+        {
+          name: "y",
+          concreteTypeId:
+            "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0",
+        },
+        {
+          name: "address",
+          concreteTypeId:
+            "ab7cd04e05be58e3fc15d424c2c4a57f824a2a2d97d67252440a3925ebdc1335",
+        },
+      ],
+      name: "set_player_position",
+      output:
+        "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d",
+      attributes: [
+        {
+          name: "storage",
+          arguments: ["read", "write"],
+        },
+      ],
+    },
   ],
   loggedTypes: [
     {
@@ -985,16 +1055,18 @@ export class FarmContractInterface extends Interface {
     get_garden_vec: FunctionFragment;
     get_item_amount: FunctionFragment;
     get_player: FunctionFragment;
+    get_player_position: FunctionFragment;
     get_seed_amount: FunctionFragment;
     harvest: FunctionFragment;
     level_up: FunctionFragment;
     new_player: FunctionFragment;
     plant_seed_at_index: FunctionFragment;
     sell_item: FunctionFragment;
+    set_player_position: FunctionFragment;
   };
 }
 
-export class FarmContract extends Contract {
+export class FarmContract extends __Contract {
   static readonly abi = abi;
   static readonly storageSlots = storageSlots;
 
@@ -1020,6 +1092,10 @@ export class FarmContract extends Contract {
       BN
     >;
     get_player: InvokeFunction<[id: IdentityInput], Option<PlayerOutput>>;
+    get_player_position: InvokeFunction<
+      [address: IdentityInput],
+      PlayerPositionOutput
+    >;
     get_seed_amount: InvokeFunction<
       [id: IdentityInput, item: FoodTypeInput],
       BN
@@ -1038,12 +1114,13 @@ export class FarmContract extends Contract {
       [food_type: FoodTypeInput, amount: BigNumberish, address: IdentityInput],
       void
     >;
+    set_player_position: InvokeFunction<
+      [x: BigNumberish, y: BigNumberish, address: IdentityInput],
+      void
+    >;
   };
 
-  constructor(
-    id: string | AbstractAddress,
-    accountOrProvider: Account | Provider,
-  ) {
+  constructor(id: string | Address, accountOrProvider: Account | Provider) {
     super(id, abi, accountOrProvider);
   }
 }

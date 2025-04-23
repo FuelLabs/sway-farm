@@ -2,19 +2,24 @@ import { cssObj } from "@fuel-ui/css";
 import { Box, BoxCentered, Heading } from "@fuel-ui/react";
 import { useIsConnected, useWallet } from "@fuels/react";
 //Add Analytics
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Provider, Wallet, WalletUnlocked } from "fuels";
+import { TransactionProvider } from "./contexts/TransactionContext.tsx";
 
 import Game from "./components/Game.tsx";
 import Home from "./components/home/Home.tsx";
 import {
   CONTRACT_ID,
   FARM_COIN_ASSET_ID,
+  FUEL_PROVIDER_URL,
   // VERCEL_ENV,
 } from "./constants.ts";
 import "./App.css";
 import { FarmContract } from "./sway-api/index.ts";
 import { Analytics } from "@vercel/analytics/react";
 
+const BASE_ASSET_ID =
+  "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07";
 function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [farmCoinAssetID, setFarmCoinAssetId] = useState<string | null>(
@@ -22,6 +27,9 @@ function App() {
   );
   const { isConnected } = useIsConnected();
   const { wallet } = useWallet();
+  // const wallet: WalletUnlocked = Wallet.fromPrivateKey(
+  //   "0x2822e732c67f525cdf1df36a92a69fa16fcd25e1eee3e5be604b386ca6a5898d",
+  // );
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -31,6 +39,8 @@ function App() {
 
   const contract = useMemo(() => {
     if (wallet) {
+      // const provider = new Provider(FUEL_PROVIDER_URL);
+      // const contract = new FarmContract(CONTRACT_ID, wallet.connect(provider));
       const contract = new FarmContract(CONTRACT_ID, wallet);
       return contract;
     }
@@ -47,28 +57,55 @@ function App() {
     }
     getAssetId();
   }, [contract]);
+  const transferBaseETH = useCallback(async () => {
+    console.log("Checking and transferring fuel...");
+    if (!wallet) return;
+    console.log("debug 5");
+
+    const ETHBalance = await wallet.getBalance(BASE_ASSET_ID);
+    console.log("ETH Balance:", Number(ETHBalance));
+    if (ETHBalance.lt(2900000)) {
+      try {
+        const provider = new Provider(FUEL_PROVIDER_URL);
+        const transferWallet: WalletUnlocked = Wallet.fromPrivateKey(
+          "0x2822e732c67f525cdf1df36a92a69fa16fcd25e1eee3e5be604b386ca6a5898d",
+          provider,
+        );
+        const baseAssetId = await provider.getBaseAssetId();
+        await transferWallet.transfer(wallet.address, 3000000, baseAssetId);
+      } catch (error) {
+        console.error("Error transferring fuel:", error);
+      }
+    }
+  }, [wallet]);
+  useEffect(() => {
+    const intervalId = setInterval(transferBaseETH, 3000);
+    return () => clearInterval(intervalId);
+  }, [transferBaseETH]);
 
   return (
-    <Box css={styles.root}>
-      {isConnected && farmCoinAssetID ? (
-        <Game
-          contract={contract}
-          isMobile={isMobile}
-          farmCoinAssetID={farmCoinAssetID}
-        />
-      ) : (
-        <BoxCentered css={styles.box}>
-          <BoxCentered css={styles.innerBox}>
-            <Heading css={styles.heading} as={"h1"}>
-              SWAY FARM
-            </Heading>
-            <span style={styles.gaslessLine}>Now completely GASLESS! 🎉</span>
-            <Home isMobile={isMobile} />
+    <TransactionProvider>
+      <Box css={styles.root}>
+        {isConnected && farmCoinAssetID ? (
+          <Game
+            contract={contract}
+            isMobile={isMobile}
+            farmCoinAssetID={farmCoinAssetID}
+          />
+        ) : (
+          <BoxCentered css={styles.box}>
+            <BoxCentered css={styles.innerBox}>
+              <Heading css={styles.heading} as={"h1"}>
+                SWAY FARM
+              </Heading>
+              <span style={styles.gaslessLine}>Now completely GASLESS! 🎉</span>
+              <Home isMobile={isMobile} />
+            </BoxCentered>
           </BoxCentered>
-        </BoxCentered>
-      )}
-      <Analytics mode="production" />
-    </Box>
+        )}
+        <Analytics mode="production" />
+      </Box>
+    </TransactionProvider>
   );
 }
 

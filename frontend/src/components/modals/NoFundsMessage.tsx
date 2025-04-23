@@ -12,7 +12,7 @@ export function NoFundsMessage({ onRecheck }: NoFundsMessageProps) {
       You need some ETH to play:
       <Link isExternal href={`https://app.fuel.network/bridge`}>
         <Button css={styles.link} variant="link">
-          Go to Bridge
+          Go to Bridgee
         </Button>
       </Link>
       <Button css={buttonStyle} onPress={onRecheck}>

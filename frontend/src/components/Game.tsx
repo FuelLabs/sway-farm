@@ -195,6 +195,7 @@ export default function Game({
                 <KeyboardControls map={controlsMap}>
                   <Player
                     tileStates={tileStates}
+                    contract={contract}
                     modal={modal}
                     setModal={setModal}
                     setTileArray={setTileArray}

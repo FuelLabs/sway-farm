@@ -17,6 +17,7 @@ import { usePaymaster } from "../../hooks/usePaymaster";
 import { toast } from "react-hot-toast";
 import { useWalletFunds } from "../../hooks/useWalletFunds";
 import { NoFundsMessage } from "./NoFundsMessage";
+import { useTransaction } from "../../hooks/useTransaction";
 
 interface HarvestProps {
   contract: FarmContract | null;
@@ -43,6 +44,7 @@ export default function HarvestModal({
   const isGaslessSupported = useGaslessWalletSupported();
   const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
     useWalletFunds(contract);
+  const { setOtherTransactionDone } = useTransaction();
 
   // Add global keyboard event listener
   useEffect(() => {
@@ -79,6 +81,7 @@ export default function HarvestModal({
       .call();
 
     if (tx) {
+      setOtherTransactionDone(true);
       onHarvestSuccess(tileArray[0]);
       setModal("plant");
       updatePageNum();
@@ -102,7 +105,7 @@ export default function HarvestModal({
   async function harvestWithGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
 
-    const provider = await Provider.create(FUEL_PROVIDER_URL);
+    const provider = new Provider(FUEL_PROVIDER_URL);
     const { maxValuePerCoin } = await paymaster.metadata();
     const { coin: gasCoin, jobId } = await paymaster.allocate();
 
@@ -118,9 +121,9 @@ export default function HarvestModal({
     request.addCoinOutput(
       gasCoin.owner,
       gasCoin.amount.sub(maxValuePerCoin),
-      provider.getBaseAssetId(),
+      await provider.getBaseAssetId(),
     );
-    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+    request.addChangeOutput(gasCoin.owner, await provider.getBaseAssetId());
 
     const txCost = await wallet.getTransactionCost(request);
     const { gasUsed, maxFee } = txCost;
@@ -132,6 +135,7 @@ export default function HarvestModal({
     const tx = await wallet.sendTransaction(request);
 
     if (tx) {
+      setOtherTransactionDone(true);
       onHarvestSuccess(tileArray[0]);
       await paymaster.postJobComplete(jobId);
       setModal("plant");

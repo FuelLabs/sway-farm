@@ -17,6 +17,7 @@ import Loading from "../Loading";
 import { useWallet } from "@fuels/react";
 import { usePaymaster } from "../../hooks/usePaymaster";
 import { toast } from "react-hot-toast";
+import { useTransaction } from "../../hooks/useTransaction";
 
 interface SellItemProps {
   contract: FarmContract | null;
@@ -39,6 +40,7 @@ export default function SellItem({
   const isGaslessSupported = useGaslessWalletSupported();
   const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
     useWalletFunds(contract);
+  const { setOtherTransactionDone } = useTransaction();
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
@@ -77,6 +79,7 @@ export default function SellItem({
       .call();
 
     if (tx) {
+      setOtherTransactionDone(true);
       updatePageNum();
       toast.success(() => (
         <div
@@ -98,7 +101,7 @@ export default function SellItem({
   async function sellWithGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
 
-    const provider = await Provider.create(FUEL_PROVIDER_URL);
+    const provider = new Provider(FUEL_PROVIDER_URL);
     const { maxValuePerCoin } = await paymaster.metadata();
     const { coin: gasCoin, jobId } = await paymaster.allocate();
 
@@ -132,16 +135,16 @@ export default function SellItem({
     request.addVariableOutputs(outputVariables);
     request.gasLimit = gasUsed;
     request.maxFee = maxFee;
-
+    const providerChain = await provider.getChain();
     request.addCoinInput(gasCoin);
     request.addCoinOutput(
       gasCoin.owner,
       gasCoin.amount.sub(maxValuePerCoin),
-      provider.getChain().consensusParameters.baseAssetId,
+      providerChain.consensusParameters.baseAssetId,
     );
     request.addChangeOutput(
       gasCoin.owner,
-      provider.getChain().consensusParameters.baseAssetId,
+      providerChain.consensusParameters.baseAssetId,
     );
 
     const { signature } = await paymaster.fetchSignature(request, jobId);
@@ -149,6 +152,7 @@ export default function SellItem({
 
     const tx = await wallet.sendTransaction(request);
     if (tx) {
+      setOtherTransactionDone(true);
       updatePageNum();
       await paymaster.postJobComplete(jobId);
       toast.success(() => (

@@ -78,6 +78,8 @@ impl GameContract for Contract {
     #[storage(read, write)]
     fn set_player_position(x: u64, y: u64, address: Identity) {
         let sender = address;
+        // The first bit (1 << 63) is used for sign
+        // The remaining bits store the value * 10000 to handle 4 decimal places
         storage.player_position.insert(sender, PlayerPosition { x, y });
     }
 

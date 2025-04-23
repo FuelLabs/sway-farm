@@ -4,15 +4,25 @@ import type { Dispatch, SetStateAction } from "react";
 import { useState, useEffect, useRef } from "react";
 import type { Texture, Sprite } from "three";
 import { Vector3, TextureLoader, NearestFilter } from "three";
+import type { FarmContract } from "../sway-api/contracts";
+import type {
+  AddressInput,
+  IdentityInput,
+} from "../sway-api/contracts/FarmContract";
+import { BN, bn, type ResolvedOutput } from "fuels";
+import { useWallet } from "@fuels/react";
+import { toast } from "react-hot-toast";
 
 import type { Modals, Controls } from "../constants";
 import { convertTime, TILES } from "../constants";
 import type { GardenVectorOutput } from "../sway-api/contracts/FarmContract";
 
 import type { MobileControls, Position } from "./Game";
+import { useTransaction } from "../hooks/useTransaction";
 
 interface PlayerProps {
   tileStates: GardenVectorOutput | undefined;
+  contract: FarmContract | null;
   modal: Modals;
   setModal: Dispatch<SetStateAction<Modals>>;
   setTileArray: Dispatch<SetStateAction<number[]>>;
@@ -48,8 +58,27 @@ const playerBounds = {
   bottom: -1.2,
 };
 
+const encodePosition = (value: number): BN => {
+  const isNegative = value < 0;
+  const absValue = Math.abs(value);
+  const scaledValue = Math.floor(absValue * 10000); // Scale to handle 4 decimal places
+  let encoded = new BN(scaledValue);
+  if (isNegative) {
+    encoded = encoded.or(new BN(1).shln(63)); // Set sign bit
+  }
+  return encoded;
+};
+
+const decodePosition = (encoded: BN): number => {
+  const isNegative = encoded.and(new BN(1).shln(63)).gt(new BN(0));
+  const value = encoded.and(new BN(1).shln(63).notn(64)); // Clear sign bit
+  const scaledValue = value.toNumber() / 10000;
+  return isNegative ? -scaledValue : scaledValue;
+};
+
 export default function Player({
   tileStates,
+  contract,
   setModal,
   setTileArray,
   setPlayerPosition,
@@ -61,19 +90,11 @@ export default function Player({
   const [spriteMap, setSpriteMap] = useState<Texture>();
   const ref = useRef<Sprite>(null);
   const [, get] = useKeyboardControls<Controls>();
+  const { otherTransactionDone, setOtherTransactionDone } = useTransaction();
   const lastSavedPosition = useRef<Vector3 | null>(null);
-
-  // Load initial position from localStorage
-  useEffect(() => {
-    const savedPosition = localStorage.getItem('playerPosition');
-    if (savedPosition) {
-      const { x, y, z } = JSON.parse(savedPosition);
-      if (ref.current) {
-        ref.current.position.set(x, y, z);
-        lastSavedPosition.current = new Vector3(x, y, z);
-      }
-    }
-  }, []);
+  const { wallet } = useWallet();
+  const isTransactionInProgress = useRef<boolean>(false);
+  const lastResolvedOutputs = useRef<ResolvedOutput[] | null>(null);
 
   const tilesHoriz = 4;
   const tilesVert = 5;
@@ -100,20 +121,251 @@ export default function Player({
     if (canMove) movePlayer(dl, state, mobileControlState);
 
     // Save position if it has changed significantly
-    if (ref.current) {
+    if (ref.current && contract && wallet) {
       const currentPos = ref.current.position;
-      if (!lastSavedPosition.current || 
-          Math.abs(currentPos.x - lastSavedPosition.current.x) > 0.1 ||
-          Math.abs(currentPos.y - lastSavedPosition.current.y) > 0.1) {
-        localStorage.setItem('playerPosition', JSON.stringify({
-          x: currentPos.x,
-          y: currentPos.y,
-          z: currentPos.z
-        }));
+      // Only update if moved more than 0.5 units in any direction
+      if (
+        !lastSavedPosition.current ||
+        Math.abs(currentPos.x - lastSavedPosition.current.x) > 0.3 ||
+        Math.abs(currentPos.y - lastSavedPosition.current.y) > 0.3
+      ) {
+        // Save to localStorage
+        localStorage.setItem(
+          "playerPosition",
+          JSON.stringify({
+            x: currentPos.x,
+            y: currentPos.y,
+            z: currentPos.z,
+          }),
+        );
         lastSavedPosition.current = currentPos.clone();
+
+        // Save to contract
+        const address: AddressInput = {
+          bits: wallet.address.toB256(),
+        };
+        const id: IdentityInput = { Address: address };
+
+        const encodedX = encodePosition(currentPos.x);
+        const encodedY = encodePosition(currentPos.y);
+        const savePosition = async () => {
+          if (isTransactionInProgress.current) {
+            return;
+          }
+
+          isTransactionInProgress.current = true;
+          try {
+            console.log("hello");
+
+            if (
+              !lastResolvedOutputs.current ||
+              lastResolvedOutputs.current.length === 0 ||
+              otherTransactionDone
+            ) {
+              // First transaction or if other transaction is done
+              console.log("first transaction or other transaction done");
+              const request = await contract.functions
+                .set_player_position(encodedX, encodedY, id)
+                .txParams({
+                  maxFee: 50_000,
+                  gasLimit: 50_000,
+                })
+                .fundWithRequiredCoins();
+              const txId = request.getTransactionId(0);
+              const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
+
+              await toast.promise(
+                (async () => {
+                  const tx = await wallet.sendTransaction(request);
+                  if (!tx) throw new Error("Failed to send transaction");
+                  setOtherTransactionDone(false);
+                  const preConfirmation = await tx.waitForPreConfirmation();
+                  if (preConfirmation.resolvedOutputs) {
+                    lastResolvedOutputs.current =
+                      preConfirmation.resolvedOutputs;
+                  }
+                  return preConfirmation;
+                })(),
+                {
+                  loading: `Sending transaction ${txId.slice(0, 4)}...${txId.slice(-4)}...`,
+                  success: (cos) => {
+                    console.log(cos);
+                    return (
+                      <div>
+                        Transaction{" "}
+                        <a
+                          href={txUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            textDecoration: "underline",
+                            color: "#15803d",
+                          }}
+                        >
+                          {txId.slice(0, 4)}...{txId.slice(-4)}
+                        </a>{" "}
+                        confirmed!
+                      </div>
+                    );
+                  },
+                  error: (err) => {
+                    console.error("Error saving position:", err);
+                    return (
+                      <div>
+                        Failed to save position for transaction{" "}
+                        <a
+                          href={txUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            textDecoration: "underline",
+                            color: "#15803d",
+                          }}
+                        >
+                          {txId.slice(0, 4)}...{txId.slice(-4)}
+                        </a>
+                      </div>
+                    );
+                  },
+                },
+              );
+            } else {
+              // Subsequent transactions
+              console.log(
+                "subsequent transaction",
+                lastResolvedOutputs.current,
+              );
+              const [{ utxoId, output }] = lastResolvedOutputs.current;
+              const change = output as unknown as {
+                assetId: string;
+                amount: string;
+              };
+              const resource = {
+                id: utxoId,
+                assetId: change.assetId,
+                amount: bn(change.amount),
+                owner: wallet?.address,
+                blockCreated: bn(0),
+                txCreatedIdx: bn(0),
+              };
+
+              const request = await contract.functions
+                .set_player_position(encodedX, encodedY, id)
+                .txParams({
+                  maxFee: 50_000,
+                  gasLimit: 50_000,
+                })
+                .getTransactionRequest();
+
+              request.addResource(resource);
+              const txId = request.getTransactionId(0);
+              const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
+
+              await toast.promise(
+                (async () => {
+                  const tx = await wallet.sendTransaction(request);
+                  if (!tx) throw new Error("Failed to send transaction");
+                  const preConfirmation = await tx.waitForPreConfirmation();
+                  if (preConfirmation.resolvedOutputs) {
+                    lastResolvedOutputs.current =
+                      preConfirmation.resolvedOutputs;
+                  }
+                  return preConfirmation;
+                })(),
+                {
+                  loading: `Sending transaction ${txId.slice(0, 4)}...${txId.slice(-4)}...`,
+                  success: (cos) => {
+                    console.log(cos);
+                    return (
+                      <div>
+                        Transaction{" "}
+                        <a
+                          href={txUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            textDecoration: "underline",
+                            color: "#15803d",
+                          }}
+                        >
+                          {txId.slice(0, 4)}...{txId.slice(-4)}
+                        </a>{" "}
+                        confirmed!
+                      </div>
+                    );
+                  },
+                  error: (err) => {
+                    console.error("Error saving position:", err);
+                    return (
+                      <div>
+                        Failed to save position for transaction{" "}
+                        <a
+                          href={txUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            textDecoration: "underline",
+                            color: "#15803d",
+                          }}
+                        >
+                          {txId.slice(0, 4)}...{txId.slice(-4)}
+                        </a>
+                      </div>
+                    );
+                  },
+                },
+              );
+            }
+          } finally {
+            isTransactionInProgress.current = false;
+          }
+        };
+        savePosition();
       }
     }
   });
+
+  // Load initial position from contract or localStorage
+  useEffect(() => {
+    const loadPosition = async () => {
+      if (contract && wallet) {
+        try {
+          const address: AddressInput = {
+            bits: wallet.address.toB256(),
+          };
+          const id: IdentityInput = { Address: address };
+
+          const { value: position } = await contract.functions
+            .get_player_position(id)
+            .get();
+
+          if (position) {
+            const x = decodePosition(new BN(position.x.toString()));
+            const y = decodePosition(new BN(position.y.toString()));
+            if (ref.current) {
+              ref.current.position.set(x, y, 2);
+              lastSavedPosition.current = new Vector3(x, y, 2);
+            }
+            return;
+          }
+        } catch (err) {
+          console.error("Error loading position from contract:", err);
+        }
+      }
+
+      // Fallback to localStorage
+      const savedPosition = localStorage.getItem("playerPosition");
+      if (savedPosition) {
+        const { x, y, z } = JSON.parse(savedPosition);
+        if (ref.current) {
+          ref.current.position.set(x, y, z);
+          lastSavedPosition.current = new Vector3(x, y, z);
+        }
+      }
+    };
+
+    loadPosition();
+  }, []);
 
   function updateCameraPosition() {
     const position = ref.current?.position;
@@ -288,13 +540,16 @@ export default function Player({
   }
 
   if (spriteMap) {
-    const savedPosition = localStorage.getItem('playerPosition');
-    const initialPosition = savedPosition 
+    const savedPosition = localStorage.getItem("playerPosition");
+    const initialPosition = savedPosition
       ? JSON.parse(savedPosition)
       : { x: -3, y: 1.7, z: 2 };
 
     return (
-      <sprite ref={ref} position={[initialPosition.x, initialPosition.y, initialPosition.z]}>
+      <sprite
+        ref={ref}
+        position={[initialPosition.x, initialPosition.y, initialPosition.z]}
+      >
         <spriteMaterial attach="material" map={spriteMap} />
       </sprite>
     );

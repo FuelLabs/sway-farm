@@ -1,5 +1,5 @@
 import { BoxCentered, Button, Link } from "@fuel-ui/react";
-import { useWallet } from "@fuels/react";
+import { useBalance, useWallet } from "@fuels/react";
 import { useEffect, useState, useCallback } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { Modals } from "../constants";
@@ -38,20 +38,22 @@ export default function NewPlayer({
   const [hasFunds, setHasFunds] = useState<boolean>(false);
   const [showNoFunds, setShowNoFunds] = useState<boolean>(false);
   const { wallet } = useWallet();
+  const BASE_ASSET_ID =
+    "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07";
+  const { balance, refetch: refetchBase } = useBalance({
+    address: wallet?.address.toB256(),
+    assetId: BASE_ASSET_ID,
+  });
   const paymaster = usePaymaster();
   const isGaslessSupported = useGaslessWalletSupported();
 
   const getBalance = useCallback(async () => {
-    const thisWallet = wallet ?? contract?.account;
-    console.log(wallet, "wallet");
-    const baseAssetId = thisWallet?.provider.getBaseAssetId();
-    const balance = await thisWallet!.getBalance(baseAssetId);
     const balanceNum = balance?.toNumber();
 
     if (balanceNum) {
       setHasFunds(balanceNum > 0);
     }
-  }, [wallet, contract]);
+  }, [balance]);
 
   useEffect(() => {
     getBalance();
@@ -78,7 +80,15 @@ export default function NewPlayer({
       window.removeEventListener("keydown", handleGlobalKeyDown);
     };
   }, [status, showNoFunds, hasFunds]);
+  useEffect(() => {
+    // Set up polling interval
+    const interval = setInterval(() => {
+      refetchBase();
+    }, 2500);
 
+    // Cleanup on unmount
+    return () => clearInterval(interval);
+  }, [refetchBase]);
   async function createPlayerWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
 
@@ -122,7 +132,7 @@ export default function NewPlayer({
   async function createPlayerWithGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
 
-    const provider = await Provider.create(FUEL_PROVIDER_URL);
+    const provider = new Provider(FUEL_PROVIDER_URL);
     const { maxValuePerCoin } = await paymaster.metadata();
     const { coin: gasCoin, jobId } = await paymaster.allocate();
 
@@ -141,9 +151,9 @@ export default function NewPlayer({
     request.addCoinOutput(
       gasCoin.owner,
       gasCoin.amount.sub(maxValuePerCoin),
-      provider.getBaseAssetId(),
+      await provider.getBaseAssetId(),
     );
-    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
+    request.addChangeOutput(gasCoin.owner, await provider.getBaseAssetId());
     // request.outputs = request.outputs.map((output) => {
     //   if (
     //     output.type === 2 &&

@@ -1,11 +1,11 @@
 import { cssObj } from "@fuel-ui/css";
 import type { Asset, BN, NetworkFuel } from "fuels";
 import { Vector3 } from "three";
-import { useCurrentConnector } from "@fuels/react";
+// import { useCurrentConnector } from "@fuels/react";
 
 // import contractIds from './sway-api/contract-ids.json';
 
-export const FUEL_PROVIDER_URL = "https://mainnet.fuel.network/v1/graphql";
+export const FUEL_PROVIDER_URL = "https://devnet.fuel.network/v1/graphql";
 
 export const TESTNET_FAUCET_URL = "https://faucet-testnet.fuel.network/";
 
@@ -16,7 +16,7 @@ export const CONTRACT_ID =
   // VERCEL_ENV === 'development'
   // ? contractIds.contract
   // :
-  "0xe774c453cc4a4e9c346441984a5db6ed6292ae1f14cae6530eb4b4e89ced4414";
+  "0x3606e90277888001e7f2fb0c8bb0654c0903911ff5950c5c4823da1eb76884ae";
 
 export const FARM_COIN_ASSET_ID =
   // VERCEL_ENV === 'development'
@@ -97,9 +97,10 @@ export enum FoodTypeInput {
 }
 
 export function useGaslessWalletSupported() {
-  const { currentConnector } = useCurrentConnector();
-  return (
-    currentConnector?.name === "Fuelet Wallet" ||
-    currentConnector?.name === "Burner Wallet"
-  );
+  // const { currentConnector } = useCurrentConnector();
+  return false;
+  // return (
+  //   currentConnector?.name === "Fuelet Wallet" ||
+  //   currentConnector?.name === "Burner Wallet"
+  // );
 }
