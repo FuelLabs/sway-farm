@@ -91,7 +91,7 @@ export default function HarvestModal({
           Seed harvested!
         </div>
       ));
-      await tx.waitForResult();
+      // await tx.waitForPreConfirmation();
     }
     return tx;
   }

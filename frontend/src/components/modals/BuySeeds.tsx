@@ -87,8 +87,8 @@ export default function BuySeeds({
         </div>
       ));
       onBuySuccess();
-      updatePageNum();
-      await tx.waitForResult();
+      // updatePageNum();
+      // await tx.waitForPreConfirmation();
     }
     return tx;
   }

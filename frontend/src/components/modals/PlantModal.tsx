@@ -85,8 +85,7 @@ export default function PlantModal({
           Seed Planted!
         </div>
       ));
-      await tx.waitForResult();
-
+      // await tx.waitForPreConfirmation();
       if (tx.transactionId.startsWith("fuel01")) {
         updatePageNum();
       }
