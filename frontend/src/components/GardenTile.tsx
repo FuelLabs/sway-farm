@@ -46,8 +46,8 @@ export default function GardenTile({
   plantTexture4.magFilter = NearestFilter;
   finalTexture.magFilter = NearestFilter;
 
-  useEffect(() => {
-    setStatus("loading");
+  const updateTileState = () => {
+    console.log("state", state);
     if (state === undefined) setTileState(undefined);
     if (state !== undefined && state.time_planted) {
       const now = Date.now();
@@ -62,7 +62,21 @@ export default function GardenTile({
       }
     }
     setStatus("loaded");
+  };
+
+  useEffect(() => {
+    setStatus("loading");
+    updateTileState();
   }, [state, updateNum]);
+
+  // Add interval to update every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updateTileState();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [state]); // Only re-run if state changes
 
   return (
     <>

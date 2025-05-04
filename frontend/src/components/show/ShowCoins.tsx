@@ -27,7 +27,7 @@ export default function ShowCoins({
       setBalance(balanceBN);
     }
     getBalance();
-  }, [wallet, updateNum, contract]);
+  }, [wallet, updateNum]);
 
   if (balance) {
     return <Box css={styles}>In-app Coins: {balance.format()}</Box>;

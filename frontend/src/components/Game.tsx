@@ -61,13 +61,23 @@ export default function Game({
   const [seeds, setSeeds] = useState<number>(0);
   const [items, setItems] = useState<number>(0);
   const [canMove, setCanMove] = useState<boolean>(true);
+  const [firstTime, setFirstTime] = useState<boolean>(true);
   const [playerPosition, setPlayerPosition] = useState<Position>("left-top");
   const [mobileControlState, setMobileControlState] =
     useState<MobileControls>("none");
+  // const contract = useMemo(() => {
+  //   if (wallet) {
+  //     // const provider = new Provider(FUEL_PROVIDER_URL);
+  //     // const contract = new FarmContract(CONTRACT_ID, wallet.connect(provider));
+  //     const contract = new FarmContract(CONTRACT_ID, wallet);
+  //     return contract;
+  //   }
+  //   return null;
+  // }, [wallet]);
 
   useEffect(() => {
     async function getPlayerInfo() {
-      if (contract && contract.account) {
+      if (contract && contract.account && firstTime) {
         try {
           const address: AddressInput = {
             bits: contract.account.address.toB256(),
@@ -78,6 +88,7 @@ export default function Game({
           const { value: Some } = await contract.functions.get_player(id).get();
           if (Some?.farming_skill.gte(1)) {
             setPlayer(Some);
+            setFirstTime(false);
             const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
             // if there is a player found, get the rest of the player info
             const { value: results } = await contract
@@ -90,6 +101,8 @@ export default function Game({
             setSeeds(seedAmount);
             const itemAmount = new BN(results[1]).toNumber();
             setItems(itemAmount);
+            console.log("seedAmount", seedAmount);
+            console.log("itemAmount", itemAmount);
           }
         } catch (err) {
           console.log("Error in Game:", err);
@@ -102,12 +115,12 @@ export default function Game({
     getPlayerInfo();
 
     // fetches player info 30 seconds
-    const interval = setInterval(() => {
-      setUpdateNum(updateNum + 1);
-    }, 20000);
+    // const interval = setInterval(() => {
+    //   setUpdateNum(updateNum + 1);
+    // }, 20000);
 
-    return () => clearInterval(interval);
-  }, [contract, updateNum]);
+    // return () => clearInterval(interval);
+  }, [updateNum, contract, firstTime]);
 
   const updatePageNum = () => {
     setTimeout(() => {

@@ -1,18 +1,10 @@
 import { Button, Spinner, BoxCentered } from "@fuel-ui/react";
-import { type BytesLike, Address, bn, Provider } from "fuels";
+import { type BytesLike, bn } from "fuels";
 import type { Dispatch, SetStateAction } from "react";
 import { useState, useEffect } from "react";
-import { useWalletFunds } from "../../hooks/useWalletFunds";
-import { NoFundsMessage } from "./NoFundsMessage";
-import {
-  FUEL_PROVIDER_URL,
-  useGaslessWalletSupported,
-  GAS_STATION_CHANGE_OUTPUT_ADDRESS,
-} from "../../constants";
 import { buttonStyle, FoodTypeInput } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts/FarmContract";
 import { useWallet } from "@fuels/react";
-import { usePaymaster } from "../../hooks/usePaymaster";
 import { toast } from "react-hot-toast";
 import { useTransaction } from "../../hooks/useTransaction";
 
@@ -35,10 +27,6 @@ export default function BuySeeds({
     "error" | "none" | "loading" | "retrying"
   >("none");
   const { wallet } = useWallet();
-  const paymaster = usePaymaster();
-  const isGaslessSupported = useGaslessWalletSupported();
-  const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
-    useWalletFunds(contract);
   const { setOtherTransactionDone } = useTransaction();
 
   useEffect(() => {
@@ -49,7 +37,7 @@ export default function BuySeeds({
         if (status === "error") {
           setStatus("none");
           updatePageNum();
-        } else if (status === "none" && !showNoFunds) {
+        } else if (status === "none") {
           buySeeds();
         }
       }
@@ -59,92 +47,7 @@ export default function BuySeeds({
     return () => {
       window.removeEventListener("keydown", handleGlobalKeyDown);
     };
-  }, [status, showNoFunds]);
-
-  async function buyWithGasStation() {
-    if (!wallet) {
-      throw new Error("No wallet found");
-    }
-    const provider = new Provider(FUEL_PROVIDER_URL);
-
-    const { maxValuePerCoin } = await paymaster.metadata();
-    const { coin: gasCoin, jobId } = await paymaster.allocate();
-
-    const amount = 10;
-    const realAmount = amount / 1_000_000_000;
-    const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
-    const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
-    const price = 750_000 * amount;
-    if (!contract) return;
-    const addressIdentityInput = {
-      Address: {
-        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
-      },
-    };
-    console.log(price);
-    const scope = contract.functions
-      .buy_seeds(seedType, inputAmount, addressIdentityInput)
-      .callParams({
-        forward: [price, farmCoinAssetID],
-      });
-    const { coins } = await wallet.getCoins(farmCoinAssetID);
-
-    const request = await scope.getTransactionRequest();
-    request.addCoinInput(coins[0]);
-    request.addChangeOutput(wallet.address, farmCoinAssetID);
-
-    request.addCoinInput(gasCoin);
-    request.addCoinOutput(
-      gasCoin.owner,
-      gasCoin.amount.sub(maxValuePerCoin),
-      await provider.getBaseAssetId(),
-    );
-    console.log("change output", GAS_STATION_CHANGE_OUTPUT_ADDRESS);
-    request.addChangeOutput(gasCoin.owner, await provider.getBaseAssetId());
-    //change output of type 2 with assetID "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07" to GAS_STATION_CHANGE_OUTPUT_ADDRESS
-    // request.outputs = request.outputs.map((output) => {
-    //   if (output.type === 2 && output.assetId === "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07") {
-    //     return { ...output, to: GAS_STATION_CHANGE_OUTPUT_ADDRESS };
-    //   }
-    //   return output;
-    // });
-    console.log("request", request);
-    const txCost = await wallet.getTransactionCost(request, {
-      quantities: coins,
-    });
-    const { gasUsed, missingContractIds, outputVariables, maxFee } = txCost;
-    console.log("Max fee", Number(maxFee), "gas used", Number(gasUsed));
-    missingContractIds.forEach((contractId) => {
-      request.addContractInputAndOutput(Address.fromString(contractId));
-    });
-
-    request.addVariableOutputs(outputVariables);
-    request.gasLimit = gasUsed;
-    request.maxFee = maxFee;
-    const { signature } = await paymaster.fetchSignature(request, jobId);
-    request.updateWitnessByOwner(gasCoin.owner, signature);
-
-    const tx = await wallet.sendTransaction(request, {
-      estimateTxDependencies: false,
-    });
-    console.log("tx", tx);
-    if (tx) {
-      setOtherTransactionDone(true);
-      toast.success(() => (
-        <div
-          onClick={() =>
-            window.open(`https://app.fuel.network/tx/${tx.id}/simple`, "_blank")
-          }
-          style={{ cursor: "pointer", textDecoration: "underline" }}
-        >
-          Successfully bought seeds!
-        </div>
-      ));
-      onBuySuccess();
-      await paymaster.postJobComplete(jobId);
-      updatePageNum();
-    }
-  }
+  }, [status]);
 
   async function buyWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
@@ -157,7 +60,7 @@ export default function BuySeeds({
 
     const addressIdentityInput = {
       Address: {
-        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+        bits: wallet.address.toB256(),
       },
     };
 
@@ -183,9 +86,9 @@ export default function BuySeeds({
           Successfully bought seeds!
         </div>
       ));
-      await tx.waitForResult();
       onBuySuccess();
       updatePageNum();
+      await tx.waitForResult();
     }
     return tx;
   }
@@ -198,38 +101,7 @@ export default function BuySeeds({
       try {
         setStatus("loading");
         setCanMove(false);
-        const canUseGasless = await paymaster.shouldUseGasless();
-        // if (!canUseGasless) {
-        //   toast.error(
-        //     "Hourly gasless transaction limit reached. Trying regular transaction...",
-        //     { duration: 5000 },
-        //   );
-        // }
-        if (isGaslessSupported && canUseGasless) {
-          try {
-            await buyWithGasStation();
-          } catch (error) {
-            console.log(
-              "Gas station failed, trying direct transaction...",
-              error,
-            );
-            toast.error("Gas Station error, please sign from wallet.");
-            setStatus("retrying");
-            if (!hasFunds) {
-              showNoFundsMessage();
-            } else {
-              await buyWithoutGasStation();
-            }
-          }
-        } else {
-          if (!hasFunds) {
-            showNoFundsMessage();
-          } else {
-            console.log("Using direct transaction method...");
-            await buyWithoutGasStation();
-          }
-        }
-
+        await buyWithoutGasStation();
         setStatus("none");
       } catch (err) {
         console.log("Error in BuySeeds:", err);
@@ -274,7 +146,7 @@ export default function BuySeeds({
           </Button>
         </div>
       )}
-      {status === "none" && !showNoFunds && (
+      {status === "none" && (
         <>
           <div className="market-header">Buy Seeds</div>
           <Button
@@ -288,9 +160,6 @@ export default function BuySeeds({
             Buy 10 seeds
           </Button>
         </>
-      )}
-      {status === "none" && !hasFunds && showNoFunds && (
-        <NoFundsMessage onRecheck={getBalance} />
       )}
     </>
   );

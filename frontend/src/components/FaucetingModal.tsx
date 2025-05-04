@@ -9,14 +9,14 @@ export default function FaucetingModal({ isOpen }: FaucetingModalProps) {
   if (!isOpen) return null;
 
   return (
-    <BoxCentered
-      css={styles.overlay}
-    >
+    <BoxCentered css={styles.overlay}>
       <Box css={styles.modal}>
         <Heading css={styles.heading}>Fauceting Funds</Heading>
         <Box css={styles.content}>
           <Spinner size={24} color="#4a2f1d" />
-          <Box css={styles.text}>Please wait while we add some funds to your wallet...</Box>
+          <Box css={styles.text}>
+            Please wait while we add some funds to your wallet...
+          </Box>
         </Box>
       </Box>
     </BoxCentered>
@@ -79,4 +79,4 @@ const styles = {
     lineHeight: "1.5",
     padding: "0 1rem",
   }),
-}; 
+};

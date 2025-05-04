@@ -155,8 +155,6 @@ export default function Player({
 
           isTransactionInProgress.current = true;
           try {
-            console.log("hello");
-
             if (
               !lastResolvedOutputs.current ||
               lastResolvedOutputs.current.length === 0 ||
@@ -510,7 +508,7 @@ export default function Player({
       // Clamp the position within bounds
       ref.current.position.x = Math.max(
         bounds.left,
-        Math.min(bounds.right, newX)
+        Math.min(bounds.right, newX),
       );
     }
 
@@ -520,7 +518,7 @@ export default function Player({
       // Clamp the position within bounds
       ref.current.position.y = Math.max(
         bounds.bottom,
-        Math.min(bounds.top, newY)
+        Math.min(bounds.top, newY),
       );
     }
   }

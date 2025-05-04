@@ -30,24 +30,20 @@ function App() {
 
   const { isConnected } = useIsConnected();
   const { wallet } = useWallet();
-const { toasts } = useToasterStore();
+  const { toasts } = useToasterStore();
 
-const TOAST_LIMIT = 3;
+  const TOAST_LIMIT = 3;
 
-useEffect(() => {
-  toasts
-    .filter((t) => t.visible) // Only consider visible toasts
-    .filter((_, i) => i >= TOAST_LIMIT) // Is toast index over limit?
-    .forEach((t) => toast.dismiss(t.id)); // Dismiss – Use toast.remove(t.id) for no exit animation
-}, [toasts]);
+  useEffect(() => {
+    toasts
+      .filter((t) => t.visible) // Only consider visible toasts
+      .filter((_, i) => i >= TOAST_LIMIT) // Is toast index over limit?
+      .forEach((t) => toast.dismiss(t.id)); // Dismiss – Use toast.remove(t.id) for no exit animation
+  }, [toasts]);
   const { balance } = useBalance({
     address: wallet?.address.toB256(),
     assetId: BASE_ASSET_ID,
   });
-
-  useEffect(() => {
-    console.log('Current balance:', balance?.toString());
-  }, [balance]);
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -92,37 +88,30 @@ useEffect(() => {
       }
     }
   }, [wallet]);
+
   useEffect(() => {
-    const checkBalanceAndSetInterval = async () => {
-      if (!wallet) return;
+    if (!wallet) return;
+
+    let timeoutId: number;
+
+    const checkBalanceAndTransfer = async () => {
       const ETHBalance = await wallet.getBalance(BASE_ASSET_ID);
       if (ETHBalance.lt(2900000)) {
-        transferBaseETH();
-        return 2000; // 2 seconds if balance is low
+        await transferBaseETH();
+        // If balance is low, check again in 2 seconds
+        timeoutId = window.setTimeout(checkBalanceAndTransfer, 2000);
+      } else {
+        // If balance is sufficient, wait 30 seconds before next check
+        timeoutId = window.setTimeout(checkBalanceAndTransfer, 30000);
       }
-      return 30000; // 30 seconds if balance is sufficient
     };
 
-    let intervalId: number;
-    
-    const setupInterval = async () => {
-      const interval = await checkBalanceAndSetInterval();
-      intervalId = window.setInterval(async () => {
-        const newInterval = await checkBalanceAndSetInterval();
-        if (newInterval !== interval) {
-          clearInterval(intervalId);
-          intervalId = window.setInterval(transferBaseETH, newInterval);
-        } else {
-          transferBaseETH();
-        }
-      }, interval);
-    };
-
-    setupInterval();
+    // Initial check
+    checkBalanceAndTransfer();
 
     return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
     };
   }, [transferBaseETH, wallet]);

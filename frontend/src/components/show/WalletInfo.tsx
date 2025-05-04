@@ -22,7 +22,7 @@ export default function WalletInfo() {
     // Set up polling interval
     const interval = setInterval(() => {
       refetch();
-    }, 5000);
+    }, 20000);
 
     // Cleanup on unmount
     return () => clearInterval(interval);
