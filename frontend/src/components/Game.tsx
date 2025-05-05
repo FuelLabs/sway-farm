@@ -277,6 +277,7 @@ export default function Game({
                   contract={contract}
                   updatePageNum={updatePageNum}
                   items={items}
+                  setItems={setItems}
                   setCanMove={setCanMove}
                   farmCoinAssetID={farmCoinAssetID}
                   onBuySuccess={handleBuySuccess}

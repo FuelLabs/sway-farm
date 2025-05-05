@@ -31,7 +31,7 @@ export default function BuySeeds({
     "error" | "none" | "loading" | "retrying"
   >("none");
   const { wallet } = useWallet();
-  const { setOtherTransactionDone } = useTransaction();
+  const { otherTransactionDone, setOtherTransactionDone } = useTransaction();
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -68,7 +68,7 @@ export default function BuySeeds({
       },
     };
 
-    if (!lastETHResolvedOutput.current || lastETHResolvedOutput.current.length === 0 || !setOtherTransactionDone) {
+    if (!lastETHResolvedOutput.current || lastETHResolvedOutput.current.length === 0 || otherTransactionDone) {
       // First transaction or if other transaction is done
       const request = await contract.functions
         .buy_seeds(seedType, inputAmount, addressIdentityInput)

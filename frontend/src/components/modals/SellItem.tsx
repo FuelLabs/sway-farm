@@ -18,6 +18,7 @@ interface SellItemProps {
   contract: FarmContract | null;
   updatePageNum: () => void;
   items: number;
+  setItems: Dispatch<SetStateAction<number>>;
   setCanMove: Dispatch<SetStateAction<boolean>>;
   lastETHResolvedOutput: React.MutableRefObject<ResolvedOutput[] | null>;
   isTransactionInProgress: React.MutableRefObject<boolean>;
@@ -27,6 +28,7 @@ export default function SellItem({
   contract,
   updatePageNum,
   items,
+  setItems,
   setCanMove,
   lastETHResolvedOutput,
   isTransactionInProgress,
@@ -62,6 +64,8 @@ export default function SellItem({
 
     const realAmount = items / 1_000_000_000;
     const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
+    console.log("inputAmount", inputAmount, realAmount);
+
     const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
     const addressIdentityInput = {
       Address: {
@@ -99,7 +103,7 @@ export default function SellItem({
         }
       }
 
-      updatePageNum();
+      setItems(0);
       toast.success(() => (
         <div
           onClick={() =>
@@ -153,12 +157,13 @@ export default function SellItem({
             (output.output as any).assetId ===
             "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
         );
+        console.log("ethOutput", ethOutput);
         if (ethOutput) {
           lastETHResolvedOutput.current = [ethOutput];
         }
       }
 
-      updatePageNum();
+      setItems(0);
       toast.success(() => (
         <div
           onClick={() =>

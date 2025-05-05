@@ -10,6 +10,7 @@ interface MarketModalProps {
   contract: FarmContract | null;
   updatePageNum: () => void;
   items: number;
+  setItems: Dispatch<SetStateAction<number>>;
   setCanMove: Dispatch<SetStateAction<boolean>>;
   farmCoinAssetID: BytesLike;
   onBuySuccess: () => void;
@@ -21,6 +22,7 @@ export default function MarketModal({
   contract,
   updatePageNum,
   items,
+  setItems,
   setCanMove,
   farmCoinAssetID,
   onBuySuccess,
@@ -44,6 +46,7 @@ export default function MarketModal({
           updatePageNum={updatePageNum}
           items={items}
           setCanMove={setCanMove}
+          setItems={setItems}
           lastETHResolvedOutput={lastETHResolvedOutput}
           isTransactionInProgress={isTransactionInProgress}
         />

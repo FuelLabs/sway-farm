@@ -100,6 +100,11 @@ export default function Player({
   const lastSavedPosition = useRef<Vector3 | null>(null);
   const { wallet } = useWallet();
   const lastResolvedOutputs = useRef<ResolvedOutput[] | null>(null);
+  const [initialPosition, setInitialPosition] = useState({
+    x: -3,
+    y: 1.7,
+    z: 2,
+  });
 
   const tilesHoriz = 4;
   const tilesVert = 5;
@@ -141,7 +146,7 @@ export default function Player({
             x: currentPos.x,
             y: currentPos.y,
             z: currentPos.z,
-          }),
+          })
         );
         lastSavedPosition.current = currentPos.clone();
 
@@ -213,6 +218,9 @@ export default function Player({
                   },
                   error: (err) => {
                     console.error("Error saving position:", err);
+                    if (err.message.includes("already spent")) {
+                      setOtherTransactionDone(true);
+                    }
                     return (
                       <div>
                         Failed to save position for transaction{" "}
@@ -230,13 +238,13 @@ export default function Player({
                       </div>
                     );
                   },
-                },
+                }
               );
             } else {
               // Subsequent transactions
               console.log(
                 "subsequent transaction",
-                lastETHResolvedOutput.current,
+                lastETHResolvedOutput.current
               );
               const [{ utxoId, output }] = lastETHResolvedOutput.current;
               const change = output as unknown as {
@@ -299,6 +307,9 @@ export default function Player({
                   },
                   error: (err) => {
                     console.error("Error saving position:", err);
+                    if (err.message.includes("already spent")) {
+                      setOtherTransactionDone(true);
+                    }
                     return (
                       <div>
                         Failed to save position for transaction{" "}
@@ -316,7 +327,7 @@ export default function Player({
                       </div>
                     );
                   },
-                },
+                }
               );
             }
           } finally {
@@ -370,6 +381,13 @@ export default function Player({
     loadPosition();
   }, []);
 
+  useEffect(() => {
+    const savedPosition = localStorage.getItem("playerPosition");
+    if (savedPosition) {
+      setInitialPosition(JSON.parse(savedPosition));
+    }
+  }, []);
+
   function updateCameraPosition() {
     const position = ref.current?.position;
     if (!position) return;
@@ -384,7 +402,7 @@ export default function Player({
 
   function updatePlayerPosition(
     side: "left" | "center" | "right",
-    position: Vector3,
+    position: Vector3
   ) {
     if (
       position.y < playerBounds.bottom &&
@@ -470,7 +488,7 @@ export default function Player({
     dl: number,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     state: any,
-    mobileControlState: MobileControls,
+    mobileControlState: MobileControls
   ) {
     if (!ref.current) return;
 
@@ -513,7 +531,7 @@ export default function Player({
       // Clamp the position within bounds
       ref.current.position.x = Math.max(
         bounds.left,
-        Math.min(bounds.right, newX),
+        Math.min(bounds.right, newX)
       );
     }
 
@@ -523,17 +541,12 @@ export default function Player({
       // Clamp the position within bounds
       ref.current.position.y = Math.max(
         bounds.bottom,
-        Math.min(bounds.top, newY),
+        Math.min(bounds.top, newY)
       );
     }
   }
 
   if (spriteMap) {
-    const savedPosition = localStorage.getItem("playerPosition");
-    const initialPosition = savedPosition
-      ? JSON.parse(savedPosition)
-      : { x: -3, y: 1.7, z: 2 };
-
     return (
       <sprite
         ref={ref}
