@@ -4,8 +4,8 @@ import type { KeyboardControlsEntry } from "@react-three/drei";
 import { KeyboardControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { BN } from "fuels";
-import type { BytesLike } from "fuels";
-import { useState, useEffect, useMemo, Suspense } from "react";
+import type { BytesLike, ResolvedOutput } from "fuels";
+import { useState, useEffect, useMemo, Suspense, useRef } from "react";
 import type { FoodOutput } from "../sway-api/contracts/FarmContract";
 
 import type { Modals } from "../constants";
@@ -65,6 +65,10 @@ export default function Game({
   const [playerPosition, setPlayerPosition] = useState<Position>("left-top");
   const [mobileControlState, setMobileControlState] =
     useState<MobileControls>("none");
+  const lastETHResolvedOutput = useRef<ResolvedOutput[] | null>(null);
+  const lastFARMResolvedOutput = useRef<ResolvedOutput[] | null>(null);
+  const isTransactionInProgress = useRef<boolean>(false);
+
   // const contract = useMemo(() => {
   //   if (wallet) {
   //     // const provider = new Provider(FUEL_PROVIDER_URL);
@@ -101,8 +105,6 @@ export default function Game({
             setSeeds(seedAmount);
             const itemAmount = new BN(results[1]).toNumber();
             setItems(itemAmount);
-            console.log("seedAmount", seedAmount);
-            console.log("itemAmount", itemAmount);
           }
         } catch (err) {
           console.log("Error in Game:", err);
@@ -215,7 +217,10 @@ export default function Game({
                     setPlayerPosition={setPlayerPosition}
                     playerPosition={playerPosition}
                     canMove={canMove}
+                    lastETHResolvedOutput={lastETHResolvedOutput}
+                    lastFARMResolvedOutput={lastFARMResolvedOutput}
                     mobileControlState={mobileControlState}
+                    isTransactionInProgress={isTransactionInProgress}
                   />
                 </KeyboardControls>
               )}
@@ -250,6 +255,8 @@ export default function Game({
                   setCanMove={setCanMove}
                   setModal={setModal}
                   onPlantSuccess={handlePlantSuccess}
+                  lastETHResolvedOutput={lastETHResolvedOutput}
+                  isTransactionInProgress={isTransactionInProgress}
                 />
               )}
               {modal === "harvest" && (
@@ -260,6 +267,8 @@ export default function Game({
                   setCanMove={setCanMove}
                   setModal={setModal}
                   onHarvestSuccess={onHarvestSuccess}
+                  lastETHResolvedOutput={lastETHResolvedOutput}
+                  isTransactionInProgress={isTransactionInProgress}
                 />
               )}
 
@@ -271,6 +280,8 @@ export default function Game({
                   setCanMove={setCanMove}
                   farmCoinAssetID={farmCoinAssetID}
                   onBuySuccess={handleBuySuccess}
+                  lastETHResolvedOutput={lastETHResolvedOutput}
+                  isTransactionInProgress={isTransactionInProgress}
                 />
               )}
             </>

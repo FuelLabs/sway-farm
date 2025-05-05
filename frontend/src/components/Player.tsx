@@ -29,7 +29,10 @@ interface PlayerProps {
   setPlayerPosition: Dispatch<SetStateAction<Position>>;
   playerPosition: Position;
   canMove: boolean;
+  lastETHResolvedOutput: React.MutableRefObject<ResolvedOutput[] | null>;
+  lastFARMResolvedOutput: React.MutableRefObject<ResolvedOutput[] | null>;
   mobileControlState: MobileControls;
+  isTransactionInProgress: React.MutableRefObject<boolean>;
 }
 
 const bounds = {
@@ -84,7 +87,10 @@ export default function Player({
   setPlayerPosition,
   playerPosition,
   canMove,
+  lastETHResolvedOutput,
+  lastFARMResolvedOutput,
   mobileControlState,
+  isTransactionInProgress,
 }: PlayerProps) {
   const [currentTile, setCurrentTile] = useState<number>(0);
   const [spriteMap, setSpriteMap] = useState<Texture>();
@@ -93,7 +99,6 @@ export default function Player({
   const { otherTransactionDone, setOtherTransactionDone } = useTransaction();
   const lastSavedPosition = useRef<Vector3 | null>(null);
   const { wallet } = useWallet();
-  const isTransactionInProgress = useRef<boolean>(false);
   const lastResolvedOutputs = useRef<ResolvedOutput[] | null>(null);
 
   const tilesHoriz = 4;
@@ -156,8 +161,8 @@ export default function Player({
           isTransactionInProgress.current = true;
           try {
             if (
-              !lastResolvedOutputs.current ||
-              lastResolvedOutputs.current.length === 0 ||
+              !lastETHResolvedOutput.current ||
+              lastETHResolvedOutput.current.length === 0 ||
               otherTransactionDone
             ) {
               // First transaction or if other transaction is done
@@ -165,12 +170,12 @@ export default function Player({
               const request = await contract.functions
                 .set_player_position(encodedX, encodedY, id)
                 .txParams({
-                  maxFee: 50_000,
-                  gasLimit: 50_000,
+                  maxFee: 100_000,
+                  gasLimit: 100_000,
                 })
                 .fundWithRequiredCoins();
               const txId = request.getTransactionId(0);
-              const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
+              const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
 
               await toast.promise(
                 (async () => {
@@ -179,7 +184,7 @@ export default function Player({
                   setOtherTransactionDone(false);
                   const preConfirmation = await tx.waitForPreConfirmation();
                   if (preConfirmation.resolvedOutputs) {
-                    lastResolvedOutputs.current =
+                    lastETHResolvedOutput.current =
                       preConfirmation.resolvedOutputs;
                   }
                   return preConfirmation;
@@ -231,9 +236,9 @@ export default function Player({
               // Subsequent transactions
               console.log(
                 "subsequent transaction",
-                lastResolvedOutputs.current,
+                lastETHResolvedOutput.current,
               );
-              const [{ utxoId, output }] = lastResolvedOutputs.current;
+              const [{ utxoId, output }] = lastETHResolvedOutput.current;
               const change = output as unknown as {
                 assetId: string;
                 amount: string;
@@ -250,14 +255,14 @@ export default function Player({
               const request = await contract.functions
                 .set_player_position(encodedX, encodedY, id)
                 .txParams({
-                  maxFee: 50_000,
-                  gasLimit: 50_000,
+                  maxFee: 100_000,
+                  gasLimit: 100_000,
                 })
                 .getTransactionRequest();
 
               request.addResource(resource);
               const txId = request.getTransactionId(0);
-              const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
+              const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
 
               await toast.promise(
                 (async () => {
@@ -265,7 +270,7 @@ export default function Player({
                   if (!tx) throw new Error("Failed to send transaction");
                   const preConfirmation = await tx.waitForPreConfirmation();
                   if (preConfirmation.resolvedOutputs) {
-                    lastResolvedOutputs.current =
+                    lastETHResolvedOutput.current =
                       preConfirmation.resolvedOutputs;
                   }
                   return preConfirmation;

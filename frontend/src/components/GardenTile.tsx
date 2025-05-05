@@ -47,7 +47,6 @@ export default function GardenTile({
   finalTexture.magFilter = NearestFilter;
 
   const updateTileState = () => {
-    console.log("state", state);
     if (state === undefined) setTileState(undefined);
     if (state !== undefined && state.time_planted) {
       const now = Date.now();

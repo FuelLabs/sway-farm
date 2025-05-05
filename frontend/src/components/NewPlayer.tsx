@@ -116,7 +116,7 @@ export default function NewPlayer({
         <div
           onClick={() =>
             window.open(
-              `https://app.fuel.network/tx/${tx.transactionId}/simple`,
+              `https://app-testnet.fuel.network/tx/${tx.transactionId}/simple`,
               "_blank",
             )
           }
@@ -184,7 +184,7 @@ export default function NewPlayer({
       toast.success(() => (
         <div
           onClick={() =>
-            window.open(`https://app.fuel.network/tx/${tx.id}/simple`, "_blank")
+            window.open(`https://app-testnet.fuel.network/tx/${tx.id}/simple`, "_blank")
           }
           style={{ cursor: "pointer", textDecoration: "underline" }}
         >
@@ -270,7 +270,7 @@ export default function NewPlayer({
           You need some ETH to play:
           <Link
             isExternal
-            href={`https://app.fuel.network/bridge`}
+            href={`https://app-testnet.fuel.network/bridge`}
             role="link"
             tabIndex={0}
           >

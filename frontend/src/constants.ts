@@ -5,7 +5,7 @@ import { Vector3 } from "three";
 
 // import contractIds from './sway-api/contract-ids.json';
 
-export const FUEL_PROVIDER_URL = "https://devnet.fuel.network/v1/graphql";
+export const FUEL_PROVIDER_URL = "https://testnet.fuel.network/v1/graphql";
 
 export const TESTNET_FAUCET_URL = "https://faucet-testnet.fuel.network/";
 
@@ -16,12 +16,12 @@ export const CONTRACT_ID =
   // VERCEL_ENV === 'development'
   // ? contractIds.contract
   // :
-  "0x3606e90277888001e7f2fb0c8bb0654c0903911ff5950c5c4823da1eb76884ae";
+  "0x8147f5468cc30d5ad464725e87d92ee26692d322fa57219704187ee39480dc20";
 
 export const FARM_COIN_ASSET_ID =
   // VERCEL_ENV === 'development'
   // ? null :
-  "0x64019f1305cfb7e76440a335cb082aaf173c9cfb9a710e38fedce1c1ea023b61";
+  "0x4a70656bfb6bb269bccf969755c5f9aba766bc3bcc7fac0e2769f8873ed4a233";
 
 export const GAS_STATION_CHANGE_OUTPUT_ADDRESS =
   "0xF9B62E7eA61219e4b82561abce1AbF4b1D581539B1505C02A7Fe92D6B4C61d1B";
@@ -30,7 +30,7 @@ export const FARM_COIN_NETWORK_ASSET = {
   /** type of network */
   type: "fuel",
   /** chain id of the network */
-  chainId: 1,
+  chainId: 0,
   /** number of decimals of the asset */
   decimals: 9,
   /** assetId on the Fuel Network */

@@ -34,7 +34,7 @@ export default function WalletInfo() {
           {`${isMobile ? "W:" : "Wallet:"}`}{" "}
           {wallet && (
             <a
-              href={`https://app.fuel.network/account/${wallet.address.toB256()}/transactions`}
+              href={`https://app-testnet.fuel.network/account/${wallet.address.toB256()}/transactions`}
               target="_blank"
               rel="noopener noreferrer"
               style={{

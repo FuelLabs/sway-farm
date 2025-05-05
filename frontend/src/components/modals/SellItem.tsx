@@ -1,21 +1,16 @@
 import { Button } from "@fuel-ui/react";
-import { Address, InputType, Provider, bn } from "fuels";
+import { bn, ResolvedOutput } from "fuels";
 import type { Dispatch, SetStateAction } from "react";
 import { useState, useEffect } from "react";
-import { useWalletFunds } from "../../hooks/useWalletFunds";
-import { NoFundsMessage } from "./NoFundsMessage";
 
 import {
   buttonStyle,
   FoodTypeInput,
-  FUEL_PROVIDER_URL,
-  useGaslessWalletSupported,
   // GAS_STATION_CHANGE_OUTPUT_ADDRESS,
 } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts";
 import Loading from "../Loading";
 import { useWallet } from "@fuels/react";
-import { usePaymaster } from "../../hooks/usePaymaster";
 import { toast } from "react-hot-toast";
 import { useTransaction } from "../../hooks/useTransaction";
 
@@ -24,6 +19,8 @@ interface SellItemProps {
   updatePageNum: () => void;
   items: number;
   setCanMove: Dispatch<SetStateAction<boolean>>;
+  lastETHResolvedOutput: React.MutableRefObject<ResolvedOutput[] | null>;
+  isTransactionInProgress: React.MutableRefObject<boolean>;
 }
 
 export default function SellItem({
@@ -31,16 +28,14 @@ export default function SellItem({
   updatePageNum,
   items,
   setCanMove,
+  lastETHResolvedOutput,
+  isTransactionInProgress,
 }: SellItemProps) {
   const [status, setStatus] = useState<
     "error" | "none" | "loading" | "retrying"
   >("none");
   const { wallet } = useWallet();
-  const paymaster = usePaymaster();
-  const isGaslessSupported = useGaslessWalletSupported();
-  const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
-    useWalletFunds(contract);
-  const { setOtherTransactionDone } = useTransaction();
+  const { otherTransactionDone, setOtherTransactionDone } = useTransaction();
 
   useEffect(() => {
     const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
@@ -50,7 +45,7 @@ export default function SellItem({
         if (status === "error") {
           setStatus("none");
           updatePageNum();
-        } else if (status === "none" && !showNoFunds) {
+        } else if (status === "none") {
           sellItems();
         }
       }
@@ -60,7 +55,7 @@ export default function SellItem({
     return () => {
       window.removeEventListener("keydown", handleGlobalKeyDown);
     };
-  }, [status, showNoFunds]);
+  }, [status]);
 
   async function sellWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
@@ -70,101 +65,111 @@ export default function SellItem({
     const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
     const addressIdentityInput = {
       Address: {
-        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+        bits: wallet.address.toB256(),
       },
     };
 
-    const tx = await contract.functions
-      .sell_item(seedType, inputAmount, addressIdentityInput)
-      .call();
+    if (!lastETHResolvedOutput.current || lastETHResolvedOutput.current.length === 0 || !otherTransactionDone) {
+      // First transaction or if other transaction is done
+      const request = await contract.functions
+        .sell_item(seedType, inputAmount, addressIdentityInput)
+        .txParams({
+          maxFee: 500_000,
+          gasLimit: 500_000,
+        })
+        .fundWithRequiredCoins();
+      
+      const txId = request.getTransactionId(0);
+      const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
 
-    if (tx) {
-      setOtherTransactionDone(true);
+      const tx = await wallet.sendTransaction(request);
+      if (!tx) throw new Error("Failed to send transaction");
+      setOtherTransactionDone(false);
+      const preConfirmation = await tx.waitForPreConfirmation();
+      if (preConfirmation.resolvedOutputs) {
+        // Filter to only get the output with ETH assetId
+        const ethOutput = preConfirmation.resolvedOutputs.find(
+          (output) =>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (output.output as any).assetId ===
+            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
+        );
+        if (ethOutput) {
+          lastETHResolvedOutput.current = [ethOutput];
+        }
+      }
+
       updatePageNum();
       toast.success(() => (
         <div
           onClick={() =>
-            window.open(
-              `https://app.fuel.network/tx/${tx.transactionId}/simple`,
-              "_blank",
-            )
+            window.open(txUrl, "_blank")
           }
           style={{ cursor: "pointer", textDecoration: "underline" }}
         >
           Successfully sold the item!
         </div>
       ));
-    }
-    return tx;
-  }
+      return tx;
+    } else {
+      // Subsequent transaction
+      console.log("subsequent transaction");
+      const [{ utxoId, output }] = lastETHResolvedOutput.current;
+      const change = output as unknown as {
+        assetId: string;
+        amount: string;
+      };
+      const resource = {
+        id: utxoId,
+        assetId: change.assetId,
+        amount: bn(change.amount),
+        owner: wallet?.address,
+        blockCreated: bn(0),
+        txCreatedIdx: bn(0),
+      };
 
-  async function sellWithGasStation() {
-    if (!wallet || !contract) throw new Error("Wallet or contract not found");
+      const request = await contract.functions
+        .sell_item(seedType, inputAmount, addressIdentityInput)
+        .txParams({
+          maxFee: 500_000,
+          gasLimit: 500_000,
+        })
+        .getTransactionRequest();
 
-    const provider = new Provider(FUEL_PROVIDER_URL);
-    const { maxValuePerCoin } = await paymaster.metadata();
-    const { coin: gasCoin, jobId } = await paymaster.allocate();
+      request.addResource(resource);
+      const txId = request.getTransactionId(0);
+      const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
 
-    const realAmount = items / 1_000_000_000;
-    const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
-    const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
-    const addressIdentityInput = {
-      Address: {
-        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
-      },
-    };
+      const tx = await wallet.sendTransaction(request);
+      if (!tx) throw new Error("Failed to send transaction");
+      const preConfirmation = await tx.waitForPreConfirmation();
+      console.log("preConfirmation", preConfirmation);
+      console.log("tx", tx);
+      if (preConfirmation.resolvedOutputs) {
+        // Filter to only get the output with ETH assetId
+        const ethOutput = preConfirmation.resolvedOutputs.find(
+          (output) =>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (output.output as any).assetId ===
+            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
+        );
+        if (ethOutput) {
+          lastETHResolvedOutput.current = [ethOutput];
+        }
+      }
 
-    const scope = contract.functions.sell_item(
-      seedType,
-      inputAmount,
-      addressIdentityInput,
-    );
-    const request = await scope.getTransactionRequest();
-    const txCost = await wallet.getTransactionCost(request);
-    const { gasUsed, missingContractIds, outputVariables, maxFee } = txCost;
-
-    // Clean coin inputs before add new coins to the request
-    request.inputs = request.inputs.filter((i) => i.type !== InputType.Coin);
-
-    // Adding missing contract ids
-    missingContractIds.forEach((contractId) => {
-      request.addContractInputAndOutput(Address.fromString(contractId));
-    });
-
-    // Adding required number of OutputVariables
-    request.addVariableOutputs(outputVariables);
-    request.gasLimit = gasUsed;
-    request.maxFee = maxFee;
-    const providerChain = await provider.getChain();
-    request.addCoinInput(gasCoin);
-    request.addCoinOutput(
-      gasCoin.owner,
-      gasCoin.amount.sub(maxValuePerCoin),
-      providerChain.consensusParameters.baseAssetId,
-    );
-    request.addChangeOutput(
-      gasCoin.owner,
-      providerChain.consensusParameters.baseAssetId,
-    );
-
-    const { signature } = await paymaster.fetchSignature(request, jobId);
-    request.updateWitnessByOwner(gasCoin.owner, signature);
-
-    const tx = await wallet.sendTransaction(request);
-    if (tx) {
-      setOtherTransactionDone(true);
       updatePageNum();
-      await paymaster.postJobComplete(jobId);
       toast.success(() => (
         <div
           onClick={() =>
-            window.open(`https://app.fuel.network/tx/${tx.id}/simple`, "_blank")
+            window.open(txUrl, "_blank")
           }
           style={{ cursor: "pointer", textDecoration: "underline" }}
         >
           Successfully sold the item!
         </div>
       ));
+      return tx;
     }
   }
 
@@ -176,38 +181,20 @@ export default function SellItem({
       try {
         setStatus("loading");
         setCanMove(false);
-        const canUseGasless = await paymaster.shouldUseGasless();
-        // if (!canUseGasless) {
-        //   toast.error(
-        //     "Hourly gasless transaction limit reached. Trying regular transaction...",
-        //     { duration: 5000 },
-        //   );
-        // }
-        if (isGaslessSupported && canUseGasless) {
-          try {
-            await sellWithGasStation();
-          } catch (error) {
-            console.log(
-              "Gas station failed, trying direct transaction...",
-              error,
-            );
-            toast.error("Gas Station error, please sign from wallet.");
-            setStatus("retrying");
-            if (!hasFunds) {
-              showNoFundsMessage();
-            } else {
-              await sellWithoutGasStation();
-            }
-          }
-        } else {
-          if (!hasFunds) {
-            showNoFundsMessage();
-          } else {
-            console.log("Using direct transaction method...");
-            await sellWithoutGasStation();
-          }
-        }
+        const waitForTransaction = () => {
+          return new Promise<void>((resolve) => {
+            const checkInterval = setInterval(() => {
+              if (!isTransactionInProgress.current) {
+                clearInterval(checkInterval);
+                resolve();
+              }
+            }, 100); // Check every 100ms
+          });
+        };
 
+        // Wait for any ongoing transaction to complete
+        await waitForTransaction();
+        await sellWithoutGasStation();
         setStatus("none");
       } catch (err) {
         console.log("Error in SellItem:", err);
@@ -245,7 +232,7 @@ export default function SellItem({
           </Button>
         </div>
       )}
-      {status === "none" && !showNoFunds && (
+      {status === "none" && (
         <Button
           css={buttonStyle}
           variant="outlined"
@@ -256,9 +243,6 @@ export default function SellItem({
         >
           Sell All Items
         </Button>
-      )}
-      {status === "none" && !hasFunds && showNoFunds && (
-        <NoFundsMessage onRecheck={getBalance} />
       )}
     </>
   );

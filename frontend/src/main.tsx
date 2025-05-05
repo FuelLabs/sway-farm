@@ -33,7 +33,7 @@ import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 const queryClient = new QueryClient();
 const networks = [
   {
-    chainId: CHAIN_IDS.fuel.devnet,
+    chainId: CHAIN_IDS.fuel.testnet,
     url: FUEL_PROVIDER_URL,
   },
 ];
