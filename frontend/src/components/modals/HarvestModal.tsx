@@ -80,7 +80,11 @@ export default function HarvestModal({
       },
     };
 
-    if (!lastETHResolvedOutput.current || lastETHResolvedOutput.current.length === 0 || otherTransactionDone) {
+    if (
+      !lastETHResolvedOutput.current ||
+      lastETHResolvedOutput.current.length === 0 ||
+      otherTransactionDone
+    ) {
       // First transaction or if other transaction is done
       const request = await contract.functions
         .harvest([tileIndex], addressIdentityInput)
@@ -89,7 +93,7 @@ export default function HarvestModal({
           gasLimit: 500_000,
         })
         .fundWithRequiredCoins();
-      
+
       const txId = request.getTransactionId(0);
       const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
 
@@ -105,9 +109,7 @@ export default function HarvestModal({
       setModal("plant");
       toast.success(() => (
         <div
-          onClick={() =>
-            window.open(txUrl, "_blank")
-          }
+          onClick={() => window.open(txUrl, "_blank")}
           style={{ cursor: "pointer", textDecoration: "underline" }}
         >
           Seed harvested!
@@ -159,9 +161,7 @@ export default function HarvestModal({
       setModal("plant");
       toast.success(() => (
         <div
-          onClick={() =>
-            window.open(txUrl, "_blank")
-          }
+          onClick={() => window.open(txUrl, "_blank")}
           style={{ cursor: "pointer", textDecoration: "underline" }}
         >
           Seed harvested!
@@ -197,7 +197,7 @@ export default function HarvestModal({
 
         // Wait for any ongoing transaction to complete
         await waitForTransaction();
-        
+
         // Now safe to proceed with harvesting
         await harvestWithoutGasStation(tileIndex);
         setStatus("none");

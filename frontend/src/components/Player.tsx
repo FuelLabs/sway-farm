@@ -146,7 +146,7 @@ export default function Player({
             x: currentPos.x,
             y: currentPos.y,
             z: currentPos.z,
-          })
+          }),
         );
         lastSavedPosition.current = currentPos.clone();
 
@@ -238,7 +238,7 @@ export default function Player({
                       </div>
                     );
                   },
-                }
+                },
               );
             } else {
               // Subsequent transactions
@@ -327,7 +327,7 @@ export default function Player({
                       </div>
                     );
                   },
-                }
+                },
               );
             }
           } finally {
@@ -402,7 +402,7 @@ export default function Player({
 
   function updatePlayerPosition(
     side: "left" | "center" | "right",
-    position: Vector3
+    position: Vector3,
   ) {
     if (
       position.y < playerBounds.bottom &&
@@ -488,7 +488,7 @@ export default function Player({
     dl: number,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     state: any,
-    mobileControlState: MobileControls
+    mobileControlState: MobileControls,
   ) {
     if (!ref.current) return;
 
@@ -531,7 +531,7 @@ export default function Player({
       // Clamp the position within bounds
       ref.current.position.x = Math.max(
         bounds.left,
-        Math.min(bounds.right, newX)
+        Math.min(bounds.right, newX),
       );
     }
 
@@ -541,7 +541,7 @@ export default function Player({
       // Clamp the position within bounds
       ref.current.position.y = Math.max(
         bounds.bottom,
-        Math.min(bounds.top, newY)
+        Math.min(bounds.top, newY),
       );
     }
   }

@@ -73,7 +73,11 @@ export default function SellItem({
       },
     };
 
-    if (!lastETHResolvedOutput.current || lastETHResolvedOutput.current.length === 0 || !otherTransactionDone) {
+    if (
+      !lastETHResolvedOutput.current ||
+      lastETHResolvedOutput.current.length === 0 ||
+      !otherTransactionDone
+    ) {
       // First transaction or if other transaction is done
       const request = await contract.functions
         .sell_item(seedType, inputAmount, addressIdentityInput)
@@ -82,7 +86,7 @@ export default function SellItem({
           gasLimit: 500_000,
         })
         .fundWithRequiredCoins();
-      
+
       const txId = request.getTransactionId(0);
       const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
 
@@ -96,7 +100,7 @@ export default function SellItem({
           (output) =>
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (output.output as any).assetId ===
-            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
+            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
         );
         if (ethOutput) {
           lastETHResolvedOutput.current = [ethOutput];
@@ -106,9 +110,7 @@ export default function SellItem({
       setItems(0);
       toast.success(() => (
         <div
-          onClick={() =>
-            window.open(txUrl, "_blank")
-          }
+          onClick={() => window.open(txUrl, "_blank")}
           style={{ cursor: "pointer", textDecoration: "underline" }}
         >
           Successfully sold the item!
@@ -155,7 +157,7 @@ export default function SellItem({
           (output) =>
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (output.output as any).assetId ===
-            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
+            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
         );
         console.log("ethOutput", ethOutput);
         if (ethOutput) {
@@ -166,9 +168,7 @@ export default function SellItem({
       setItems(0);
       toast.success(() => (
         <div
-          onClick={() =>
-            window.open(txUrl, "_blank")
-          }
+          onClick={() => window.open(txUrl, "_blank")}
           style={{ cursor: "pointer", textDecoration: "underline" }}
         >
           Successfully sold the item!

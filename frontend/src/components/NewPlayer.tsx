@@ -184,7 +184,10 @@ export default function NewPlayer({
       toast.success(() => (
         <div
           onClick={() =>
-            window.open(`https://app-testnet.fuel.network/tx/${tx.id}/simple`, "_blank")
+            window.open(
+              `https://app-testnet.fuel.network/tx/${tx.id}/simple`,
+              "_blank",
+            )
           }
           style={{ cursor: "pointer", textDecoration: "underline" }}
         >

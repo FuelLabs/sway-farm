@@ -77,7 +77,11 @@ export default function PlantModal({
       },
     };
 
-    if (!lastETHResolvedOutput.current || lastETHResolvedOutput.current.length === 0 || otherTransactionDone) {
+    if (
+      !lastETHResolvedOutput.current ||
+      lastETHResolvedOutput.current.length === 0 ||
+      otherTransactionDone
+    ) {
       // First transaction or if other transaction is done
       const request = await contract.functions
         .plant_seed_at_index(seedType, tileIndex, addressIdentityInput)
@@ -86,7 +90,7 @@ export default function PlantModal({
           gasLimit: 500_000,
         })
         .fundWithRequiredCoins();
-      
+
       const txId = request.getTransactionId(0);
       const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
 
@@ -102,9 +106,7 @@ export default function PlantModal({
       setModal("none");
       toast.success(() => (
         <div
-          onClick={() =>
-            window.open(txUrl, "_blank")
-          }
+          onClick={() => window.open(txUrl, "_blank")}
           style={{ cursor: "pointer", textDecoration: "underline" }}
         >
           Seed Planted!
@@ -156,9 +158,7 @@ export default function PlantModal({
       setModal("none");
       toast.success(() => (
         <div
-          onClick={() =>
-            window.open(txUrl, "_blank")
-          }
+          onClick={() => window.open(txUrl, "_blank")}
           style={{ cursor: "pointer", textDecoration: "underline" }}
         >
           Seed Planted!
@@ -194,7 +194,7 @@ export default function PlantModal({
 
         // Wait for any ongoing transaction to complete
         await waitForTransaction();
-        
+
         // Now safe to proceed with planting
         await plantWithoutGasStation(tileIndex);
 

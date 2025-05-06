@@ -98,7 +98,7 @@ export default function BuySeeds({
           (output) =>
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (output.output as any).assetId ===
-            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
+            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
         );
         if (ethOutput) {
           lastETHResolvedOutput.current = [ethOutput];
@@ -149,7 +149,10 @@ export default function BuySeeds({
       request.addChangeOutput(wallet.address, farmCoinAssetID);
       const txId = request.getTransactionId(0);
       const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
-      console.log("txid", `https://app-testnet.fuel.network/tx/${txId}/standard`);
+      console.log(
+        "txid",
+        `https://app-testnet.fuel.network/tx/${txId}/standard`,
+      );
       const tx = await wallet.sendTransaction(request);
       if (!tx) throw new Error("Failed to send transaction");
       const preConfirmation = await tx.waitForPreConfirmation();
@@ -164,7 +167,7 @@ export default function BuySeeds({
           (output) =>
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (output.output as any).assetId ===
-            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
+            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
         );
         if (ethOutput) {
           lastETHResolvedOutput.current = [ethOutput];

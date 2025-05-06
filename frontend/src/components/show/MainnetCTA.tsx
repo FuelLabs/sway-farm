@@ -3,7 +3,8 @@ import { Box } from "@fuel-ui/react";
 
 export default function MainnetCTA() {
   return (
-    <Box as="a"
+    <Box
+      as="a"
       href="https://mainnet.swayfarm.xyz"
       rel="noreferrer"
       target="_blank"
@@ -47,4 +48,4 @@ const styles = {
       background: "#8b5a2b",
     },
   }),
-}; 
+};
