@@ -77,7 +77,7 @@ export default function BuySeeds({
       const request = await contract.functions
         .buy_seeds(seedType, inputAmount, addressIdentityInput)
         .txParams({
-          maxFee: 500_000,
+          maxFee: 5000,
           gasLimit: 500_000,
         })
         .callParams({
@@ -85,7 +85,8 @@ export default function BuySeeds({
         })
         .fundWithRequiredCoins();
 
-      const txId = request.getTransactionId(0);
+      const chainId = await wallet.provider.getChainId();
+      const txId = request.getTransactionId(chainId);
       const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
 
       const tx = await wallet.sendTransaction(request);
@@ -135,7 +136,7 @@ export default function BuySeeds({
       const request = await contract.functions
         .buy_seeds(seedType, inputAmount, addressIdentityInput)
         .txParams({
-          maxFee: 500_000,
+          maxFee: 5000,
           gasLimit: 500_000,
         })
         .callParams({
@@ -147,7 +148,8 @@ export default function BuySeeds({
       const { coins } = await wallet.getCoins(farmCoinAssetID);
       request.addCoinInput(coins[0]);
       request.addChangeOutput(wallet.address, farmCoinAssetID);
-      const txId = request.getTransactionId(0);
+      const chainId = await wallet.provider.getChainId();
+      const txId = request.getTransactionId(chainId);      
       const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
       console.log(
         "txid",

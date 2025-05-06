@@ -82,17 +82,19 @@ export default function PlantModal({
       lastETHResolvedOutput.current.length === 0 ||
       otherTransactionDone
     ) {
+
       // First transaction or if other transaction is done
       const request = await contract.functions
         .plant_seed_at_index(seedType, tileIndex, addressIdentityInput)
         .txParams({
-          maxFee: 500_000,
+          maxFee: 5000,
           gasLimit: 500_000,
         })
         .fundWithRequiredCoins();
 
-      const txId = request.getTransactionId(0);
-      const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
+      const chainId = await wallet.provider.getChainId();
+      const txId = request.getTransactionId(chainId);
+      const txUrl = `https://app.fuel.network/tx/${txId}`;
 
       const tx = await wallet.sendTransaction(request);
       if (!tx) throw new Error("Failed to send transaction");
@@ -136,14 +138,15 @@ export default function PlantModal({
       const request = await contract.functions
         .plant_seed_at_index(seedType, tileIndex, addressIdentityInput)
         .txParams({
-          maxFee: 500_000,
+          maxFee: 5000,
           gasLimit: 500_000,
         })
         .getTransactionRequest();
 
       request.addResource(resource);
-      const txId = request.getTransactionId(0);
-      const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
+      const chainId = await wallet.provider.getChainId();
+      const txId = request.getTransactionId(chainId);
+      const txUrl = `https://app.fuel.network/tx/${txId}`;
 
       const tx = await wallet.sendTransaction(request);
       if (!tx) throw new Error("Failed to send transaction");

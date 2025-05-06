@@ -82,12 +82,13 @@ export default function SellItem({
       const request = await contract.functions
         .sell_item(seedType, inputAmount, addressIdentityInput)
         .txParams({
-          maxFee: 500_000,
+          maxFee: 5000,
           gasLimit: 500_000,
         })
         .fundWithRequiredCoins();
 
-      const txId = request.getTransactionId(0);
+      const chainId = await wallet.provider.getChainId();
+      const txId = request.getTransactionId(chainId);
       const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
 
       const tx = await wallet.sendTransaction(request);
@@ -100,7 +101,7 @@ export default function SellItem({
           (output) =>
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (output.output as any).assetId ===
-            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
+            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
         );
         if (ethOutput) {
           lastETHResolvedOutput.current = [ethOutput];
@@ -137,13 +138,14 @@ export default function SellItem({
       const request = await contract.functions
         .sell_item(seedType, inputAmount, addressIdentityInput)
         .txParams({
-          maxFee: 500_000,
+          maxFee: 5000,
           gasLimit: 500_000,
         })
         .getTransactionRequest();
 
       request.addResource(resource);
-      const txId = request.getTransactionId(0);
+      const chainId = await wallet.provider.getChainId();
+      const txId = request.getTransactionId(chainId);
       const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
 
       const tx = await wallet.sendTransaction(request);
@@ -157,7 +159,7 @@ export default function SellItem({
           (output) =>
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (output.output as any).assetId ===
-            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
+            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
         );
         console.log("ethOutput", ethOutput);
         if (ethOutput) {
