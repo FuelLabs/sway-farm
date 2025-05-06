@@ -94,7 +94,8 @@ export default function HarvestModal({
         })
         .fundWithRequiredCoins();
 
-      const txId = request.getTransactionId(0);
+      const chainId = await wallet.provider.getChainId();
+      const txId = request.getTransactionId(chainId);
       const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
 
       const tx = await wallet.sendTransaction(request);
@@ -139,13 +140,14 @@ export default function HarvestModal({
       const request = await contract.functions
         .harvest([tileIndex], addressIdentityInput)
         .txParams({
-          maxFee: 500_000,
+          maxFee: 5000,
           gasLimit: 500_000,
         })
         .getTransactionRequest();
 
       request.addResource(resource);
-      const txId = request.getTransactionId(0);
+      const chainId = await wallet.provider.getChainId();
+      const txId = request.getTransactionId(chainId);
       const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
 
       const tx = await wallet.sendTransaction(request);
