@@ -1,6 +1,6 @@
 import { Button } from "@fuel-ui/react";
 import type { Dispatch, SetStateAction } from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { buttonStyle, FoodTypeInput } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts";
 import type { Modals } from "../../constants";
@@ -39,6 +39,13 @@ export default function PlantModal({
   >("none");
   const { wallet } = useWallet();
   const { otherTransactionDone, setOtherTransactionDone } = useTransaction();
+  const currentTileArrayRef = useRef(tileArray);
+
+  // Update the ref whenever tileArray changes
+  useEffect(() => {
+    currentTileArrayRef.current = tileArray;
+  }, [tileArray]);
+
   useEffect(() => {
     const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -47,7 +54,9 @@ export default function PlantModal({
         if (status === "error") {
           setStatus("none");
         } else if (status === "none" && seeds > 0) {
-          handlePlant();
+          // Use the current tileArray value from the ref
+          const currentTileArray = currentTileArrayRef.current;
+          handlePlant(currentTileArray[0]);
         }
       }
     };
@@ -58,7 +67,7 @@ export default function PlantModal({
     };
   }, [status, seeds]);
 
-  async function plantWithoutGasStation() {
+  async function plantWithoutGasStation(tileIndex: number) {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
 
     const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
@@ -71,7 +80,7 @@ export default function PlantModal({
     if (!lastETHResolvedOutput.current || lastETHResolvedOutput.current.length === 0 || otherTransactionDone) {
       // First transaction or if other transaction is done
       const request = await contract.functions
-        .plant_seed_at_index(seedType, tileArray[0], addressIdentityInput)
+        .plant_seed_at_index(seedType, tileIndex, addressIdentityInput)
         .txParams({
           maxFee: 500_000,
           gasLimit: 500_000,
@@ -89,7 +98,7 @@ export default function PlantModal({
         lastETHResolvedOutput.current = preConfirmation.resolvedOutputs;
       }
 
-      onPlantSuccess(tileArray[0]);
+      onPlantSuccess(tileIndex);
       setModal("none");
       toast.success(() => (
         <div
@@ -123,7 +132,7 @@ export default function PlantModal({
       };
 
       const request = await contract.functions
-        .plant_seed_at_index(seedType, tileArray[0], addressIdentityInput)
+        .plant_seed_at_index(seedType, tileIndex, addressIdentityInput)
         .txParams({
           maxFee: 500_000,
           gasLimit: 500_000,
@@ -143,7 +152,7 @@ export default function PlantModal({
         lastETHResolvedOutput.current = preConfirmation.resolvedOutputs;
       }
 
-      onPlantSuccess(tileArray[0]);
+      onPlantSuccess(tileIndex);
       setModal("none");
       toast.success(() => (
         <div
@@ -162,7 +171,7 @@ export default function PlantModal({
     }
   }
 
-  async function handlePlant() {
+  async function handlePlant(tileIndex: number) {
     if (!wallet) {
       throw new Error("No wallet found");
     }
@@ -187,7 +196,7 @@ export default function PlantModal({
         await waitForTransaction();
         
         // Now safe to proceed with planting
-        await plantWithoutGasStation();
+        await plantWithoutGasStation(tileIndex);
 
         setStatus("none");
       } catch (err) {
@@ -231,7 +240,7 @@ export default function PlantModal({
               <div style={styles.seeds}>Plant a seed here?</div>
               <Button
                 css={buttonStyle}
-                onPress={handlePlant}
+                onPress={() => handlePlant(tileArray[0])}
                 role="button"
                 tabIndex={0}
                 aria-label="Plant seed"

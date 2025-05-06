@@ -1,6 +1,6 @@
 import { Spinner, Button, BoxCentered } from "@fuel-ui/react";
 import type { Dispatch, SetStateAction } from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cssObj } from "@fuel-ui/css";
 
 import {
@@ -40,7 +40,13 @@ export default function HarvestModal({
     "error" | "none" | "loading" | "retrying"
   >("none");
   const { wallet } = useWallet();
-  const { otherTransactionDone,setOtherTransactionDone } = useTransaction();
+  const { otherTransactionDone, setOtherTransactionDone } = useTransaction();
+  const currentTileArrayRef = useRef(tileArray);
+
+  // Update the ref whenever tileArray changes
+  useEffect(() => {
+    currentTileArrayRef.current = tileArray;
+  }, [tileArray]);
 
   // Add global keyboard event listener
   useEffect(() => {
@@ -52,7 +58,9 @@ export default function HarvestModal({
           setStatus("none");
           updatePageNum();
         } else if (status === "none") {
-          harvestItem();
+          // Use the current tileArray value from the ref
+          const currentTileArray = currentTileArrayRef.current;
+          harvestItem(currentTileArray[0]);
         }
       }
     };
@@ -63,7 +71,7 @@ export default function HarvestModal({
     };
   }, [status]);
 
-  async function harvestWithoutGasStation() {
+  async function harvestWithoutGasStation(tileIndex: number) {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
 
     const addressIdentityInput = {
@@ -75,7 +83,7 @@ export default function HarvestModal({
     if (!lastETHResolvedOutput.current || lastETHResolvedOutput.current.length === 0 || otherTransactionDone) {
       // First transaction or if other transaction is done
       const request = await contract.functions
-        .harvest(tileArray, addressIdentityInput)
+        .harvest([tileIndex], addressIdentityInput)
         .txParams({
           maxFee: 500_000,
           gasLimit: 500_000,
@@ -93,7 +101,7 @@ export default function HarvestModal({
         lastETHResolvedOutput.current = preConfirmation.resolvedOutputs;
       }
 
-      onHarvestSuccess(tileArray[0]);
+      onHarvestSuccess(tileIndex);
       setModal("plant");
       toast.success(() => (
         <div
@@ -127,7 +135,7 @@ export default function HarvestModal({
       };
 
       const request = await contract.functions
-        .harvest(tileArray, addressIdentityInput)
+        .harvest([tileIndex], addressIdentityInput)
         .txParams({
           maxFee: 500_000,
           gasLimit: 500_000,
@@ -147,7 +155,7 @@ export default function HarvestModal({
         lastETHResolvedOutput.current = preConfirmation.resolvedOutputs;
       }
 
-      onHarvestSuccess(tileArray[0]);
+      onHarvestSuccess(tileIndex);
       setModal("plant");
       toast.success(() => (
         <div
@@ -166,7 +174,7 @@ export default function HarvestModal({
     }
   }
 
-  async function harvestItem() {
+  async function harvestItem(tileIndex: number) {
     if (!wallet) {
       throw new Error("No wallet found");
     }
@@ -191,7 +199,7 @@ export default function HarvestModal({
         await waitForTransaction();
         
         // Now safe to proceed with harvesting
-        await harvestWithoutGasStation();
+        await harvestWithoutGasStation(tileIndex);
         setStatus("none");
       } catch (err) {
         console.log("Error in HarvestModal:", err);
@@ -241,7 +249,7 @@ export default function HarvestModal({
           <div style={styles.items}>Harvest this item?</div>
           <Button
             css={buttonStyle}
-            onPress={harvestItem}
+            onPress={() => harvestItem(tileArray[0])}
             role="button"
             tabIndex={0}
             aria-label="Harvest item"
