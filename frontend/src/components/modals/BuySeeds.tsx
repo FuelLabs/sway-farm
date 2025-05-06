@@ -155,9 +155,9 @@ export default function BuySeeds({
       const preConfirmation = await tx.waitForPreConfirmation();
       console.log("preConfirmation", preConfirmation);
       console.log("tx", tx);
-      if (preConfirmation.isStatusSuccess) {
-        setOtherTransactionDone(true);
-      }
+      // if (preConfirmation.isStatusSuccess) {
+      //   setOtherTransactionDone(true);
+      // }
       if (preConfirmation.resolvedOutputs) {
         // Filter to only get the output with ETH assetId
         const ethOutput = preConfirmation.resolvedOutputs.find(
