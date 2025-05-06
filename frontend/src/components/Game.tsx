@@ -29,6 +29,7 @@ import HarvestModal from "./modals/HarvestModal";
 import MarketModal from "./modals/MarketModal";
 import PlantModal from "./modals/PlantModal";
 import Info from "./show/Info";
+// import MainnetCTA from "./show/MainnetCTA";
 
 interface GameProps {
   contract: FarmContract | null;
@@ -242,6 +243,7 @@ export default function Game({
             items={items}
             farmCoinAssetID={farmCoinAssetID}
           />
+          {/* <MainnetCTA /> */}
 
           {player !== null && (
             <>

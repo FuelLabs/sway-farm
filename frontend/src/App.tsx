@@ -66,7 +66,7 @@ function App() {
       if (contract) {
         const { value } = await contract.functions.get_asset_id().get();
         setFarmCoinAssetId(value.bits);
-        console.log("FARM COIN ASSET ID:", value.bits);
+        // console.log("FARM COIN ASSET ID:", value.bits);
       }
     }
     getAssetId();
@@ -134,7 +134,15 @@ function App() {
               <Heading css={styles.heading} as={"h1"}>
                 SWAY FARM
               </Heading>
-              <span style={styles.gaslessLine}>Now completely GASLESS! 🎉</span>
+              <span style={styles.gaslessLine}>
+                Now supporting Preconfs! 🎉
+              </span>
+              <div style={styles.mainnetLink}>
+                Mainnet link:{" "}
+                <a href="https://www.swayfarm.xyz/" style={styles.link}>
+                  https://swayfarm.xyz
+                </a>
+              </div>
               <Home isMobile={isMobile} />
             </BoxCentered>
           </BoxCentered>
@@ -204,5 +212,14 @@ const styles = {
   gaslessLine: cssObj({
     color: "white",
     fontSize: "20px",
+  }),
+  mainnetLink: cssObj({
+    color: "white",
+    fontSize: "9px",
+    marginBottom: "10px",
+  }),
+  link: cssObj({
+    color: "green",
+    textDecoration: "underline",
   }),
 };

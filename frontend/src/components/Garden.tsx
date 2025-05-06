@@ -35,7 +35,7 @@ export default function Garden({
           const id: IdentityInput = { Address: address };
           const { value } = await contract.functions.get_garden_vec(id).get();
           setFirstTime(false);
-          console.log("value", value);
+          // console.log("value", value);
           setTileStates(value);
         } catch (err) {
           console.log("Error in Garden:", err);

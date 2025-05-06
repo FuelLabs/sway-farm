@@ -117,7 +117,7 @@ export default function BuySeeds({
       return tx;
     } else {
       // Subsequent transaction
-      console.log("subsequent transaction");
+      // console.log("subsequent transaction");
       const [{ utxoId, output }] = lastETHResolvedOutput.current;
       const change = output as unknown as {
         assetId: string;
@@ -153,11 +153,11 @@ export default function BuySeeds({
       const tx = await wallet.sendTransaction(request);
       if (!tx) throw new Error("Failed to send transaction");
       const preConfirmation = await tx.waitForPreConfirmation();
-      console.log("preConfirmation", preConfirmation);
-      console.log("tx", tx);
-      // if (preConfirmation.isStatusSuccess) {
-      //   setOtherTransactionDone(true);
-      // }
+      // console.log("preConfirmation", preConfirmation);
+      // console.log("tx", tx);
+      if (preConfirmation.isStatusSuccess) {
+        setOtherTransactionDone(true);
+      }
       if (preConfirmation.resolvedOutputs) {
         // Filter to only get the output with ETH assetId
         const ethOutput = preConfirmation.resolvedOutputs.find(

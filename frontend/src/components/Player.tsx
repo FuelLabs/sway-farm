@@ -171,7 +171,7 @@ export default function Player({
               otherTransactionDone
             ) {
               // First transaction or if other transaction is done
-              console.log("first transaction or other transaction done");
+              // console.log("first transaction or other transaction done");
               const request = await contract.functions
                 .set_player_position(encodedX, encodedY, id)
                 .txParams({
@@ -197,7 +197,7 @@ export default function Player({
                 {
                   loading: `Sending transaction ${txId.slice(0, 4)}...${txId.slice(-4)}...`,
                   success: (cos) => {
-                    console.log(cos);
+                    // console.log(cos);
                     return (
                       <div>
                         Transaction{" "}
@@ -242,10 +242,10 @@ export default function Player({
               );
             } else {
               // Subsequent transactions
-              console.log(
-                "subsequent transaction",
-                lastETHResolvedOutput.current
-              );
+              // console.log(
+              //   "subsequent transaction",
+              //   lastETHResolvedOutput.current
+              // );
               const [{ utxoId, output }] = lastETHResolvedOutput.current;
               const change = output as unknown as {
                 assetId: string;
@@ -286,7 +286,7 @@ export default function Player({
                 {
                   loading: `Sending transaction ${txId.slice(0, 4)}...${txId.slice(-4)}...`,
                   success: (cos) => {
-                    console.log(cos);
+                    // console.log(cos);
                     return (
                       <div>
                         Transaction{" "}

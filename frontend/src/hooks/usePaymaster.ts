@@ -65,7 +65,7 @@ export const usePaymaster = () => {
         data: { recaptchaToken: token },
       },
     );
-    console.log("MetaDataResponse", MetaDataResponse);
+    // console.log("MetaDataResponse", MetaDataResponse);
     const { maxValuePerCoin, allocateCoinRateLimit } = MetaDataResponse;
     if (!maxValuePerCoin) {
       throw new Error("No maxValuePerCoin found");
@@ -120,7 +120,7 @@ export const usePaymaster = () => {
     if (!response.data.signature) {
       throw new Error("No signature found");
     }
-    console.log("response.data", response.data);
+    // console.log("response.data", response.data);
     const gasInput = request.inputs.find((coin) => {
       return coin.type === 0;
     });

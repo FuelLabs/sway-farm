@@ -168,7 +168,7 @@ export default function NewPlayer({
     const { gasUsed, maxFee } = txCost;
     request.gasLimit = gasUsed;
     request.maxFee = maxFee;
-    console.log("Max fee", Number(maxFee), "gas used", Number(gasUsed));
+    // console.log("Max fee", Number(maxFee), "gas used", Number(gasUsed));
     const { signature } = await paymaster.fetchSignature(request, jobId);
     request.updateWitnessByOwner(gasCoin.owner, signature);
 
@@ -234,7 +234,7 @@ export default function NewPlayer({
               setShowNoFunds(false);
             }, 5000);
           } else {
-            console.log("Using direct transaction method...");
+            // console.log("Using direct transaction method...");
             await createPlayerWithoutGasStation();
           }
         }

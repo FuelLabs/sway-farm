@@ -116,7 +116,7 @@ export default function PlantModal({
       return tx;
     } else {
       // Subsequent transaction
-      console.log("subsequent transaction");
+      // console.log("subsequent transaction");
       const [{ utxoId, output }] = lastETHResolvedOutput.current;
       const change = output as unknown as {
         assetId: string;
@@ -146,8 +146,8 @@ export default function PlantModal({
       const tx = await wallet.sendTransaction(request);
       if (!tx) throw new Error("Failed to send transaction");
       const preConfirmation = await tx.waitForPreConfirmation();
-      console.log("preConfirmation", preConfirmation);
-      console.log("tx", tx);
+      // console.log("preConfirmation", preConfirmation);
+      // console.log("tx", tx);
       if (preConfirmation.resolvedOutputs) {
         lastETHResolvedOutput.current = preConfirmation.resolvedOutputs;
       }
