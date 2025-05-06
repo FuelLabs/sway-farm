@@ -92,7 +92,7 @@ export default function PlantModal({
         .fundWithRequiredCoins();
 
       const txId = request.getTransactionId(0);
-      const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
+      const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
 
       const tx = await wallet.sendTransaction(request);
       if (!tx) throw new Error("Failed to send transaction");
@@ -143,7 +143,7 @@ export default function PlantModal({
 
       request.addResource(resource);
       const txId = request.getTransactionId(0);
-      const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
+      const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
 
       const tx = await wallet.sendTransaction(request);
       if (!tx) throw new Error("Failed to send transaction");

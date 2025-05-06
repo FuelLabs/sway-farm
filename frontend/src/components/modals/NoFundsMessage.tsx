@@ -10,7 +10,7 @@ export function NoFundsMessage({ onRecheck }: NoFundsMessageProps) {
   return (
     <BoxCentered css={styles.container}>
       You need some ETH to play:
-      <Link isExternal href={`https://app-testnet.fuel.network/bridge`}>
+      <Link isExternal href={`https://app.fuel.network/bridge`}>
         <Button css={styles.link} variant="link">
           Go to Bridgee
         </Button>

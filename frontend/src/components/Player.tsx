@@ -180,7 +180,7 @@ export default function Player({
                 })
                 .fundWithRequiredCoins();
               const txId = request.getTransactionId(0);
-              const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
+              const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
 
               await toast.promise(
                 (async () => {
@@ -270,7 +270,7 @@ export default function Player({
 
               request.addResource(resource);
               const txId = request.getTransactionId(0);
-              const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
+              const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
 
               await toast.promise(
                 (async () => {

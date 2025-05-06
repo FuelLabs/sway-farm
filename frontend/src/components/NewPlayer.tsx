@@ -116,7 +116,7 @@ export default function NewPlayer({
         <div
           onClick={() =>
             window.open(
-              `https://app-testnet.fuel.network/tx/${tx.transactionId}/simple`,
+              `https://app.fuel.network/tx/${tx.transactionId}/simple`,
               "_blank",
             )
           }
@@ -184,10 +184,7 @@ export default function NewPlayer({
       toast.success(() => (
         <div
           onClick={() =>
-            window.open(
-              `https://app-testnet.fuel.network/tx/${tx.id}/simple`,
-              "_blank",
-            )
+            window.open(`https://app.fuel.network/tx/${tx.id}/simple`, "_blank")
           }
           style={{ cursor: "pointer", textDecoration: "underline" }}
         >
@@ -273,7 +270,7 @@ export default function NewPlayer({
           You need some ETH to play:
           <Link
             isExternal
-            href={`https://app-testnet.fuel.network/bridge`}
+            href={`https://app.fuel.network/bridge`}
             role="link"
             tabIndex={0}
           >
@@ -285,6 +282,22 @@ export default function NewPlayer({
               aria-label="Go to Bridge"
             >
               Go to Bridge
+            </Button>
+          </Link>
+          <Link
+            isExternal
+            href={`https://testnet.swayfarm.xyz`}
+            role="link"
+            tabIndex={0}
+          >
+            <Button
+              css={styles.testlink}
+              variant="link"
+              role="button"
+              tabIndex={0}
+              aria-label="Testnet App"
+            >
+              Try testnet app
             </Button>
           </Link>
           <Button
@@ -338,6 +351,11 @@ const styles = {
   }),
   link: cssObj({
     fontFamily: "pressStart2P",
+    fontSize: "14px",
+  }),
+  testlink: cssObj({
+    fontFamily: "pressStart2P",
+    color: "green",
     fontSize: "14px",
   }),
 };

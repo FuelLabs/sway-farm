@@ -86,7 +86,7 @@ export default function BuySeeds({
         .fundWithRequiredCoins();
 
       const txId = request.getTransactionId(0);
-      const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
+      const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
 
       const tx = await wallet.sendTransaction(request);
       if (!tx) throw new Error("Failed to send transaction");
@@ -148,10 +148,10 @@ export default function BuySeeds({
       request.addCoinInput(coins[0]);
       request.addChangeOutput(wallet.address, farmCoinAssetID);
       const txId = request.getTransactionId(0);
-      const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
+      const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
       console.log(
         "txid",
-        `https://app-testnet.fuel.network/tx/${txId}/standard`,
+        `https://app.fuel.network/tx/${txId}/standard`,
       );
       const tx = await wallet.sendTransaction(request);
       if (!tx) throw new Error("Failed to send transaction");

@@ -71,57 +71,57 @@ function App() {
     }
     getAssetId();
   }, [contract]);
-  const transferBaseETH = useCallback(async () => {
-    if (!wallet) return;
-    const ETHBalance = await wallet.getBalance(BASE_ASSET_ID);
-    if (ETHBalance.lt(2900000)) {
-      try {
-        const provider = new Provider(FUEL_PROVIDER_URL);
-        const transferWallet: WalletUnlocked = Wallet.fromPrivateKey(
-          "0x2822e732c67f525cdf1df36a92a69fa16fcd25e1eee3e5be604b386ca6a5898d",
-          provider,
-        );
-        const baseAssetId = await provider.getBaseAssetId();
-        await transferWallet.transfer(wallet.address, 3000000, baseAssetId);
-      } catch (error) {
-        console.error("Error transferring fuel:", error);
-      }
-    }
-  }, [wallet]);
+  // const transferBaseETH = useCallback(async () => {
+  //   if (!wallet) return;
+  //   const ETHBalance = await wallet.getBalance(BASE_ASSET_ID);
+  //   if (ETHBalance.lt(2900000)) {
+  //     try {
+  //       const provider = new Provider(FUEL_PROVIDER_URL);
+  //       const transferWallet: WalletUnlocked = Wallet.fromPrivateKey(
+  //         "0x2822e732c67f525cdf1df36a92a69fa16fcd25e1eee3e5be604b386ca6a5898d",
+  //         provider,
+  //       );
+  //       const baseAssetId = await provider.getBaseAssetId();
+  //       await transferWallet.transfer(wallet.address, 3000000, baseAssetId);
+  //     } catch (error) {
+  //       console.error("Error transferring fuel:", error);
+  //     }
+  //   }
+  // }, [wallet]);
 
-  useEffect(() => {
-    if (!wallet) return;
+  // useEffect(() => {
+  //   if (!wallet) return;
 
-    let timeoutId: number;
+  //   let timeoutId: number;
 
-    const checkBalanceAndTransfer = async () => {
-      const ETHBalance = await wallet.getBalance(BASE_ASSET_ID);
-      if (ETHBalance.lt(2900000)) {
-        await transferBaseETH();
-        // If balance is low, check again in 2 seconds
-        timeoutId = window.setTimeout(checkBalanceAndTransfer, 2000);
-      } else {
-        // If balance is sufficient, wait 30 seconds before next check
-        timeoutId = window.setTimeout(checkBalanceAndTransfer, 30000);
-      }
-    };
+  //   const checkBalanceAndTransfer = async () => {
+  //     const ETHBalance = await wallet.getBalance(BASE_ASSET_ID);
+  //     if (ETHBalance.lt(2900000)) {
+  //       await transferBaseETH();
+  //       // If balance is low, check again in 2 seconds
+  //       timeoutId = window.setTimeout(checkBalanceAndTransfer, 2000);
+  //     } else {
+  //       // If balance is sufficient, wait 30 seconds before next check
+  //       timeoutId = window.setTimeout(checkBalanceAndTransfer, 30000);
+  //     }
+  //   };
 
-    // Initial check
-    checkBalanceAndTransfer();
+  //   // Initial check
+  //   checkBalanceAndTransfer();
 
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [transferBaseETH, wallet]);
+  //   return () => {
+  //     if (timeoutId) {
+  //       clearTimeout(timeoutId);
+  //     }
+  //   };
+  // }, [transferBaseETH, wallet]);
 
   return (
     <TransactionProvider>
       <Box css={styles.root}>
         {isConnected && farmCoinAssetID ? (
           <>
-            <FaucetingModal isOpen={!balance || balance.isZero()} />
+            {/* <FaucetingModal isOpen={!balance || balance.isZero()} /> */}
             <Game
               contract={contract}
               isMobile={isMobile}
@@ -138,9 +138,9 @@ function App() {
                 Now supporting Preconfs! 🎉
               </span>
               <div style={styles.mainnetLink}>
-                Mainnet link:{" "}
-                <a href="https://www.swayfarm.xyz/" style={styles.link}>
-                  https://swayfarm.xyz
+                Testnet link:{" "}
+                <a href="https://www.testnet.swayfarm.xyz/" style={styles.link}>
+                 testnet.swayfarm.xyz
                 </a>
               </div>
               <Home isMobile={isMobile} />
