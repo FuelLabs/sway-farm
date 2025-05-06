@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { TILES } from "../constants";
 import type { FarmContract } from "../sway-api";
@@ -24,15 +24,18 @@ export default function Garden({
   setTileStates,
   updateNum,
 }: GardenProps) {
+  const [firstTime, setFirstTime] = useState<boolean>(true);
   useEffect(() => {
     async function getPlantedSeeds() {
-      if (contract && contract.account) {
+      if (contract && contract.account && firstTime) {
         try {
           const address: AddressInput = {
             bits: contract.account.address.toB256(),
           };
           const id: IdentityInput = { Address: address };
           const { value } = await contract.functions.get_garden_vec(id).get();
+          setFirstTime(false);
+          // console.log("value", value);
           setTileStates(value);
         } catch (err) {
           console.log("Error in Garden:", err);
@@ -40,7 +43,7 @@ export default function Garden({
       }
     }
     getPlantedSeeds();
-  }, [contract, updateNum]);
+  }, [updateNum, firstTime, contract]);
 
   return (
     <>

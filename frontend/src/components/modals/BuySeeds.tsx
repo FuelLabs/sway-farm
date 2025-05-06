@@ -1,19 +1,12 @@
 import { Button, Spinner, BoxCentered } from "@fuel-ui/react";
-import { type BytesLike, Address, bn, Provider } from "fuels";
+import { type BytesLike, ResolvedOutput, bn } from "fuels";
 import type { Dispatch, SetStateAction } from "react";
-import { useState, useEffect } from "react";
-import { useWalletFunds } from "../../hooks/useWalletFunds";
-import { NoFundsMessage } from "./NoFundsMessage";
-import {
-  FUEL_PROVIDER_URL,
-  useGaslessWalletSupported,
-  GAS_STATION_CHANGE_OUTPUT_ADDRESS,
-} from "../../constants";
+import { useState, useEffect, useRef } from "react";
 import { buttonStyle, FoodTypeInput } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts/FarmContract";
 import { useWallet } from "@fuels/react";
-import { usePaymaster } from "../../hooks/usePaymaster";
 import { toast } from "react-hot-toast";
+import { useTransaction } from "../../hooks/useTransaction";
 
 interface BuySeedsProps {
   contract: FarmContract | null;
@@ -21,6 +14,8 @@ interface BuySeedsProps {
   setCanMove: Dispatch<SetStateAction<boolean>>;
   farmCoinAssetID: BytesLike;
   onBuySuccess: () => void;
+  lastETHResolvedOutput: React.MutableRefObject<ResolvedOutput[] | null>;
+  isTransactionInProgress: React.MutableRefObject<boolean>;
 }
 
 export default function BuySeeds({
@@ -29,16 +24,15 @@ export default function BuySeeds({
   setCanMove,
   farmCoinAssetID,
   onBuySuccess,
+  lastETHResolvedOutput,
+  isTransactionInProgress,
 }: BuySeedsProps) {
   const [status, setStatus] = useState<
     "error" | "none" | "loading" | "retrying"
   >("none");
   const { wallet } = useWallet();
-  const paymaster = usePaymaster();
-  const isGaslessSupported = useGaslessWalletSupported();
-  const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
-    useWalletFunds(contract);
-
+  const { otherTransactionDone, setOtherTransactionDone } = useTransaction();
+  const isBuying = useRef(false);
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -47,7 +41,7 @@ export default function BuySeeds({
         if (status === "error") {
           setStatus("none");
           updatePageNum();
-        } else if (status === "none" && !showNoFunds) {
+        } else if (status === "none") {
           buySeeds();
         }
       }
@@ -57,91 +51,7 @@ export default function BuySeeds({
     return () => {
       window.removeEventListener("keydown", handleGlobalKeyDown);
     };
-  }, [status, showNoFunds]);
-
-  async function buyWithGasStation() {
-    if (!wallet) {
-      throw new Error("No wallet found");
-    }
-    const provider = await Provider.create(FUEL_PROVIDER_URL);
-
-    const { maxValuePerCoin } = await paymaster.metadata();
-    const { coin: gasCoin, jobId } = await paymaster.allocate();
-
-    const amount = 10;
-    const realAmount = amount / 1_000_000_000;
-    const inputAmount = bn.parseUnits(realAmount.toFixed(9).toString());
-    const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
-    const price = 750_000 * amount;
-    if (!contract) return;
-    const addressIdentityInput = {
-      Address: {
-        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
-      },
-    };
-    console.log(price);
-    const scope = contract.functions
-      .buy_seeds(seedType, inputAmount, addressIdentityInput)
-      .callParams({
-        forward: [price, farmCoinAssetID],
-      });
-    const { coins } = await wallet.getCoins(farmCoinAssetID);
-
-    const request = await scope.getTransactionRequest();
-    request.addCoinInput(coins[0]);
-    request.addChangeOutput(wallet.address, farmCoinAssetID);
-
-    request.addCoinInput(gasCoin);
-    request.addCoinOutput(
-      gasCoin.owner,
-      gasCoin.amount.sub(maxValuePerCoin),
-      provider.getBaseAssetId(),
-    );
-    console.log("change output", GAS_STATION_CHANGE_OUTPUT_ADDRESS);
-    request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
-    //change output of type 2 with assetID "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07" to GAS_STATION_CHANGE_OUTPUT_ADDRESS
-    // request.outputs = request.outputs.map((output) => {
-    //   if (output.type === 2 && output.assetId === "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07") {
-    //     return { ...output, to: GAS_STATION_CHANGE_OUTPUT_ADDRESS };
-    //   }
-    //   return output;
-    // });
-    console.log("request", request);
-    const txCost = await wallet.getTransactionCost(request, {
-      quantities: coins,
-    });
-    const { gasUsed, missingContractIds, outputVariables, maxFee } = txCost;
-    console.log("Max fee", Number(maxFee), "gas used", Number(gasUsed));
-    missingContractIds.forEach((contractId) => {
-      request.addContractInputAndOutput(Address.fromString(contractId));
-    });
-
-    request.addVariableOutputs(outputVariables);
-    request.gasLimit = gasUsed;
-    request.maxFee = maxFee;
-    const { signature } = await paymaster.fetchSignature(request, jobId);
-    request.updateWitnessByOwner(gasCoin.owner, signature);
-
-    const tx = await wallet.sendTransaction(request, {
-      estimateTxDependencies: false,
-    });
-    console.log("tx", tx);
-    if (tx) {
-      toast.success(() => (
-        <div
-          onClick={() =>
-            window.open(`https://app.fuel.network/tx/${tx.id}/simple`, "_blank")
-          }
-          style={{ cursor: "pointer", textDecoration: "underline" }}
-        >
-          Successfully bought seeds!
-        </div>
-      ));
-      onBuySuccess();
-      await paymaster.postJobComplete(jobId);
-      updatePageNum();
-    }
-  }
+  }, [status]);
 
   async function buyWithoutGasStation() {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
@@ -154,35 +64,127 @@ export default function BuySeeds({
 
     const addressIdentityInput = {
       Address: {
-        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+        bits: wallet.address.toB256(),
       },
     };
 
-    const tx = await contract.functions
-      .buy_seeds(seedType, inputAmount, addressIdentityInput)
-      .callParams({
-        forward: [price, farmCoinAssetID],
-      })
-      .call();
+    if (
+      !lastETHResolvedOutput.current ||
+      lastETHResolvedOutput.current.length === 0 ||
+      otherTransactionDone
+    ) {
+      // First transaction or if other transaction is done
+      const request = await contract.functions
+        .buy_seeds(seedType, inputAmount, addressIdentityInput)
+        .txParams({
+          maxFee: 500_000,
+          gasLimit: 500_000,
+        })
+        .callParams({
+          forward: [price, farmCoinAssetID],
+        })
+        .fundWithRequiredCoins();
 
-    if (tx) {
+      const txId = request.getTransactionId(0);
+      const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
+
+      const tx = await wallet.sendTransaction(request);
+      if (!tx) throw new Error("Failed to send transaction");
+      setOtherTransactionDone(false);
+      const preConfirmation = await tx.waitForPreConfirmation();
+      if (preConfirmation.resolvedOutputs) {
+        // Filter to only get the output with ETH assetId
+        const ethOutput = preConfirmation.resolvedOutputs.find(
+          (output) =>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (output.output as any).assetId ===
+            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
+        );
+        if (ethOutput) {
+          lastETHResolvedOutput.current = [ethOutput];
+        }
+      }
+
       toast.success(() => (
         <div
-          onClick={() =>
-            window.open(
-              `https://app.fuel.network/tx/${tx.transactionId}/simple`,
-              "_blank",
-            )
-          }
+          onClick={() => window.open(txUrl, "_blank")}
           style={{ cursor: "pointer", textDecoration: "underline" }}
         >
           Successfully bought seeds!
         </div>
       ));
       onBuySuccess();
-      updatePageNum();
+      return tx;
+    } else {
+      // Subsequent transaction
+      // console.log("subsequent transaction");
+      const [{ utxoId, output }] = lastETHResolvedOutput.current;
+      const change = output as unknown as {
+        assetId: string;
+        amount: string;
+      };
+      const resource = {
+        id: utxoId,
+        assetId: change.assetId,
+        amount: bn(change.amount),
+        owner: wallet?.address,
+        blockCreated: bn(0),
+        txCreatedIdx: bn(0),
+      };
+
+      const request = await contract.functions
+        .buy_seeds(seedType, inputAmount, addressIdentityInput)
+        .txParams({
+          maxFee: 500_000,
+          gasLimit: 500_000,
+        })
+        .callParams({
+          forward: [price, farmCoinAssetID],
+        })
+        .getTransactionRequest();
+
+      request.addResource(resource);
+      const { coins } = await wallet.getCoins(farmCoinAssetID);
+      request.addCoinInput(coins[0]);
+      request.addChangeOutput(wallet.address, farmCoinAssetID);
+      const txId = request.getTransactionId(0);
+      const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
+      console.log(
+        "txid",
+        `https://app.fuel.network/tx/${txId}/standard`,
+      );
+      const tx = await wallet.sendTransaction(request);
+      if (!tx) throw new Error("Failed to send transaction");
+      const preConfirmation = await tx.waitForPreConfirmation();
+      // console.log("preConfirmation", preConfirmation);
+      // console.log("tx", tx);
+      if (preConfirmation.isStatusSuccess) {
+        setOtherTransactionDone(true);
+      }
+      if (preConfirmation.resolvedOutputs) {
+        // Filter to only get the output with ETH assetId
+        const ethOutput = preConfirmation.resolvedOutputs.find(
+          (output) =>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (output.output as any).assetId ===
+            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07",
+        );
+        if (ethOutput) {
+          lastETHResolvedOutput.current = [ethOutput];
+        }
+      }
+
+      toast.success(() => (
+        <div
+          onClick={() => window.open(txUrl, "_blank")}
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+        >
+          Successfully bought seeds!
+        </div>
+      ));
+      onBuySuccess();
+      return tx;
     }
-    return tx;
   }
 
   async function buySeeds() {
@@ -193,38 +195,25 @@ export default function BuySeeds({
       try {
         setStatus("loading");
         setCanMove(false);
-        const canUseGasless = await paymaster.shouldUseGasless();
-        if (!canUseGasless) {
-          toast.error(
-            "Hourly gasless transaction limit reached. Trying regular transaction...",
-            { duration: 5000 },
-          );
-        }
-        if (isGaslessSupported && canUseGasless) {
-          try {
-            await buyWithGasStation();
-          } catch (error) {
-            console.log(
-              "Gas station failed, trying direct transaction...",
-              error,
-            );
-            toast.error("Gas Station error, please sign from wallet.");
-            setStatus("retrying");
-            if (!hasFunds) {
-              showNoFundsMessage();
-            } else {
-              await buyWithoutGasStation();
-            }
-          }
-        } else {
-          if (!hasFunds) {
-            showNoFundsMessage();
-          } else {
-            console.log("Using direct transaction method...");
-            await buyWithoutGasStation();
-          }
-        }
 
+        // Create a promise that resolves when isTransactionInProgress becomes false
+        const waitForTransaction = () => {
+          return new Promise<void>((resolve) => {
+            const checkInterval = setInterval(() => {
+              if (!isTransactionInProgress.current && !isBuying.current) {
+                clearInterval(checkInterval);
+                resolve();
+              }
+            }, 100); // Check every 100ms
+          });
+        };
+
+        // Wait for any ongoing transaction to complete
+        await waitForTransaction();
+        isBuying.current = true;
+
+        // Now safe to proceed with buying seeds
+        await buyWithoutGasStation();
         setStatus("none");
       } catch (err) {
         console.log("Error in BuySeeds:", err);
@@ -232,6 +221,7 @@ export default function BuySeeds({
         toast.error("Failed to buy seeds :( Please try again.");
       } finally {
         setCanMove(true);
+        isBuying.current = false;
       }
     } else {
       console.log("ERROR: contract missing");
@@ -269,7 +259,7 @@ export default function BuySeeds({
           </Button>
         </div>
       )}
-      {status === "none" && !showNoFunds && (
+      {status === "none" && (
         <>
           <div className="market-header">Buy Seeds</div>
           <Button
@@ -283,9 +273,6 @@ export default function BuySeeds({
             Buy 10 seeds
           </Button>
         </>
-      )}
-      {status === "none" && !hasFunds && showNoFunds && (
-        <NoFundsMessage onRecheck={getBalance} />
       )}
     </>
   );

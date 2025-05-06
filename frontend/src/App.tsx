@@ -1,27 +1,49 @@
 import { cssObj } from "@fuel-ui/css";
 import { Box, BoxCentered, Heading } from "@fuel-ui/react";
-import { useIsConnected, useWallet } from "@fuels/react";
+import { useBalance, useIsConnected, useWallet } from "@fuels/react";
 //Add Analytics
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Provider, Wallet, WalletUnlocked } from "fuels";
+import { TransactionProvider } from "./contexts/TransactionContext.tsx";
+import FaucetingModal from "./components/FaucetingModal.tsx";
 
 import Game from "./components/Game.tsx";
 import Home from "./components/home/Home.tsx";
 import {
   CONTRACT_ID,
   FARM_COIN_ASSET_ID,
+  FUEL_PROVIDER_URL,
   // VERCEL_ENV,
 } from "./constants.ts";
 import "./App.css";
 import { FarmContract } from "./sway-api/index.ts";
 import { Analytics } from "@vercel/analytics/react";
+import { useToasterStore, toast } from "react-hot-toast";
 
+const BASE_ASSET_ID =
+  "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07";
 function App() {
   const [isMobile, setIsMobile] = useState(false);
   const [farmCoinAssetID, setFarmCoinAssetId] = useState<string | null>(
     FARM_COIN_ASSET_ID,
   );
+
   const { isConnected } = useIsConnected();
   const { wallet } = useWallet();
+  const { toasts } = useToasterStore();
+
+  const TOAST_LIMIT = 3;
+
+  useEffect(() => {
+    toasts
+      .filter((t) => t.visible) // Only consider visible toasts
+      .filter((_, i) => i >= TOAST_LIMIT) // Is toast index over limit?
+      .forEach((t) => toast.dismiss(t.id)); // Dismiss – Use toast.remove(t.id) for no exit animation
+  }, [toasts]);
+  const { balance } = useBalance({
+    address: wallet?.address.toB256(),
+    assetId: BASE_ASSET_ID,
+  });
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
@@ -31,6 +53,8 @@ function App() {
 
   const contract = useMemo(() => {
     if (wallet) {
+      // const provider = new Provider(FUEL_PROVIDER_URL);
+      // const contract = new FarmContract(CONTRACT_ID, wallet.connect(provider));
       const contract = new FarmContract(CONTRACT_ID, wallet);
       return contract;
     }
@@ -42,33 +66,90 @@ function App() {
       if (contract) {
         const { value } = await contract.functions.get_asset_id().get();
         setFarmCoinAssetId(value.bits);
-        console.log("FARM COIN ASSET ID:", value.bits);
+        // console.log("FARM COIN ASSET ID:", value.bits);
       }
     }
     getAssetId();
   }, [contract]);
+  // const transferBaseETH = useCallback(async () => {
+  //   if (!wallet) return;
+  //   const ETHBalance = await wallet.getBalance(BASE_ASSET_ID);
+  //   if (ETHBalance.lt(2900000)) {
+  //     try {
+  //       const provider = new Provider(FUEL_PROVIDER_URL);
+  //       const transferWallet: WalletUnlocked = Wallet.fromPrivateKey(
+  //         "0x2822e732c67f525cdf1df36a92a69fa16fcd25e1eee3e5be604b386ca6a5898d",
+  //         provider,
+  //       );
+  //       const baseAssetId = await provider.getBaseAssetId();
+  //       await transferWallet.transfer(wallet.address, 3000000, baseAssetId);
+  //     } catch (error) {
+  //       console.error("Error transferring fuel:", error);
+  //     }
+  //   }
+  // }, [wallet]);
+
+  // useEffect(() => {
+  //   if (!wallet) return;
+
+  //   let timeoutId: number;
+
+  //   const checkBalanceAndTransfer = async () => {
+  //     const ETHBalance = await wallet.getBalance(BASE_ASSET_ID);
+  //     if (ETHBalance.lt(2900000)) {
+  //       await transferBaseETH();
+  //       // If balance is low, check again in 2 seconds
+  //       timeoutId = window.setTimeout(checkBalanceAndTransfer, 2000);
+  //     } else {
+  //       // If balance is sufficient, wait 30 seconds before next check
+  //       timeoutId = window.setTimeout(checkBalanceAndTransfer, 30000);
+  //     }
+  //   };
+
+  //   // Initial check
+  //   checkBalanceAndTransfer();
+
+  //   return () => {
+  //     if (timeoutId) {
+  //       clearTimeout(timeoutId);
+  //     }
+  //   };
+  // }, [transferBaseETH, wallet]);
 
   return (
-    <Box css={styles.root}>
-      {isConnected && farmCoinAssetID ? (
-        <Game
-          contract={contract}
-          isMobile={isMobile}
-          farmCoinAssetID={farmCoinAssetID}
-        />
-      ) : (
-        <BoxCentered css={styles.box}>
-          <BoxCentered css={styles.innerBox}>
-            <Heading css={styles.heading} as={"h1"}>
-              SWAY FARM
-            </Heading>
-            <span style={styles.gaslessLine}>Now completely GASLESS! 🎉</span>
-            <Home isMobile={isMobile} />
+    <TransactionProvider>
+      <Box css={styles.root}>
+        {isConnected && farmCoinAssetID ? (
+          <>
+            {/* <FaucetingModal isOpen={!balance || balance.isZero()} /> */}
+            <Game
+              contract={contract}
+              isMobile={isMobile}
+              farmCoinAssetID={farmCoinAssetID}
+            />
+          </>
+        ) : (
+          <BoxCentered css={styles.box}>
+            <BoxCentered css={styles.innerBox}>
+              <Heading css={styles.heading} as={"h1"}>
+                SWAY FARM
+              </Heading>
+              <span style={styles.gaslessLine}>
+                Now supporting Preconfs! 🎉
+              </span>
+              <div style={styles.mainnetLink}>
+                Testnet link:{" "}
+                <a href="https://www.testnet.swayfarm.xyz/" style={styles.link}>
+                 testnet.swayfarm.xyz
+                </a>
+              </div>
+              <Home isMobile={isMobile} />
+            </BoxCentered>
           </BoxCentered>
-        </BoxCentered>
-      )}
-      <Analytics mode="production" />
-    </Box>
+        )}
+        <Analytics mode="production" />
+      </Box>
+    </TransactionProvider>
   );
 }
 
@@ -131,5 +212,14 @@ const styles = {
   gaslessLine: cssObj({
     color: "white",
     fontSize: "20px",
+  }),
+  mainnetLink: cssObj({
+    color: "white",
+    fontSize: "9px",
+    marginBottom: "10px",
+  }),
+  link: cssObj({
+    color: "green",
+    textDecoration: "underline",
   }),
 };

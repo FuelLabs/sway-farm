@@ -4,8 +4,8 @@ import type { KeyboardControlsEntry } from "@react-three/drei";
 import { KeyboardControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { BN } from "fuels";
-import type { BytesLike } from "fuels";
-import { useState, useEffect, useMemo, Suspense } from "react";
+import type { BytesLike, ResolvedOutput } from "fuels";
+import { useState, useEffect, useMemo, Suspense, useRef } from "react";
 import type { FoodOutput } from "../sway-api/contracts/FarmContract";
 
 import type { Modals } from "../constants";
@@ -29,6 +29,7 @@ import HarvestModal from "./modals/HarvestModal";
 import MarketModal from "./modals/MarketModal";
 import PlantModal from "./modals/PlantModal";
 import Info from "./show/Info";
+// import MainnetCTA from "./show/MainnetCTA";
 
 interface GameProps {
   contract: FarmContract | null;
@@ -61,13 +62,27 @@ export default function Game({
   const [seeds, setSeeds] = useState<number>(0);
   const [items, setItems] = useState<number>(0);
   const [canMove, setCanMove] = useState<boolean>(true);
+  const [firstTime, setFirstTime] = useState<boolean>(true);
   const [playerPosition, setPlayerPosition] = useState<Position>("left-top");
   const [mobileControlState, setMobileControlState] =
     useState<MobileControls>("none");
+  const lastETHResolvedOutput = useRef<ResolvedOutput[] | null>(null);
+  const lastFARMResolvedOutput = useRef<ResolvedOutput[] | null>(null);
+  const isTransactionInProgress = useRef<boolean>(false);
+
+  // const contract = useMemo(() => {
+  //   if (wallet) {
+  //     // const provider = new Provider(FUEL_PROVIDER_URL);
+  //     // const contract = new FarmContract(CONTRACT_ID, wallet.connect(provider));
+  //     const contract = new FarmContract(CONTRACT_ID, wallet);
+  //     return contract;
+  //   }
+  //   return null;
+  // }, [wallet]);
 
   useEffect(() => {
     async function getPlayerInfo() {
-      if (contract && contract.account) {
+      if (contract && contract.account && firstTime) {
         try {
           const address: AddressInput = {
             bits: contract.account.address.toB256(),
@@ -78,6 +93,7 @@ export default function Game({
           const { value: Some } = await contract.functions.get_player(id).get();
           if (Some?.farming_skill.gte(1)) {
             setPlayer(Some);
+            setFirstTime(false);
             const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
             // if there is a player found, get the rest of the player info
             const { value: results } = await contract
@@ -102,12 +118,12 @@ export default function Game({
     getPlayerInfo();
 
     // fetches player info 30 seconds
-    const interval = setInterval(() => {
-      setUpdateNum(updateNum + 1);
-    }, 20000);
+    // const interval = setInterval(() => {
+    //   setUpdateNum(updateNum + 1);
+    // }, 20000);
 
-    return () => clearInterval(interval);
-  }, [contract, updateNum]);
+    // return () => clearInterval(interval);
+  }, [updateNum, contract, firstTime]);
 
   const updatePageNum = () => {
     setTimeout(() => {
@@ -195,13 +211,17 @@ export default function Game({
                 <KeyboardControls map={controlsMap}>
                   <Player
                     tileStates={tileStates}
+                    contract={contract}
                     modal={modal}
                     setModal={setModal}
                     setTileArray={setTileArray}
                     setPlayerPosition={setPlayerPosition}
                     playerPosition={playerPosition}
                     canMove={canMove}
+                    lastETHResolvedOutput={lastETHResolvedOutput}
+                    lastFARMResolvedOutput={lastFARMResolvedOutput}
                     mobileControlState={mobileControlState}
+                    isTransactionInProgress={isTransactionInProgress}
                   />
                 </KeyboardControls>
               )}
@@ -223,6 +243,7 @@ export default function Game({
             items={items}
             farmCoinAssetID={farmCoinAssetID}
           />
+          {/* <MainnetCTA /> */}
 
           {player !== null && (
             <>
@@ -236,6 +257,8 @@ export default function Game({
                   setCanMove={setCanMove}
                   setModal={setModal}
                   onPlantSuccess={handlePlantSuccess}
+                  lastETHResolvedOutput={lastETHResolvedOutput}
+                  isTransactionInProgress={isTransactionInProgress}
                 />
               )}
               {modal === "harvest" && (
@@ -246,6 +269,8 @@ export default function Game({
                   setCanMove={setCanMove}
                   setModal={setModal}
                   onHarvestSuccess={onHarvestSuccess}
+                  lastETHResolvedOutput={lastETHResolvedOutput}
+                  isTransactionInProgress={isTransactionInProgress}
                 />
               )}
 
@@ -254,9 +279,12 @@ export default function Game({
                   contract={contract}
                   updatePageNum={updatePageNum}
                   items={items}
+                  setItems={setItems}
                   setCanMove={setCanMove}
                   farmCoinAssetID={farmCoinAssetID}
                   onBuySuccess={handleBuySuccess}
+                  lastETHResolvedOutput={lastETHResolvedOutput}
+                  isTransactionInProgress={isTransactionInProgress}
                 />
               )}
             </>

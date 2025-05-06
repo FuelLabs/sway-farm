@@ -63,12 +63,11 @@ export const UnsupportedWalletsNoticeModal = ({
       >
         <div style={styles.title}>Wallet Support Notice</div>
         <div style={styles.text}>
-          Note: Gasless transactions are currently only supported for the Burner
-          wallet & Fuelet Wallet.
+          Note: Swayfarm with pre-confirmations is only supported for the Burner
+          wallet to ensure a smooth experience.
           <br />
           <br />
-          Support for other wallets is coming soon. If you use these other
-          wallets, you can still play the game by paying gas fees yourself.
+          Support for other wallets is coming soon.
         </div>
         <button onClick={onClose} style={styles.button}>
           Continue

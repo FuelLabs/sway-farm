@@ -1,7 +1,7 @@
 import { cssObj } from "@fuel-ui/css";
 import type { Asset, BN, NetworkFuel } from "fuels";
 import { Vector3 } from "three";
-import { useCurrentConnector } from "@fuels/react";
+// import { useCurrentConnector } from "@fuels/react";
 
 // import contractIds from './sway-api/contract-ids.json';
 
@@ -16,12 +16,12 @@ export const CONTRACT_ID =
   // VERCEL_ENV === 'development'
   // ? contractIds.contract
   // :
-  "0xe774c453cc4a4e9c346441984a5db6ed6292ae1f14cae6530eb4b4e89ced4414";
+  "0xd20c003853156dc6b03f0cd88725efebdc1d8c02b4ff80389072981a5f070ae0";
 
 export const FARM_COIN_ASSET_ID =
   // VERCEL_ENV === 'development'
   // ? null :
-  "0x64019f1305cfb7e76440a335cb082aaf173c9cfb9a710e38fedce1c1ea023b61";
+  "0xfb8182e8b620e5043d3e739b08b4c21afdc6e0b010ef2f89f9d700a70d3e7e8e";
 
 export const GAS_STATION_CHANGE_OUTPUT_ADDRESS =
   "0xF9B62E7eA61219e4b82561abce1AbF4b1D581539B1505C02A7Fe92D6B4C61d1B";
@@ -30,7 +30,7 @@ export const FARM_COIN_NETWORK_ASSET = {
   /** type of network */
   type: "fuel",
   /** chain id of the network */
-  chainId: 1,
+  chainId: 0,
   /** number of decimals of the asset */
   decimals: 9,
   /** assetId on the Fuel Network */
@@ -97,9 +97,10 @@ export enum FoodTypeInput {
 }
 
 export function useGaslessWalletSupported() {
-  const { currentConnector } = useCurrentConnector();
-  return (
-    currentConnector?.name === "Fuelet Wallet" ||
-    currentConnector?.name === "Burner Wallet"
-  );
+  // const { currentConnector } = useCurrentConnector();
+  return false;
+  // return (
+  //   currentConnector?.name === "Fuelet Wallet" ||
+  //   currentConnector?.name === "Burner Wallet"
+  // );
 }

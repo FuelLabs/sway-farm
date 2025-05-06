@@ -1,8 +1,8 @@
 export const CustomSuccessIcon = () => (
-  <div className="flex items-center justify-center w-7 h-7">
+  <div className="flex items-center justify-center w-5 h-5">
     <svg
-      width="26"
-      height="26"
+      width="17"
+      height="17"
       viewBox="0 0 26 26"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -16,10 +16,10 @@ export const CustomSuccessIcon = () => (
 );
 
 export const CustomErrorIcon = () => (
-  <div className="flex items-center justify-center w-7 h-7">
+  <div className="flex items-center justify-center w-5 h-5">
     <svg
-      width="26"
-      height="26"
+      width="17"
+      height="17"
       viewBox="0 0 26 26"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

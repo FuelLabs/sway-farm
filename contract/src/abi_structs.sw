@@ -10,6 +10,12 @@ abi GameContract {
     // get asset ID
     fn get_asset_id() -> AssetId;
 
+    #[storage(read, write)]
+    fn set_player_position(x: u64, y: u64, address: Identity);
+
+    #[storage(read)]
+    fn get_player_position(address: Identity) -> PlayerPosition;
+
     // level up farming skill
     #[storage(read, write)]
     fn level_up(address: Identity);
@@ -377,6 +383,11 @@ pub struct LevelUp {
     pub player_info: Player,
 }
 
+pub struct PlayerPosition {
+    pub x: u64,
+    pub y: u64,
+}
+
 pub struct BuySeeds {
     pub address: Identity,
     pub food_type: FoodType,
@@ -406,3 +417,4 @@ pub struct SellItem {
     pub value_sold: u64,
     pub player_info: Player
 }
+

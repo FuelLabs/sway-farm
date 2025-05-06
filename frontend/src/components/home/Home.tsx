@@ -12,11 +12,11 @@ interface HomeProps {
 
 export default function Home({ isMobile }: HomeProps) {
   const { connect, isConnecting } = useConnectUI();
-  const [isUnsupportedWalletModalOpen, setIsUnsupportedWalletModalOpen] =
-    useState(false);
+  // const [isUnsupportedWalletModalOpen, setIsUnsupportedWalletModalOpen] =
+  //   useState(false);
 
   const onConnectPress = () => {
-    setIsUnsupportedWalletModalOpen(true);
+    connect();
   };
 
   return (
@@ -61,13 +61,13 @@ export default function Home({ isMobile }: HomeProps) {
           </div>
         </Box>
       </Box>
-      <UnsupportedWalletsNoticeModal
+      {/* <UnsupportedWalletsNoticeModal
         isOpen={isUnsupportedWalletModalOpen}
         onClose={() => {
           setIsUnsupportedWalletModalOpen(false);
           connect();
         }}
-      />
+      /> */}
     </div>
   );
 }

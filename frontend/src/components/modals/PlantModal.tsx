@@ -1,23 +1,15 @@
 import { Button } from "@fuel-ui/react";
 import type { Dispatch, SetStateAction } from "react";
-import { useState, useEffect } from "react";
-import { useWalletFunds } from "../../hooks/useWalletFunds";
-import { NoFundsMessage } from "./NoFundsMessage";
-
-import {
-  buttonStyle,
-  FoodTypeInput,
-  FUEL_PROVIDER_URL,
-  useGaslessWalletSupported,
-  // GAS_STATION_CHANGE_OUTPUT_ADDRESS,
-} from "../../constants";
+import { useState, useEffect, useRef } from "react";
+import { buttonStyle, FoodTypeInput } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts";
 import type { Modals } from "../../constants";
 import Loading from "../Loading";
-import { Address, Provider } from "fuels";
 import { useWallet } from "@fuels/react";
-import { usePaymaster } from "../../hooks/usePaymaster";
 import { toast } from "react-hot-toast";
+import { useTransaction } from "../../hooks/useTransaction";
+import type { ResolvedOutput } from "fuels";
+import { bn } from "fuels";
 
 interface PlantModalProps {
   contract: FarmContract | null;
@@ -27,6 +19,8 @@ interface PlantModalProps {
   setCanMove: Dispatch<SetStateAction<boolean>>;
   onPlantSuccess: (position: number) => void;
   setModal: Dispatch<SetStateAction<Modals>>;
+  lastETHResolvedOutput: React.MutableRefObject<ResolvedOutput[] | null>;
+  isTransactionInProgress: React.MutableRefObject<boolean>;
 }
 
 export default function PlantModal({
@@ -37,17 +31,21 @@ export default function PlantModal({
   setCanMove,
   onPlantSuccess,
   setModal,
+  lastETHResolvedOutput,
+  isTransactionInProgress,
 }: PlantModalProps) {
   const [status, setStatus] = useState<
     "error" | "none" | "loading" | "retrying" | "accelerating"
   >("none");
   const { wallet } = useWallet();
-  const paymaster = usePaymaster();
-  const isGaslessSupported = useGaslessWalletSupported();
-  const { hasFunds, showNoFunds, getBalance, showNoFundsMessage } =
-    useWalletFunds(contract);
-  const dollarFarmAssetID =
-    "0x9858ea1307794a769dc91aaad7dc7ddb9fa29dadb08345ba82c8f762b2eb0c97";
+  const { otherTransactionDone, setOtherTransactionDone } = useTransaction();
+  const currentTileArrayRef = useRef(tileArray);
+
+  // Update the ref whenever tileArray changes
+  useEffect(() => {
+    currentTileArrayRef.current = tileArray;
+  }, [tileArray]);
+
   useEffect(() => {
     const handleGlobalKeyDown = (e: globalThis.KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -55,8 +53,10 @@ export default function PlantModal({
 
         if (status === "error") {
           setStatus("none");
-        } else if (status === "none" && !showNoFunds && seeds > 0) {
-          handlePlant();
+        } else if (status === "none" && seeds > 0) {
+          // Use the current tileArray value from the ref
+          const currentTileArray = currentTileArrayRef.current;
+          handlePlant(currentTileArray[0]);
         }
       }
     };
@@ -65,172 +65,113 @@ export default function PlantModal({
     return () => {
       window.removeEventListener("keydown", handleGlobalKeyDown);
     };
-  }, [status, showNoFunds, seeds]);
+  }, [status, seeds]);
 
-  async function plantWithoutGasStation() {
+  async function plantWithoutGasStation(tileIndex: number) {
     if (!wallet || !contract) throw new Error("Wallet or contract not found");
 
     const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
     const addressIdentityInput = {
       Address: {
-        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
+        bits: wallet.address.toB256(),
       },
     };
 
-    const balance = Number(await wallet.getBalance(dollarFarmAssetID));
-
-    let tx;
-    if (balance > 10) {
-      // If balance is greater than 10, use accelerate_plant_seed_at_index
-      tx = await contract.functions
-        .accelerate_plant_seed_at_index(
-          seedType,
-          tileArray[0],
-          addressIdentityInput,
-        )
-        .callParams({
-          forward: [10, dollarFarmAssetID],
+    if (
+      !lastETHResolvedOutput.current ||
+      lastETHResolvedOutput.current.length === 0 ||
+      otherTransactionDone
+    ) {
+      // First transaction or if other transaction is done
+      const request = await contract.functions
+        .plant_seed_at_index(seedType, tileIndex, addressIdentityInput)
+        .txParams({
+          maxFee: 500_000,
+          gasLimit: 500_000,
         })
-        .call();
-    } else {
-      console.log("planting without gas station");
-      // Otherwise, use plant_seed_at_index
-      tx = await contract.functions
-        .plant_seed_at_index(seedType, tileArray[0], addressIdentityInput)
-        .call();
-    }
+        .fundWithRequiredCoins();
 
-    if (tx) {
-      onPlantSuccess(tileArray[0]);
-      setModal("none");
-      toast.success(() => (
-        <div
-          onClick={() =>
-            window.open(
-              `https://app.fuel.network/tx/${tx.transactionId}/simple`,
-              "_blank",
-            )
-          }
-          style={{ cursor: "pointer", textDecoration: "underline" }}
-        >
-          Seed Planted!
-        </div>
-      ));
-      updatePageNum();
-    }
-    return tx;
-  }
+      const txId = request.getTransactionId(0);
+      const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
 
-  async function plantWithGasStation() {
-    if (!wallet || !contract) throw new Error("Wallet or contract not found");
-
-    const provider = await Provider.create(FUEL_PROVIDER_URL);
-    const { maxValuePerCoin } = await paymaster.metadata();
-    const { coin: gasCoin, jobId } = await paymaster.allocate();
-
-    const seedType: FoodTypeInput = FoodTypeInput.Tomatoes;
-    const addressIdentityInput = {
-      Address: {
-        bits: Address.fromAddressOrString(wallet.address.toString()).toB256(),
-      },
-    };
-
-    const balance = Number(await wallet.getBalance(dollarFarmAssetID));
-    console.log(balance);
-
-    let tx;
-    if (balance < 10) {
-      const scope = contract.functions.plant_seed_at_index(
-        seedType,
-        tileArray[0],
-        addressIdentityInput,
-      );
-      const request = await scope.getTransactionRequest();
-      request.addCoinInput(gasCoin);
-      request.addCoinOutput(
-        gasCoin.owner,
-        gasCoin.amount.sub(maxValuePerCoin),
-        provider.getBaseAssetId(),
-      );
-      request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
-
-      const txCost = await wallet.getTransactionCost(request);
-      const { gasUsed, maxFee } = txCost;
-      request.gasLimit = gasUsed;
-      request.maxFee = maxFee;
-
-      const { signature } = await paymaster.fetchSignature(request, jobId);
-      request.updateWitnessByOwner(gasCoin.owner, signature);
-
-      tx = await wallet.sendTransaction(request);
-    } else {
-      setStatus("accelerating");
-      const scope = contract.functions
-        .accelerate_plant_seed_at_index(
-          seedType,
-          tileArray[0],
-          addressIdentityInput,
-        )
-        .callParams({
-          forward: [10, dollarFarmAssetID],
-        });
-      const request = await scope.getTransactionRequest();
-      const { coins } = await wallet.getCoins(dollarFarmAssetID);
-
-      // request.addCoinInput(coins[0]);
-      const resources = await wallet.getResourcesToSpend([
-        { amount: 10, assetId: dollarFarmAssetID },
-      ]);
-      request.addResources(resources);
-      request.addChangeOutput(wallet.address, dollarFarmAssetID);
-      request.addCoinInput(gasCoin);
-      request.addCoinOutput(
-        gasCoin.owner,
-        gasCoin.amount.sub(maxValuePerCoin),
-        provider.getBaseAssetId(),
-      );
-      request.addChangeOutput(gasCoin.owner, provider.getBaseAssetId());
-
-      const txCost = await wallet.getTransactionCost(request, {
-        quantities: coins,
-      });
-      const { gasUsed, missingContractIds, outputVariables, maxFee } = txCost;
-      console.log("Max fee", Number(maxFee), "gas used", Number(gasUsed));
-      missingContractIds.forEach((contractId) => {
-        request.addContractInputAndOutput(Address.fromString(contractId));
-      });
-
-      request.addVariableOutputs(outputVariables);
-      request.gasLimit = gasUsed;
-      request.maxFee = maxFee;
-
-      const { signature } = await paymaster.fetchSignature(request, jobId);
-      request.updateWitnessByOwner(gasCoin.owner, signature);
-
-      tx = await wallet.sendTransaction(request);
-    }
-
-    if (tx) {
-      onPlantSuccess(tileArray[0]);
-      if (balance > 10) {
-        await paymaster.postJobComplete(jobId);
+      const tx = await wallet.sendTransaction(request);
+      if (!tx) throw new Error("Failed to send transaction");
+      setOtherTransactionDone(false);
+      const preConfirmation = await tx.waitForPreConfirmation();
+      if (preConfirmation.resolvedOutputs) {
+        lastETHResolvedOutput.current = preConfirmation.resolvedOutputs;
       }
+
+      onPlantSuccess(tileIndex);
       setModal("none");
-      updatePageNum();
       toast.success(() => (
         <div
-          onClick={() =>
-            window.open(`https://app.fuel.network/tx/${tx.id}/simple`, "_blank")
-          }
+          onClick={() => window.open(txUrl, "_blank")}
           style={{ cursor: "pointer", textDecoration: "underline" }}
         >
           Seed Planted!
         </div>
       ));
+      if (tx.id.startsWith("fuel01")) {
+        updatePageNum();
+      }
+      return tx;
+    } else {
+      // Subsequent transaction
+      // console.log("subsequent transaction");
+      const [{ utxoId, output }] = lastETHResolvedOutput.current;
+      const change = output as unknown as {
+        assetId: string;
+        amount: string;
+      };
+      const resource = {
+        id: utxoId,
+        assetId: change.assetId,
+        amount: bn(change.amount),
+        owner: wallet?.address,
+        blockCreated: bn(0),
+        txCreatedIdx: bn(0),
+      };
+
+      const request = await contract.functions
+        .plant_seed_at_index(seedType, tileIndex, addressIdentityInput)
+        .txParams({
+          maxFee: 500_000,
+          gasLimit: 500_000,
+        })
+        .getTransactionRequest();
+
+      request.addResource(resource);
+      const txId = request.getTransactionId(0);
+      const txUrl = `https://app.fuel.network/tx/${txId}/simple`;
+
+      const tx = await wallet.sendTransaction(request);
+      if (!tx) throw new Error("Failed to send transaction");
+      const preConfirmation = await tx.waitForPreConfirmation();
+      // console.log("preConfirmation", preConfirmation);
+      // console.log("tx", tx);
+      if (preConfirmation.resolvedOutputs) {
+        lastETHResolvedOutput.current = preConfirmation.resolvedOutputs;
+      }
+
+      onPlantSuccess(tileIndex);
+      setModal("none");
+      toast.success(() => (
+        <div
+          onClick={() => window.open(txUrl, "_blank")}
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+        >
+          Seed Planted!
+        </div>
+      ));
+      if (tx.id.startsWith("fuel01")) {
+        updatePageNum();
+      }
+      return tx;
     }
   }
 
-  async function handlePlant() {
+  async function handlePlant(tileIndex: number) {
     if (!wallet) {
       throw new Error("No wallet found");
     }
@@ -238,37 +179,24 @@ export default function PlantModal({
       try {
         setStatus("loading");
         setCanMove(false);
-        const canUseGasless = await paymaster.shouldUseGasless();
-        if (!canUseGasless) {
-          toast.error(
-            "Hourly gasless transaction limit reached. Trying regular transaction...",
-            { duration: 5000 },
-          );
-        }
-        if (isGaslessSupported && canUseGasless) {
-          try {
-            await plantWithGasStation();
-          } catch (error) {
-            console.log(
-              "Gas station failed, trying direct transaction...",
-              error,
-            );
-            toast.error("Gas Station error, please sign from wallet.");
-            setStatus("retrying");
-            if (!hasFunds) {
-              showNoFundsMessage();
-            } else {
-              await plantWithoutGasStation();
-            }
-          }
-        } else {
-          if (!hasFunds) {
-            showNoFundsMessage();
-          } else {
-            console.log("Using direct transaction method...");
-            await plantWithoutGasStation();
-          }
-        }
+
+        // Create a promise that resolves when isTransactionInProgress becomes false
+        const waitForTransaction = () => {
+          return new Promise<void>((resolve) => {
+            const checkInterval = setInterval(() => {
+              if (!isTransactionInProgress.current) {
+                clearInterval(checkInterval);
+                resolve();
+              }
+            }, 100); // Check every 100ms
+          });
+        };
+
+        // Wait for any ongoing transaction to complete
+        await waitForTransaction();
+
+        // Now safe to proceed with planting
+        await plantWithoutGasStation(tileIndex);
 
         setStatus("none");
       } catch (err) {
@@ -288,12 +216,6 @@ export default function PlantModal({
   return (
     <div className="plant-modal">
       {status === "loading" && <Loading />}
-      {status === "accelerating" && (
-        <div>
-          <p>$FARM detected, accelerating harvest...</p>
-          <Loading />
-        </div>
-      )}
       {status === "retrying" && <Loading />}
       {status === "error" && (
         <div>
@@ -311,14 +233,14 @@ export default function PlantModal({
           </Button>
         </div>
       )}
-      {status === "none" && !showNoFunds && (
+      {status === "none" && (
         <>
           {seeds > 0 ? (
             <>
               <div style={styles.seeds}>Plant a seed here?</div>
               <Button
                 css={buttonStyle}
-                onPress={handlePlant}
+                onPress={() => handlePlant(tileArray[0])}
                 role="button"
                 tabIndex={0}
                 aria-label="Plant seed"
@@ -330,9 +252,6 @@ export default function PlantModal({
             <div>You don&apos;t have any seeds to plant.</div>
           )}
         </>
-      )}
-      {status === "none" && !hasFunds && showNoFunds && (
-        <NoFundsMessage onRecheck={getBalance} />
       )}
     </div>
   );

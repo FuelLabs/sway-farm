@@ -6,14 +6,13 @@ export function useWalletFunds(contract: FarmContract | null) {
   const [hasFunds, setHasFunds] = useState<boolean>(false);
   const [showNoFunds, setShowNoFunds] = useState<boolean>(false);
   const { wallet } = useWallet();
-
   useEffect(() => {
     getBalance();
   }, [wallet]);
 
   async function getBalance() {
     const thisWallet = wallet ?? contract?.account;
-    const baseAssetId = thisWallet?.provider.getBaseAssetId();
+    const baseAssetId = await thisWallet?.provider.getBaseAssetId();
     const balance = await thisWallet!.getBalance(baseAssetId);
     const balanceNum = balance?.toNumber();
 
