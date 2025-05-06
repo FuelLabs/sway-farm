@@ -1,7 +1,7 @@
 import { Button, Spinner, BoxCentered } from "@fuel-ui/react";
 import { type BytesLike, ResolvedOutput, bn } from "fuels";
 import type { Dispatch, SetStateAction } from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { buttonStyle, FoodTypeInput } from "../../constants";
 import type { FarmContract } from "../../sway-api/contracts/FarmContract";
 import { useWallet } from "@fuels/react";
@@ -32,7 +32,7 @@ export default function BuySeeds({
   >("none");
   const { wallet } = useWallet();
   const { otherTransactionDone, setOtherTransactionDone } = useTransaction();
-
+  const isBuying = useRef(false);
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -68,7 +68,11 @@ export default function BuySeeds({
       },
     };
 
-    if (!lastETHResolvedOutput.current || lastETHResolvedOutput.current.length === 0 || otherTransactionDone) {
+    if (
+      !lastETHResolvedOutput.current ||
+      lastETHResolvedOutput.current.length === 0 ||
+      otherTransactionDone
+    ) {
       // First transaction or if other transaction is done
       const request = await contract.functions
         .buy_seeds(seedType, inputAmount, addressIdentityInput)
@@ -80,7 +84,7 @@ export default function BuySeeds({
           forward: [price, farmCoinAssetID],
         })
         .fundWithRequiredCoins();
-      
+
       const txId = request.getTransactionId(0);
       const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
 
@@ -91,8 +95,10 @@ export default function BuySeeds({
       if (preConfirmation.resolvedOutputs) {
         // Filter to only get the output with ETH assetId
         const ethOutput = preConfirmation.resolvedOutputs.find(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (output) => (output.output as any).assetId === "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
+          (output) =>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (output.output as any).assetId ===
+            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
         );
         if (ethOutput) {
           lastETHResolvedOutput.current = [ethOutput];
@@ -101,9 +107,7 @@ export default function BuySeeds({
 
       toast.success(() => (
         <div
-          onClick={() =>
-            window.open(txUrl, "_blank")
-          }
+          onClick={() => window.open(txUrl, "_blank")}
           style={{ cursor: "pointer", textDecoration: "underline" }}
         >
           Successfully bought seeds!
@@ -140,22 +144,27 @@ export default function BuySeeds({
         .getTransactionRequest();
 
       request.addResource(resource);
-          const { coins } = await wallet.getCoins(farmCoinAssetID);
-              request.addCoinInput(coins[0]);
-              request.addChangeOutput(wallet.address, farmCoinAssetID);
+      const { coins } = await wallet.getCoins(farmCoinAssetID);
+      request.addCoinInput(coins[0]);
+      request.addChangeOutput(wallet.address, farmCoinAssetID);
       const txId = request.getTransactionId(0);
       const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
-
+      console.log("txid", `https://app-testnet.fuel.network/tx/${txId}/standard`);
       const tx = await wallet.sendTransaction(request);
       if (!tx) throw new Error("Failed to send transaction");
       const preConfirmation = await tx.waitForPreConfirmation();
       console.log("preConfirmation", preConfirmation);
       console.log("tx", tx);
+      if (preConfirmation.isStatusSuccess) {
+        setOtherTransactionDone(true);
+      }
       if (preConfirmation.resolvedOutputs) {
         // Filter to only get the output with ETH assetId
         const ethOutput = preConfirmation.resolvedOutputs.find(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (output) => (output.output as any).assetId === "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
+          (output) =>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (output.output as any).assetId ===
+            "0xf8f8b6283d7fa5b672b530cbb84fcccb4ff8dc40f8176ef4544ddb1f1952ad07"
         );
         if (ethOutput) {
           lastETHResolvedOutput.current = [ethOutput];
@@ -164,9 +173,7 @@ export default function BuySeeds({
 
       toast.success(() => (
         <div
-          onClick={() =>
-            window.open(txUrl, "_blank")
-          }
+          onClick={() => window.open(txUrl, "_blank")}
           style={{ cursor: "pointer", textDecoration: "underline" }}
         >
           Successfully bought seeds!
@@ -190,7 +197,7 @@ export default function BuySeeds({
         const waitForTransaction = () => {
           return new Promise<void>((resolve) => {
             const checkInterval = setInterval(() => {
-              if (!isTransactionInProgress.current) {
+              if (!isTransactionInProgress.current && !isBuying.current) {
                 clearInterval(checkInterval);
                 resolve();
               }
@@ -200,7 +207,8 @@ export default function BuySeeds({
 
         // Wait for any ongoing transaction to complete
         await waitForTransaction();
-        
+        isBuying.current = true;
+
         // Now safe to proceed with buying seeds
         await buyWithoutGasStation();
         setStatus("none");
@@ -210,6 +218,7 @@ export default function BuySeeds({
         toast.error("Failed to buy seeds :( Please try again.");
       } finally {
         setCanMove(true);
+        isBuying.current = false;
       }
     } else {
       console.log("ERROR: contract missing");
