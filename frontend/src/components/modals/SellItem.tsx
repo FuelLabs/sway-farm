@@ -82,7 +82,7 @@ export default function SellItem({
       const request = await contract.functions
         .sell_item(seedType, inputAmount, addressIdentityInput)
         .txParams({
-          maxFee: 500_000,
+          maxFee: 10_000,
           gasLimit: 500_000,
         })
         .fundWithRequiredCoins();
@@ -137,7 +137,7 @@ export default function SellItem({
       const request = await contract.functions
         .sell_item(seedType, inputAmount, addressIdentityInput)
         .txParams({
-          maxFee: 500_000,
+          maxFee: 10_000,
           gasLimit: 500_000,
         })
         .getTransactionRequest();

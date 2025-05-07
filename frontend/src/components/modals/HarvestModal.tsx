@@ -89,7 +89,7 @@ export default function HarvestModal({
       const request = await contract.functions
         .harvest([tileIndex], addressIdentityInput)
         .txParams({
-          maxFee: 500_000,
+          maxFee: 10_000,
           gasLimit: 500_000,
         })
         .fundWithRequiredCoins();
@@ -139,7 +139,7 @@ export default function HarvestModal({
       const request = await contract.functions
         .harvest([tileIndex], addressIdentityInput)
         .txParams({
-          maxFee: 500_000,
+          maxFee: 10_000,
           gasLimit: 500_000,
         })
         .getTransactionRequest();

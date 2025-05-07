@@ -86,7 +86,7 @@ export default function PlantModal({
       const request = await contract.functions
         .plant_seed_at_index(seedType, tileIndex, addressIdentityInput)
         .txParams({
-          maxFee: 500_000,
+          maxFee: 10_000,
           gasLimit: 500_000,
         })
         .fundWithRequiredCoins();
@@ -136,7 +136,7 @@ export default function PlantModal({
       const request = await contract.functions
         .plant_seed_at_index(seedType, tileIndex, addressIdentityInput)
         .txParams({
-          maxFee: 500_000,
+          maxFee: 10_000,
           gasLimit: 500_000,
         })
         .getTransactionRequest();

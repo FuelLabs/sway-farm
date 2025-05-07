@@ -33,6 +33,7 @@ export default function BuySeeds({
   const { wallet } = useWallet();
   const { otherTransactionDone, setOtherTransactionDone } = useTransaction();
   const isBuying = useRef(false);
+  const lastFARMResolvedOutput = useRef<ResolvedOutput[] | null>(null);
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " ") {
@@ -71,13 +72,15 @@ export default function BuySeeds({
     if (
       !lastETHResolvedOutput.current ||
       lastETHResolvedOutput.current.length === 0 ||
-      otherTransactionDone
+      otherTransactionDone ||
+      !lastFARMResolvedOutput.current ||
+      lastFARMResolvedOutput.current.length === 0
     ) {
       // First transaction or if other transaction is done
       const request = await contract.functions
         .buy_seeds(seedType, inputAmount, addressIdentityInput)
         .txParams({
-          maxFee: 500_000,
+          maxFee: 100_00,
           gasLimit: 500_000,
         })
         .callParams({
@@ -103,6 +106,14 @@ export default function BuySeeds({
         if (ethOutput) {
           lastETHResolvedOutput.current = [ethOutput];
         }
+        const farmOutput = preConfirmation.resolvedOutputs.find(
+          (output) =>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (output.output as any).assetId === farmCoinAssetID,
+        );
+        if (farmOutput) {
+          lastFARMResolvedOutput.current = [farmOutput];
+        }
       }
 
       toast.success(() => (
@@ -119,7 +130,13 @@ export default function BuySeeds({
       // Subsequent transaction
       // console.log("subsequent transaction");
       const [{ utxoId, output }] = lastETHResolvedOutput.current;
+      const [{ utxoId: farmUtxoId, output: farmOutput }] =
+        lastFARMResolvedOutput.current;
       const change = output as unknown as {
+        assetId: string;
+        amount: string;
+      };
+      const farmChange = farmOutput as unknown as {
         assetId: string;
         amount: string;
       };
@@ -131,11 +148,19 @@ export default function BuySeeds({
         blockCreated: bn(0),
         txCreatedIdx: bn(0),
       };
+      const farmResource = {
+        id: farmUtxoId,
+        assetId: farmChange.assetId,
+        amount: bn(farmChange.amount),
+        owner: wallet?.address,
+        blockCreated: bn(0),
+        txCreatedIdx: bn(0),
+      };
 
       const request = await contract.functions
         .buy_seeds(seedType, inputAmount, addressIdentityInput)
         .txParams({
-          maxFee: 500_000,
+          maxFee: 10_000,
           gasLimit: 500_000,
         })
         .callParams({
@@ -144,9 +169,10 @@ export default function BuySeeds({
         .getTransactionRequest();
 
       request.addResource(resource);
-      const { coins } = await wallet.getCoins(farmCoinAssetID);
-      request.addCoinInput(coins[0]);
-      request.addChangeOutput(wallet.address, farmCoinAssetID);
+      request.addResource(farmResource);
+      // const { coins } = await wallet.getCoins(farmCoinAssetID);
+      // request.addCoinInput(coins[0]);
+      // request.addChangeOutput(wallet.address, farmCoinAssetID);
       const txId = request.getTransactionId(0);
       const txUrl = `https://app-testnet.fuel.network/tx/${txId}/simple`;
       console.log(
@@ -171,6 +197,14 @@ export default function BuySeeds({
         );
         if (ethOutput) {
           lastETHResolvedOutput.current = [ethOutput];
+        }
+        const farmOutput = preConfirmation.resolvedOutputs.find(
+          (output) =>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (output.output as any).assetId === farmCoinAssetID,
+        );
+        if (farmOutput) {
+          lastFARMResolvedOutput.current = [farmOutput];
         }
       }
 
