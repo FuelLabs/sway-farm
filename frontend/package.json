@@ -21,7 +21,7 @@
     "@vercel/analytics": "^1.4.1",
     "@wagmi/connectors": "^5.7.12",
     "@wagmi/core": "^2.16.7",
-    "axios": "^1.7.9",
+    "axios": "^1.13.5",
     "fuels": "^0.100.4",
     "ramda": "^0.30.1",
     "react": "^18.3.1",
