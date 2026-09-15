@@ -40,7 +40,7 @@ export const FARM_COIN_NETWORK_ASSET = {
 };
 
 export const FARM_COIN_ASSET: Asset = {
-  icon: "https://sway-farm.vercel.app/images/pixel-bunny.png",
+  icon: "https://swayfarm.xyz/images/pixel-bunny.png",
   name: "Sway Farm Coin",
   symbol: "FARM",
   networks: [FARM_COIN_NETWORK_ASSET as NetworkFuel],

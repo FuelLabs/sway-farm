@@ -1,0 +1,32 @@
+name: Deploy to Railway
+
+# Needs the RAILWAY_TOKEN repository secret (project token for fuel-web); the job
+# skips itself while it is missing.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: railway-sway-farm
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    steps:
+      - name: Check secret
+        id: gate
+        run: |
+          if [ -z "$RAILWAY_TOKEN" ]; then echo "RAILWAY_TOKEN not set; skipping"; echo "run=false" >> "$GITHUB_OUTPUT"; else echo "run=true" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'true'
+      - name: Install Railway CLI
+        if: steps.gate.outputs.run == 'true'
+        run: npm install -g @railway/cli@4
+      - name: railway up
+        if: steps.gate.outputs.run == 'true'
+        run: railway up --ci --service sway-farm
