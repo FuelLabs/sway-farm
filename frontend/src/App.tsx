@@ -17,7 +17,6 @@ import {
 } from "./constants.ts";
 import "./App.css";
 import { FarmContract } from "./sway-api/index.ts";
-import { Analytics } from "@vercel/analytics/react";
 import { useToasterStore, toast } from "react-hot-toast";
 
 const BASE_ASSET_ID =
@@ -147,7 +146,6 @@ function App() {
             </BoxCentered>
           </BoxCentered>
         )}
-        <Analytics mode="production" />
       </Box>
     </TransactionProvider>
   );
